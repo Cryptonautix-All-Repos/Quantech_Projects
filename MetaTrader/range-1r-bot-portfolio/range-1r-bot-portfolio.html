@@ -688,14 +688,6 @@ END IF
                                 <td>8:00-9:00 AM Mexican Time</td>
                             </tr>
                             <tr>
-                                <td>Risk Per Trade</td>
-                                <td>0.2% (configurable)</td>
-                            </tr>
-                            <tr>
-                                <td>Risk/Reward Ratio</td>
-                                <td>1:8 (configurable)</td>
-                            </tr>
-                            <tr>
                                 <td>Lookback Period</td>
                                 <td>20 ticks (configurable)</td>
                             </tr>
@@ -771,24 +763,6 @@ END IF
                 Designed for consistent performance with emphasis on capital preservation and steady growth.
             </p>
             
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <div class="metric-value">1:8</div>
-                    <div class="metric-label">Risk/Reward Ratio</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">0.2%</div>
-                    <div class="metric-label">Risk Per Trade</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">5%</div>
-                    <div class="metric-label">Daily Limit Protection</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-value">1hr</div>
-                    <div class="metric-label">Daily Trading Window</div>
-                </div>
-            </div>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin: 40px 0;">
                 <div>
@@ -940,7 +914,7 @@ END IF
     </section>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer id="contact" class="footer">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
@@ -963,9 +937,18 @@ END IF
             
             <div style="border-top: 1px solid var(--border-color); padding-top: 20px; margin-top: 30px; text-align: center;">
                 <p style="color: var(--secondary-text); font-size: 0.9rem;">
-                    This portfolio demonstrates professional trading system development capabilities. 
+                    This portfolio demonstrates professional trading system development capabilities.
                     All code and algorithms remain proprietary and confidential.
                 </p>
+                
+                <div style="margin-top: 30px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                    <a href="#contact" style="display: inline-block; background: var(--accent-text); color: white; padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: 500; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);">
+                        📧 Contact Us
+                    </a>
+                    <a href="https://portfolio.quantechinnovation.com/" target="_blank" style="display: inline-block; background: var(--gold-accent); color: var(--primary-bg); padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: 500; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);">
+                        🌐 View Portfolio
+                    </a>
+                </div>
             </div>
         </div>
     </footer>
