@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gold SMA CrossOver Strategy EA - Professional Trading System Portfolio</title>
+    <!-- Mermaid.js for diagram rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary-bg: #0a0e15;
+            --secondary-bg: #1a1f2e;
+            --accent-bg: #242938;
+            --text-primary: #e1e6ed;
+            --text-secondary: #a0a9ba;
+            --accent-color: #ffd700;
+            --success-color: #00ff88;
+            --danger-color: #ff4757;
+            --info-color: #3742fa;
+            --border-color: #2d3748;
+            --gradient-gold: linear-gradient(135deg, #ffd700, #ffed4e);
+            --gradient-success: linear-gradient(135deg, #00ff88, #00d4aa);
+            --gradient-info: linear-gradient(135deg, #3742fa, #5352ed);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 14, 21, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,215,0,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.1;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 800px;
+            padding: 0 2rem;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero .tagline {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .platform-badges {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+
+        .badge {
+            background: var(--accent-bg);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
+        }
+
+        .cta-button {
+            background: var(--gradient-gold);
+            color: var(--primary-bg);
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Sections */
+        .section {
+            padding: 5rem 0;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        /* Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .card {
+            background: var(--secondary-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.1);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .card h4 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        /* Features List */
+        .features-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--accent-bg);
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+            color: var(--success-color);
+        }
+
+        /* Technical Specs */
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .spec-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: var(--accent-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .spec-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .spec-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        /* Image Placeholders */
+        .image-placeholder {
+            background: var(--accent-bg);
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 3rem;
+            text-align: center;
+            margin: 2rem 0;
+            transition: border-color 0.3s ease;
+        }
+
+        .image-placeholder:hover {
+            border-color: var(--accent-color);
+        }
+
+        .image-placeholder .icon {
+            font-size: 4rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .image-placeholder .caption {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .image-placeholder .dimensions {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        /* Logic Flow */
+        .logic-flow {
+            background: var(--accent-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--secondary-bg);
+            border-radius: 10px;
+            border-left: 4px solid var(--info-color);
+        }
+
+        .step-number {
+            background: var(--gradient-info);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        /* Performance Section */
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .performance-item {
+            background: var(--secondary-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .performance-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--success-color);
+        }
+
+        /* Risk Disclosure */
+        .risk-disclosure {
+            background: linear-gradient(135deg, var(--danger-color), #ff6b7a);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 3rem 0;
+            color: white;
+        }
+
+        .risk-disclosure h3 {
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--secondary-bg);
+            padding: 3rem 0;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero .tagline {
+                font-size: 1.2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .cards-grid,
+            .features-list,
+            .specs-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                padding: 3rem 1rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .tab {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .tab.active {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Code snippet styling */
+        .code-snippet {
+            background: var(--primary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: var(--success-color);
+            margin: 1rem 0;
+        }
+
+        /* Mermaid diagram styling */
+        .mermaid {
+            background: transparent !important;
+        }
+
+        .logic-diagram-container .mermaid svg {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        /* Custom mermaid node styling for better integration */
+        .mermaid .node rect,
+        .mermaid .node circle,
+        .mermaid .node ellipse,
+        .mermaid .node polygon {
+            stroke-width: 2px;
+        }
+
+        .mermaid .edgePath .path {
+            stroke-width: 2px;
+        }
+
+        .mermaid .edgeLabel {
+            background-color: var(--secondary-bg);
+            border-radius: 4px;
+            padding: 2px 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">Gold SMA Strategy</div>
+            <ul class="nav-links">
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#methodology">Methodology</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#technical">Technical</a></li>
+                <li><a href="#performance">Performance</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content fade-in-up">
+            <h1>Gold SMA CrossOver Strategy EA</h1>
+            <p class="tagline">Professional Real-Time Crossover Detection System with Advanced Risk Management</p>
+            
+            <div class="platform-badges">
+                <span class="badge">MetaTrader 5</span>
+                <span class="badge">MQL5</span>
+                <span class="badge">Gold Trading</span>
+                <span class="badge">M1 Timeframe</span>
+                <span class="badge">Real-Time Execution</span>
+            </div>
+            
+            <a href="#overview" class="cta-button">Explore Strategy</a>
+        </div>
+    </section>
+
+    <!-- Executive Summary -->
+    <section id="overview" class="section">
+        <h2>Executive Summary</h2>
+        <div class="cards-grid">
+            <div class="card">
+                <span class="card-icon">📈</span>
+                <h4>What It Does</h4>
+                <p>A sophisticated SMA crossover system designed specifically for Gold trading that detects trend changes in real-time using dual Simple Moving Average crossovers (7-period and 27-period SMAs) with advanced filtering mechanisms to eliminate false signals.</p>
+            </div>
+            
+            <div class="card">
+                <span class="card-icon">⚡</span>
+                <h4>Key Innovation</h4>
+                <p>Revolutionary zero-lag crossover detection system that identifies and executes trades in real-time without waiting for candle close, combined with intelligent signal validation using candle size, body requirements, and MA touch filters.</p>
+            </div>
+            
+            <div class="card">
+                <span class="card-icon">🎯</span>
+                <h4>Primary Use Case</h4>
+                <p>Designed for active Gold traders seeking consistent trend-following entries with professional risk management. Ideal for scalping and short-term trading on M1 timeframe with robust position sizing and trailing stop functionality.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Methodology & Logic -->
+    <section id="methodology" class="section">
+        <h2>Methodology & Logic</h2>
+        
+        <h3>Conceptual Framework</h3>
+        <p>The strategy employs a dual-SMA crossover approach enhanced with multiple validation layers. Unlike traditional crossover systems that wait for candle completion, this system detects crossovers as they happen and validates them through real-time price action analysis, ensuring faster market entry while maintaining signal quality.</p>
+
+        <div class="logic-flow">
+            <h3>Core Signal Generation Process</h3>
+            
+            <div class="flow-step">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>Real-Time Crossover Detection:</strong> Continuously monitors 7-period and 27-period SMA relationships, identifying bullish (short SMA crosses above long SMA) and bearish (short SMA crosses below long SMA) crossovers as they develop.
+                </div>
+            </div>
+            
+            <div class="flow-step">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>Candle Formation Analysis:</strong> Validates that the crossover candle is forming in the correct direction (bullish candle for buy signals, bearish for sell signals) with minimum body size requirement of 30 pips to ensure momentum.
+                </div>
+            </div>
+            
+            <div class="flow-step">
+                <div class="step-number">3</div>
+                <div>
+                    <strong>Size and Quality Filters:</strong> Applies minimum candle size filter (30 pips total range) and body requirements to eliminate weak signals during low-volatility periods or market consolidation.
+                </div>
+            </div>
+            
+            <div class="flow-step">
+                <div class="step-number">4</div>
+                <div>
+                    <strong>MA Touch Filter:</strong> Optional advanced filter that rejects entries if the entry price would be too close to either moving average line, avoiding potential whipsaw scenarios.
+                </div>
+            </div>
+            
+            <div class="flow-step">
+                <div class="step-number">5</div>
+                <div>
+                    <strong>Breakout Execution:</strong> Executes trades when price breaks the high (for buys) or low (for sells) of the signal candle, confirming momentum continuation in the direction of the crossover.
+                </div>
+            </div>
+        </div>
+
+        <h3>Logic Flow Diagram</h3>
+        <div class="logic-diagram-container" style="text-align: center; margin: 2rem 0; background: var(--secondary-bg); border-radius: 15px; padding: 2rem; border: 1px solid var(--border-color);">
+            <div class="mermaid" id="strategy-logic-flow">
+                flowchart TD
+                    A[📊 Start: New Tick Received] --> B{📈 Sufficient Historical Data?<br/>Long SMA + 5 bars}
+                    B -->|No| Z[❌ Exit - Wait for Data]
+                    B -->|Yes| C[📊 Get Current & Previous<br/>SMA Values]
+                    
+                    C --> D{🔄 SMA Crossover Detected?}
+                    D -->|No Crossover| A
+                    D -->|Bullish Cross<br/>Short > Long| E[📈 Bullish Signal Detected]
+                    D -->|Bearish Cross<br/>Short < Long| F[📉 Bearish Signal Detected]
+                    
+                    E --> G{📊 Current Candle<br/>Forming Bullish?<br/>Price > Open}
+                    F --> H{📊 Current Candle<br/>Forming Bearish?<br/>Price < Open}
+                    
+                    G -->|No| I[❌ Signal Cancelled]
+                    H -->|No| I
+                    G -->|Yes| J{📏 Candle Body Size<br/>≥ 30 Pips?}
+                    H -->|Yes| K{📏 Candle Body Size<br/>≥ 30 Pips?}
+                    
+                    J -->|No| I
+                    K -->|No| I
+                    J -->|Yes| L{📏 Total Candle Size<br/>≥ Min Size Filter?}
+                    K -->|Yes| M{📏 Total Candle Size<br/>≥ Min Size Filter?}
+                    
+                    L -->|No| I
+                    M -->|No| I
+                    L -->|Yes| N{⚙️ Trade Filter<br/>Allows Buy?}
+                    M -->|Yes| O{⚙️ Trade Filter<br/>Allows Sell?}
+                    
+                    N -->|No| I
+                    O -->|No| I
+                    N -->|Yes| P[✅ BUY Signal Active<br/>Store Signal Candle]
+                    O -->|Yes| Q[✅ SELL Signal Active<br/>Store Signal Candle]
+                    
+                    P --> R[🎯 Monitor for Buy Entry]
+                    Q --> S[🎯 Monitor for Sell Entry]
+                    
+                    R --> T{💰 Price Breaks<br/>Signal Candle High?}
+                    S --> U{💰 Price Breaks<br/>Signal Candle Low?}
+                    
+                    T -->|No| V{📉 Price Below<br/>Signal Candle Low?}
+                    U -->|No| W{📈 Price Above<br/>Signal Candle High?}
+                    
+                    V -->|Yes| X[❌ Buy Signal Cancelled]
+                    W -->|Yes| Y[❌ Sell Signal Cancelled]
+                    V -->|No| T
+                    W -->|No| U
+                    
+                    T -->|Yes| AA{🎯 MA Touch Filter<br/>Enabled?}
+                    U -->|Yes| BB{🎯 MA Touch Filter<br/>Enabled?}
+                    
+                    AA -->|No| CC[🔥 Execute BUY Trade]
+                    BB -->|No| DD[🔥 Execute SELL Trade]
+                    AA -->|Yes| EE{📊 Entry Price Too Close<br/>to MA Lines?}
+                    BB -->|Yes| FF{📊 Entry Price Too Close<br/>to MA Lines?}
+                    
+                    EE -->|Yes| GG[❌ Buy Entry Rejected<br/>MA Touch Filter]
+                    FF -->|Yes| HH[❌ Sell Entry Rejected<br/>MA Touch Filter]
+                    EE -->|No| CC
+                    FF -->|No| DD
+                    
+                    CC --> II[⚙️ Calculate Position Size<br/>Risk % or Fixed Lot]
+                    DD --> JJ[⚙️ Calculate Position Size<br/>Risk % or Fixed Lot]
+                    
+                    II --> KK[🎯 Set Stop Loss<br/>Signal Candle Low]
+                    JJ --> LL[🎯 Set Stop Loss<br/>Signal Candle High + Spread]
+                    
+                    KK --> MM[🎯 Set Take Profit<br/>1:1 Risk Reward]
+                    LL --> NN[🎯 Set Take Profit<br/>1:1 Risk Reward]
+                    
+                    MM --> OO[📝 Submit BUY Order]
+                    NN --> PP[📝 Submit SELL Order]
+                    
+                    OO --> QQ{✅ Order Executed<br/>Successfully?}
+                    PP --> RR{✅ Order Executed<br/>Successfully?}
+                    
+                    QQ -->|Yes| SS[🎯 Position Management<br/>Start Monitoring]
+                    RR -->|Yes| SS
+                    QQ -->|No| TT[❌ Order Failed]
+                    RR -->|No| TT
+                    
+                    SS --> UU{📊 Trailing Stops<br/>Enabled?}
+                    UU -->|No| VV[🔄 Continue Monitoring]
+                    UU -->|Yes| WW{📈 Current P&L<br/>≥ 0.8 Risk Reward?}
+                    
+                    WW -->|No| VV
+                    WW -->|Yes| XX[🎯 Activate Trailing Stop<br/>Move SL to 0.5 RR]
+                    
+                    XX --> YY[🔄 Continue Trail Management]
+                    
+                    VV --> ZZ[🔄 Return to Tick Monitoring]
+                    YY --> ZZ
+                    TT --> ZZ
+                    I --> A
+                    X --> A
+                    Y --> A
+                    GG --> A
+                    HH --> A
+                    ZZ --> A
+                    Z --> A
+                    
+                    classDef startEnd fill:#ffd700,stroke:#000,stroke-width:2px,color:#000
+                    classDef process fill:#1a1f2e,stroke:#ffd700,stroke-width:2px,color:#e1e6ed
+                    classDef decision fill:#242938,stroke:#3742fa,stroke-width:2px,color:#e1e6ed
+                    classDef success fill:#00ff88,stroke:#000,stroke-width:2px,color:#000
+                    classDef error fill:#ff4757,stroke:#000,stroke-width:2px,color:#fff
+                    classDef signal fill:#3742fa,stroke:#ffd700,stroke-width:2px,color:#fff
+                    
+                    class A,Z,ZZ startEnd
+                    class C,II,JJ,KK,LL,MM,NN,OO,PP,SS,XX,YY,VV process
+                    class B,D,G,H,J,K,L,M,N,O,T,U,V,W,AA,BB,EE,FF,QQ,RR,UU,WW decision
+                    class P,Q,CC,DD success
+                    class I,X,Y,GG,HH,TT error
+                    class E,F signal
+            </div>
+            <div style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                <strong>Complete Decision Tree:</strong> From crossover detection through trade execution and position management
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Features -->
+    <section id="features" class="section">
+        <h2>Key Features</h2>
+        
+        <div class="features-list">
+            <div class="feature-item">
+                <span class="feature-icon">⚡</span>
+                <div>
+                    <strong>Zero-Lag Detection:</strong> Real-time crossover identification without waiting for candle close
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <span class="feature-icon">🎯</span>
+                <div>
+                    <strong>Advanced Filtering:</strong> Candle size, body requirements, and MA touch filters
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <span class="feature-icon">📊</span>
+                <div>
+                    <strong>Visual Feedback:</strong> Signal arrows, execution markers, and SMA overlay display
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <span class="feature-icon">💰</span>
+                <div>
+                    <strong>Smart Position Sizing:</strong> Risk percentage-based or fixed lot sizing options
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <span class="feature-icon">🛡️</span>
+                <div>
+                    <strong>Trailing Stops:</strong> Automated trailing at 0.8 RR moving to 0.5 RR protection
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <span class="feature-icon">📈</span>
+                <div>
+                    <strong>Historical Analysis:</strong> Backtesting visualization with past signal markers
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <span class="feature-icon">⚙️</span>
+                <div>
+                    <strong>Trade Direction Control:</strong> Buy-only, sell-only, or both directions trading
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <span class="feature-icon">🔄</span>
+                <div>
+                    <strong>Customizable Parameters:</strong> Adjustable SMA periods, risk levels, and filters
+                </div>
+            </div>
+        </div>
+
+        <h3>Customizable Parameters</h3>
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('sma-settings')">SMA Settings</button>
+            <button class="tab" onclick="showTab('trade-settings')">Trade Settings</button>
+            <button class="tab" onclick="showTab('risk-settings')">Risk Management</button>
+            <button class="tab" onclick="showTab('visual-settings')">Visual Settings</button>
+        </div>
+
+        <div id="sma-settings" class="tab-content active">
+            <div class="specs-grid">
+                <div class="spec-item">
+                    <div class="spec-label">Short SMA Period</div>
+                    <div class="spec-value">7 (Default)</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Long SMA Period</div>
+                    <div class="spec-value">27 (Default)</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Price Source</div>
+                    <div class="spec-value">Close Prices</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">MA Type</div>
+                    <div class="spec-value">Simple Moving Average</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="trade-settings" class="tab-content">
+            <div class="specs-grid">
+                <div class="spec-item">
+                    <div class="spec-label">Minimum Candle Size</div>
+                    <div class="spec-value">30 Pips</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Minimum Body Size</div>
+                    <div class="spec-value">30 Pips</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">MA Touch Filter</div>
+                    <div class="spec-value">Configurable</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Trade Direction</div>
+                    <div class="spec-value">Both/Buy/Sell Only</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="risk-settings" class="tab-content">
+            <div class="specs-grid">
+                <div class="spec-item">
+                    <div class="spec-label">Position Sizing</div>
+                    <div class="spec-value">Risk % or Fixed Lot</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Default Risk %</div>
+                    <div class="spec-value">2% per Trade</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Trailing Trigger</div>
+                    <div class="spec-value">0.8 Risk-Reward</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Trailing Target</div>
+                    <div class="spec-value">0.5 Risk-Reward</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="visual-settings" class="tab-content">
+            <div class="specs-grid">
+                <div class="spec-item">
+                    <div class="spec-label">SMA Display</div>
+                    <div class="spec-value">Optional Overlay</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Signal Arrows</div>
+                    <div class="spec-value">Customizable Codes</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Execution Markers</div>
+                    <div class="spec-value">Entry Point Display</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Historical Scan</div>
+                    <div class="spec-value">5000 Bars Analysis</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Specifications -->
+    <section id="technical" class="section">
+        <h2>Technical Specifications</h2>
+        
+        <div class="specs-grid">
+            <div class="spec-item">
+                <div class="spec-label">Platform</div>
+                <div class="spec-value">MetaTrader 5</div>
+            </div>
+            <div class="spec-item">
+                <div class="spec-label">Language</div>
+                <div class="spec-value">MQL5</div>
+            </div>
+            <div class="spec-item">
+                <div class="spec-label">Timeframe</div>
+                <div class="spec-value">M1 (1 Minute)</div>
+            </div>
+            <div class="spec-item">
+                <div class="spec-label">Asset Class</div>
+                <div class="spec-value">Gold (XAUUSD)</div>
+            </div>
+            <div class="spec-item">
+                <div class="spec-label">Execution Type</div>
+                <div class="spec-value">Market Orders</div>
+            </div>
+            <div class="spec-item">
+                <div class="spec-label">Risk-Reward</div>
+                <div class="spec-value">1:1 Base Ratio</div>
+            </div>
+        </div>
+
+        <h3>System Requirements</h3>
+        <div class="cards-grid">
+            <div class="card">
+                <span class="card-icon">💻</span>
+                <h4>Platform Requirements</h4>
+                <ul>
+                    <li>MetaTrader 5 build 3000+</li>
+                    <li>Stable internet connection</li>
+                    <li>Low-latency broker execution</li>
+                    <li>Minimum 1GB available RAM</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <span class="card-icon">🔧</span>
+                <h4>Dependencies</h4>
+                <ul>
+                    <li>Standard MQL5 Trade library</li>
+                    <li>Built-in SMA indicator functions</li>
+                    <li>No external DLL requirements</li>
+                    <li>Native MT5 object management</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <span class="card-icon">📊</span>
+                <h4>Data Requirements</h4>
+                <ul>
+                    <li>Minimum 100 historical M1 bars</li>
+                    <li>Real-time tick data feed</li>
+                    <li>Gold symbol with proper specifications</li>
+                    <li>5000+ bars for historical analysis</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Visual Documentation -->
+    <section class="section">
+        <h2>Visual Documentation</h2>
+        
+        <h3>Chart Examples</h3>
+        <div class="image-placeholder">
+            <div class="icon">📈</div>
+            <div class="caption">Live Trading Chart with SMA Crossover Signals</div>
+            <div class="dimensions">1400x900px - Shows SMA lines, crossover points, signal arrows, and trade execution markers on Gold M1 chart</div>
+        </div>
+
+        <div class="image-placeholder">
+            <div class="icon">🎯</div>
+            <div class="caption">Signal Generation and Entry Logic Visualization</div>
+            <div class="dimensions">1200x700px - Detailed view showing candle formation requirements, breakout levels, and entry triggers</div>
+        </div>
+
+        <h3>Historical Analysis Display</h3>
+        <div class="image-placeholder">
+            <div class="icon">📊</div>
+            <div class="caption">5000-Bar Historical Scan Results</div>
+            <div class="dimensions">1600x1000px - Historical chart showing all detected crossover signals and execution points over extended period</div>
+        </div>
+
+        <h3>Risk Management Visualization</h3>
+        <div class="image-placeholder">
+            <div class="icon">🛡️</div>
+            <div class="caption">Trailing Stop Management in Action</div>
+            <div class="dimensions">1200x600px - Shows trailing stop progression from 0.8 RR trigger to 0.5 RR protection level</div>
+        </div>
+    </section>
+
+    <!-- Use Cases & Applications -->
+    <section class="section">
+        <h2>Use Cases & Applications</h2>
+        
+        <div class="cards-grid">
+            <div class="card">
+                <span class="card-icon">🌊</span>
+                <h4>Trending Markets</h4>
+                <p>Excels in clear trending conditions where Gold shows directional momentum. The dual-SMA system captures trend initiation points effectively while filtering out minor consolidations through size requirements.</p>
+            </div>
+            
+            <div class="card">
+                <span class="card-icon">⚡</span>
+                <h4>Scalping Operations</h4>
+                <p>Designed for active scalping with real-time execution on M1 timeframe. Fast signal detection and immediate entry logic suit high-frequency trading approaches with tight risk management.</p>
+            </div>
+            
+            <div class="card">
+                <span class="card-icon">🎯</span>
+                <h4>Breakout Trading</h4>
+                <p>Combines crossover signals with breakout confirmation, entering only when price breaks the signal candle's high/low. This approach filters out false crossovers and improves entry timing.</p>
+            </div>
+            
+            <div class="card">
+                <span class="card-icon">📈</span>
+                <h4>Momentum Capture</h4>
+                <p>Minimum 30-pip candle and body requirements ensure trades are taken only during periods of sufficient market momentum, avoiding slow-moving or indecisive market conditions.</p>
+            </div>
+        </div>
+
+        <h3>Optimal Market Conditions</h3>
+        <div class="performance-grid">
+            <div class="performance-item">
+                <div class="performance-icon">📊</div>
+                <h4>High Volatility</h4>
+                <p>Performs best during active trading sessions with 40+ pip average candle ranges</p>
+            </div>
+            
+            <div class="performance-item">
+                <div class="performance-icon">📈</div>
+                <h4>Clear Trends</h4>
+                <p>Optimal in trending markets with sustained directional movement over multiple minutes</p>
+            </div>
+            
+            <div class="performance-item">
+                <div class="performance-icon">🌍</div>
+                <h4>Major Sessions</h4>
+                <p>Best performance during London and New York overlap periods (highest Gold liquidity)</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Performance Characteristics -->
+    <section id="performance" class="section">
+        <h2>Performance Characteristics</h2>
+        
+        <div class="cards-grid">
+            <div class="card">
+                <span class="card-icon">🎯</span>
+                <h4>Signal Quality</h4>
+                <p>Advanced filtering mechanisms significantly reduce false signals compared to basic crossover systems. The combination of candle size, body requirements, and optional MA touch filters creates a robust signal validation process.</p>
+            </div>
+            
+            <div class="card">
+                <span class="card-icon">⚡</span>
+                <h4>Execution Speed</h4>
+                <p>Real-time crossover detection provides faster market entry compared to traditional systems that wait for candle close. This speed advantage is crucial in fast-moving Gold markets where timing impacts profitability.</p>
+            </div>
+            
+            <div class="card">
+                <span class="card-icon">🛡️</span>
+                <h4>Risk Management</h4>
+                <p>Systematic approach with signal candle-based stop losses, 1:1 base risk-reward ratio, and intelligent trailing stops that activate at 0.8 RR and trail to 0.5 RR for profit protection.</p>
+            </div>
+            
+            <div class="card">
+                <span class="card-icon">📊</span>
+                <h4>Market Adaptation</h4>
+                <p>Performs consistently across different Gold market conditions. Less effective during extreme low-volatility periods but includes built-in filters to avoid trading in unsuitable market environments.</p>
+            </div>
+        </div>
+
+        <h3>Strengths & Limitations</h3>
+        <div class="logic-flow">
+            <h4 style="color: var(--success-color); margin-bottom: 1rem;">Strengths</h4>
+            <div class="flow-step" style="border-left-color: var(--success-color);">
+                <div class="step-number" style="background: var(--gradient-success);">✓</div>
+                <div><strong>Zero-lag execution:</strong> Immediate signal detection and trade execution without waiting delays</div>
+            </div>
+            <div class="flow-step" style="border-left-color: var(--success-color);">
+                <div class="step-number" style="background: var(--gradient-success);">✓</div>
+                <div><strong>Robust filtering:</strong> Multiple validation layers eliminate most false signals and poor setups</div>
+            </div>
+            <div class="flow-step" style="border-left-color: var(--success-color);">
+                <div class="step-number" style="background: var(--gradient-success);">✓</div>
+                <div><strong>Professional risk management:</strong> Automated position sizing and trailing stop functionality</div>
+            </div>
+            
+            <h4 style="color: var(--danger-color); margin: 2rem 0 1rem 0;">Limitations</h4>
+            <div class="flow-step" style="border-left-color: var(--danger-color);">
+                <div class="step-number" style="background: linear-gradient(135deg, var(--danger-color), #ff6b7a);">!</div>
+                <div><strong>Volatility dependent:</strong> Requires minimum volatility levels; may underperform in extremely quiet markets</div>
+            </div>
+            <div class="flow-step" style="border-left-color: var(--danger-color);">
+                <div class="step-number" style="background: linear-gradient(135deg, var(--danger-color), #ff6b7a);">!</div>
+                <div><strong>Trending bias:</strong> Crossover systems naturally work better in trending vs. ranging market conditions</div>
+            </div>
+            <div class="flow-step" style="border-left-color: var(--danger-color);">
+                <div class="step-number" style="background: linear-gradient(135deg, var(--danger-color), #ff6b7a);">!</div>
+                <div><strong>M1 timeframe sensitivity:</strong> Higher frequency trading requires stable execution environment and low latency</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Implementation Notes -->
+    <section class="section">
+        <h2>Implementation Notes</h2>
+        
+        <div class="cards-grid">
+            <div class="card">
+                <span class="card-icon">🚀</span>
+                <h4>Setup Considerations</h4>
+                <ul>
+                    <li>Ensure sufficient historical data (5000+ M1 bars) for optimal analysis</li>
+                    <li>Configure broker settings for fast execution and minimal slippage</li>
+                    <li>Test parameters on demo account before live deployment</li>
+                    <li>Verify Gold symbol specifications match EA requirements</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <span class="card-icon">⚙️</span>
+                <h4>Optimization Tips</h4>
+                <ul>
+                    <li>Adjust SMA periods based on current market volatility patterns</li>
+                    <li>Fine-tune minimum candle size for different trading sessions</li>
+                    <li>Enable MA touch filter during high-noise market periods</li>
+                    <li>Use buy-only or sell-only modes during strong trending phases</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <span class="card-icon">✅</span>
+                <h4>Best Practices</h4>
+                <ul>
+                    <li>Start with default parameters and adjust gradually based on results</li>
+                    <li>Monitor performance during different trading sessions</li>
+                    <li>Use historical scan feature to validate strategy performance</li>
+                    <li>Combine with fundamental analysis for directional bias</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <span class="card-icon">🔍</span>
+                <h4>Compatibility Notes</h4>
+                <ul>
+                    <li>Designed specifically for Gold (XAUUSD) trading characteristics</li>
+                    <li>Optimized for ECN/STP broker environments</li>
+                    <li>Compatible with MetaTrader 5 VPS hosting</li>
+                    <li>Works with multiple account types (standard, micro, etc.)</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Sample Configuration</h3>
+        <div class="code-snippet">
+// Recommended Settings for Active Gold Trading
+Short SMA Period: 7
+Long SMA Period: 27
+Risk Percentage: 2.0%
+Minimum Candle Size: 30 pips (300 points)
+Use MA Touch Filter: true
+Trade Filter: BOTH_TRADES
+Use Trailing: true
+Trail at RR: 0.8
+Trail to RR: 0.5
+        </div>
+    </section>
+
+    <!-- Risk Disclosure -->
+    <div class="risk-disclosure">
+        <h3>⚠️ Risk Disclosure</h3>
+        <p><strong>Trading foreign exchange and precious metals involves substantial risk of loss and is not suitable for all investors.</strong> This Expert Advisor is a trading tool designed to assist in trade execution based on technical analysis. Past performance does not guarantee future results.</p>
+        
+        <p><strong>Key Risk Factors:</strong></p>
+        <ul>
+            <li>Gold markets can be highly volatile with rapid price movements</li>
+            <li>M1 timeframe trading involves higher frequency and increased transaction costs</li>
+            <li>System performance depends on market conditions and broker execution quality</li>
+            <li>No trading system can guarantee profitable results</li>
+            <li>Proper risk management and position sizing are essential</li>
+        </ul>
+        
+        <p><em>Always test thoroughly on demo accounts and never risk more than you can afford to lose. Consider seeking advice from independent financial advisors.</em></p>
+    </div>
+
+    <!-- Footer -->
+    <footer id="contact" class="footer">
+        <div class="footer-content">
+            <h3>Professional Trading System Development</h3>
+            <p>This Gold SMA CrossOver Strategy EA represents sophisticated approach to automated trading system design, combining real-time signal detection with professional risk management practices.</p>
+            
+            <div style="margin: 2rem 0;">
+                <div class="platform-badges">
+                    <span class="badge">MetaTrader 5 Expert</span>
+                    <span class="badge">MQL5 Development</span>
+                    <span class="badge">Real-Time Systems</span>
+                    <span class="badge">Risk Management</span>
+                </div>
+            </div>
+            
+            <p style="margin-top: 2rem; color: var(--text-secondary);">
+                <strong>Gold SMA CrossOver Strategy EA v1.00</strong><br>
+                For collaboration opportunities, system customization, or additional strategy development
+            </p>
+            
+            <div style="margin-top: 2rem;">
+                <a href="mailto:contact@quantechinnovation.com" class="cta-button" style="margin-right: 1rem; background: var(--gradient-info);">Contact Developer</a>
+                <a href="https://portfolio.quantechinnovation.com/" class="cta-button" target="_blank" rel="noopener noreferrer">View Portfolio</a>
+            </div>
+        </div>
+    </footer>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        // Initialize Mermaid with custom theme configuration
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#ffd700',
+                primaryTextColor: '#e1e6ed',
+                primaryBorderColor: '#ffd700',
+                lineColor: '#3742fa',
+                secondaryColor: '#1a1f2e',
+                tertiaryColor: '#242938',
+                background: '#0a0e15',
+                mainBkg: '#1a1f2e',
+                secondBkg: '#242938',
+                tertiaryBkg: '#2d3748'
+            },
+            flowchart: {
+                htmlLabels: true,
+                curve: 'basis',
+                padding: 10
+            }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Tab functionality
+        function showTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabId).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections for animation
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(30px)';
+            section.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            observer.observe(section);
+        });
+
+        // Image placeholder hover effects
+        document.querySelectorAll('.image-placeholder').forEach(placeholder => {
+            placeholder.addEventListener('mouseenter', function() {
+                this.style.backgroundColor = 'rgba(255, 215, 0, 0.05)';
+                this.style.borderColor = 'var(--accent-color)';
+            });
+            
+            placeholder.addEventListener('mouseleave', function() {
+                this.style.backgroundColor = 'var(--accent-bg)';
+                this.style.borderColor = 'var(--border-color)';
+            });
+        });
+
+        // Copy to clipboard for code snippets
+        document.querySelectorAll('.code-snippet').forEach(snippet => {
+            snippet.addEventListener('click', function() {
+                navigator.clipboard.writeText(this.textContent).then(() => {
+                    const originalBg = this.style.backgroundColor;
+                    this.style.backgroundColor = 'rgba(0, 255, 136, 0.1)';
+                    setTimeout(() => {
+                        this.style.backgroundColor = originalBg;
+                    }, 500);
+                });
+            });
+            
+            snippet.style.cursor = 'pointer';
+            snippet.title = 'Click to copy';
+        });
+
+        // Dynamic navbar background on scroll
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.style.backgroundColor = 'rgba(10, 14, 21, 0.98)';
+            } else {
+                navbar.style.backgroundColor = 'rgba(10, 14, 21, 0.95)';
+            }
+        });
+
+        // Loading animation for hero content
+        window.addEventListener('load', () => {
+            const heroContent = document.querySelector('.hero-content');
+            heroContent.style.opacity = '1';
+            heroContent.style.transform = 'translateY(0)';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+flowchart TD
+    A[📊 Start: New Tick Received] --> B{📈 Sufficient Historical Data?<br/>Long SMA + 5 bars}
+    B -->|No| Z[❌ Exit - Wait for Data]
+    B -->|Yes| C[📊 Get Current & Previous<br/>SMA Values]
+    
+    C --> D{🔄 SMA Crossover Detected?}
+    D -->|No Crossover| A
+    D -->|Bullish Cross<br/>Short > Long| E[📈 Bullish Signal Detected]
+    D -->|Bearish Cross<br/>Short < Long| F[📉 Bearish Signal Detected]
+    
+    E --> G{📊 Current Candle<br/>Forming Bullish?<br/>Price > Open}
+    F --> H{📊 Current Candle<br/>Forming Bearish?<br/>Price < Open}
+    
+    G -->|No| I[❌ Signal Cancelled]
+    H -->|No| I
+    G -->|Yes| J{📏 Candle Body Size<br/>≥ 30 Pips?}
+    H -->|Yes| K{📏 Candle Body Size<br/>≥ 30 Pips?}
+    
+    J -->|No| I
+    K -->|No| I
+    J -->|Yes| L{📏 Total Candle Size<br/>≥ Min Size Filter?}
+    K -->|Yes| M{📏 Total Candle Size<br/>≥ Min Size Filter?}
+    
+    L -->|No| I
+    M -->|No| I
+    L -->|Yes| N{⚙️ Trade Filter<br/>Allows Buy?}
+    M -->|Yes| O{⚙️ Trade Filter<br/>Allows Sell?}
+    
+    N -->|No| I
+    O -->|No| I
+    N -->|Yes| P[✅ BUY Signal Active<br/>Store Signal Candle]
+    O -->|Yes| Q[✅ SELL Signal Active<br/>Store Signal Candle]
+    
+    P --> R[🎯 Monitor for Buy Entry]
+    Q --> S[🎯 Monitor for Sell Entry]
+    
+    R --> T{💰 Price Breaks<br/>Signal Candle High?}
+    S --> U{💰 Price Breaks<br/>Signal Candle Low?}
+    
+    T -->|No| V{📉 Price Below<br/>Signal Candle Low?}
+    U -->|No| W{📈 Price Above<br/>Signal Candle High?}
+    
+    V -->|Yes| X[❌ Buy Signal Cancelled]
+    W -->|Yes| Y[❌ Sell Signal Cancelled]
+    V -->|No| T
+    W -->|No| U
+    
+    T -->|Yes| AA{🎯 MA Touch Filter<br/>Enabled?}
+    U -->|Yes| BB{🎯 MA Touch Filter<br/>Enabled?}
+    
+    AA -->|No| CC[🔥 Execute BUY Trade]
+    BB -->|No| DD[🔥 Execute SELL Trade]
+    AA -->|Yes| EE{📊 Entry Price Too Close<br/>to MA Lines?}
+    BB -->|Yes| FF{📊 Entry Price Too Close<br/>to MA Lines?}
+    
+    EE -->|Yes| GG[❌ Buy Entry Rejected<br/>MA Touch Filter]
+    FF -->|Yes| HH[❌ Sell Entry Rejected<br/>MA Touch Filter]
+    EE -->|No| CC
+    FF -->|No| DD
+    
+    CC --> II[⚙️ Calculate Position Size<br/>Risk % or Fixed Lot]
+    DD --> JJ[⚙️ Calculate Position Size<br/>Risk % or Fixed Lot]
+    
+    II --> KK[🎯 Set Stop Loss<br/>Signal Candle Low]
+    JJ --> LL[🎯 Set Stop Loss<br/>Signal Candle High + Spread]
+    
+    KK --> MM[🎯 Set Take Profit<br/>1:1 Risk Reward]
+    LL --> NN[🎯 Set Take Profit<br/>1:1 Risk Reward]
+    
+    MM --> OO[📝 Submit BUY Order]
+    NN --> PP[📝 Submit SELL Order]
+    
+    OO --> QQ{✅ Order Executed<br/>Successfully?}
+    PP --> RR{✅ Order Executed<br/>Successfully?}
+    
+    QQ -->|Yes| SS[🎯 Position Management<br/>Start Monitoring]
+    RR -->|Yes| SS
+    QQ -->|No| TT[❌ Order Failed]
+    RR -->|No| TT
+    
+    SS --> UU{📊 Trailing Stops<br/>Enabled?}
+    UU -->|No| VV[🔄 Continue Monitoring]
+    UU -->|Yes| WW{📈 Current P&L<br/>≥ 0.8 Risk Reward?}
+    
+    WW -->|No| VV
+    WW -->|Yes| XX[🎯 Activate Trailing Stop<br/>Move SL to 0.5 RR]
+    
+    XX --> YY[🔄 Continue Trail Management]
+    
+    VV --> ZZ[🔄 Return to Tick Monitoring]
+    YY --> ZZ
+    TT --> ZZ
+    I --> A
+    X --> A
+    Y --> A
+    GG --> A
+    HH --> A
+    ZZ --> A
+    Z --> A
+    
+    classDef startEnd fill:#ffd700,stroke:#000,stroke-width:2px,color:#000
+    classDef process fill:#1a1f2e,stroke:#ffd700,stroke-width:2px,color:#e1e6ed
+    classDef decision fill:#242938,stroke:#3742fa,stroke-width:2px,color:#e1e6ed
+    classDef success fill:#00ff88,stroke:#000,stroke-width:2px,color:#000
+    classDef error fill:#ff4757,stroke:#000,stroke-width:2px,color:#fff
+    classDef signal fill:#3742fa,stroke:#ffd700,stroke-width:2px,color:#fff
+    
+    class A,Z,ZZ startEnd
+    class C,II,JJ,KK,LL,MM,NN,OO,PP,SS,XX,YY,VV process
+    class B,D,G,H,J,K,L,M,N,O,T,U,V,W,AA,BB,EE,FF,QQ,RR,UU,WW decision
+    class P,Q,CC,DD success
+    class I,X,Y,GG,HH,TT error
+    class E,F signal
