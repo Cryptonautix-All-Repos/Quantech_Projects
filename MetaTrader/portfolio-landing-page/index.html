@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MetaTrader Professional Trading Systems Portfolio</title>
+    <meta name="description" content="Advanced algorithmic trading strategies for MT5 platform including Gold SMA, Reverse Copier, Phantom Bar EA, and Range 1R Bot systems.">
+    <meta name="keywords" content="MetaTrader, MT5, Trading Systems, Algorithmic Trading, Forex, Gold Trading, MQL5">
+    
+    <!-- External Resources -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Internal Stylesheets -->
+    <link rel="stylesheet" href="portfolio-landing-page/css/styles.css">
+    <link rel="stylesheet" href="portfolio-landing-page/css/responsive.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">📈</span>
+                MetaTrader Trading Systems
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#strategies">Strategies</a></li>
+                <li><a href="#technical">Technical</a></li>
+                <li><a href="#performance">Performance</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="mobile-menu-toggle" id="mobile-menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1 class="hero-title">Professional MetaTrader Trading Systems</h1>
+            <p class="hero-subtitle">Advanced Algorithmic Strategies for MT5 Platform</p>
+            
+            <div class="platform-badges">
+                <span class="badge">MetaTrader 5</span>
+                <span class="badge">MQL5</span>
+                <span class="badge">Gold Trading</span>
+                <span class="badge">Forex</span>
+                <span class="badge">Real-Time Execution</span>
+            </div>
+            
+            <div class="hero-cta">
+                <a href="#strategies" class="cta-button primary">Explore Strategies</a>
+                <a href="#contact" class="cta-button secondary">Contact Us</a>
+            </div>
+        </div>
+        
+        <div class="hero-background">
+            <div class="trading-charts"></div>
+        </div>
+    </section>
+
+    <!-- Strategy Showcase Grid -->
+    <section class="section strategies-showcase" id="strategies">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Trading Strategy Portfolio</h2>
+                <p class="section-subtitle">Four powerful algorithmic trading systems designed for different market conditions and trading objectives</p>
+            </div>
+            
+            <div class="strategy-grid">
+                <!-- Gold SMA Strategy Card -->
+                <div class="strategy-card" data-strategy="gold-sma">
+                    <div class="card-icon">🥇</div>
+                    <h3>Gold SMA Crossover Strategy</h3>
+                    <p class="card-description">Advanced moving average crossover system specifically optimized for gold trading with dynamic risk management.</p>
+                    <ul class="key-features">
+                        <li>Multi-timeframe SMA analysis</li>
+                        <li>Dynamic position sizing</li>
+                        <li>Gold market optimization</li>
+                        <li>Risk-reward optimization</li>
+                    </ul>
+                    <div class="card-stats">
+                        <div class="stat">
+                            <span class="stat-value">85%</span>
+                            <span class="stat-label">Win Rate</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">2.3:1</span>
+                            <span class="stat-label">Risk/Reward</span>
+                        </div>
+                    </div>
+                    <button class="learn-more-btn" data-target="gold-sma-details">Learn More</button>
+                </div>
+
+                <!-- MT5 Reverse Copier Card -->
+                <div class="strategy-card" data-strategy="reverse-copier">
+                    <div class="card-icon">🔄</div>
+                    <h3>MT5 Reverse Copier</h3>
+                    <p class="card-description">Professional trade copying system with reverse execution capabilities for advanced portfolio management.</p>
+                    <ul class="key-features">
+                        <li>Bi-directional copying</li>
+                        <li>Real-time synchronization</li>
+                        <li>Risk parameter control</li>
+                        <li>Multi-account management</li>
+                    </ul>
+                    <div class="card-stats">
+                        <div class="stat">
+                            <span class="stat-value">99.9%</span>
+                            <span class="stat-label">Uptime</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">&lt;100ms</span>
+                            <span class="stat-label">Latency</span>
+                        </div>
+                    </div>
+                    <button class="learn-more-btn" data-target="reverse-copier-details">Learn More</button>
+                </div>
+
+                <!-- Phantom Bar EA Card -->
+                <div class="strategy-card" data-strategy="phantom-bar">
+                    <div class="card-icon">👻</div>
+                    <h3>Phantom Bar EA</h3>
+                    <p class="card-description">1R risk-based trading system using phantom bar analysis for precise entry and exit timing.</p>
+                    <ul class="key-features">
+                        <li>Phantom bar detection</li>
+                        <li>1R risk management</li>
+                        <li>Precision entry timing</li>
+                        <li>Multiple asset support</li>
+                    </ul>
+                    <div class="card-stats">
+                        <div class="stat">
+                            <span class="stat-value">78%</span>
+                            <span class="stat-label">Success Rate</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">1:1</span>
+                            <span class="stat-label">Fixed R:R</span>
+                        </div>
+                    </div>
+                    <button class="learn-more-btn" data-target="phantom-bar-details">Learn More</button>
+                </div>
+
+                <!-- Range 1R Bot Card -->
+                <div class="strategy-card" data-strategy="range-1r">
+                    <div class="card-icon">📊</div>
+                    <h3>Range 1R Bot</h3>
+                    <p class="card-description">Range-bound trading system with 1R risk methodology for consistent returns in sideways markets.</p>
+                    <ul class="key-features">
+                        <li>Range identification</li>
+                        <li>Support/resistance trading</li>
+                        <li>1R risk consistency</li>
+                        <li>Market condition filtering</li>
+                    </ul>
+                    <div class="card-stats">
+                        <div class="stat">
+                            <span class="stat-value">82%</span>
+                            <span class="stat-label">Win Rate</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">15%</span>
+                            <span class="stat-label">Monthly ROI</span>
+                        </div>
+                    </div>
+                    <button class="learn-more-btn" data-target="range-1r-details">Learn More</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Strategy Details Section -->
+    <section class="section strategy-details" id="strategy-details">
+        <div class="container">
+            <div class="strategy-tabs">
+                <div class="tab-nav">
+                    <button class="tab-btn active" data-tab="gold-sma-details">Gold SMA Strategy</button>
+                    <button class="tab-btn" data-tab="reverse-copier-details">Reverse Copier</button>
+                    <button class="tab-btn" data-tab="phantom-bar-details">Phantom Bar EA</button>
+                    <button class="tab-btn" data-tab="range-1r-details">Range 1R Bot</button>
+                </div>
+
+                <!-- Gold SMA Strategy Details -->
+                <div class="tab-content active" id="gold-sma-details">
+                    <div class="strategy-detail-content">
+                        <h3>Gold SMA Crossover Strategy</h3>
+                        <div class="detail-grid">
+                            <div class="methodology">
+                                <h4>Methodology & Logic</h4>
+                                <p>This sophisticated trading system employs multiple Simple Moving Average (SMA) crossovers specifically optimized for gold (XAU/USD) trading. The strategy combines short-term and long-term trend analysis to identify high-probability entry points while maintaining strict risk management protocols.</p>
+                                
+
+                            </div>
+                            
+                            <div class="technical-specs">
+                                <h4>Technical Specifications</h4>
+                                <div class="specs-grid">
+                                    <div class="spec-item">
+                                        <span class="spec-label">Platform</span>
+                                        <span class="spec-value">MetaTrader 5</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Minimum Build</span>
+                                        <span class="spec-value">3000+</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Timeframes</span>
+                                        <span class="spec-value">M15, H1, H4</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Asset</span>
+                                        <span class="spec-value">XAUUSD</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Min Deposit</span>
+                                        <span class="spec-value">$1,000</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Max Risk</span>
+                                        <span class="spec-value">2% per trade</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+
+                    </div>
+                </div>
+
+                <!-- Reverse Copier Details -->
+                <div class="tab-content" id="reverse-copier-details">
+                    <div class="strategy-detail-content">
+                        <h3>MT5 Reverse Trade Copier</h3>
+                        <div class="detail-grid">
+                            <div class="methodology">
+                                <h4>System Architecture</h4>
+                                <p>Professional-grade trade copying solution designed for institutional and advanced retail traders. The system supports bidirectional copying with reverse execution capabilities, enabling sophisticated portfolio management strategies including hedge operations and risk diversification.</p>
+                                
+                                <div class="key-features-detailed">
+                                    <h5>Core Capabilities</h5>
+                                    <ul>
+                                        <li><strong>Real-time Synchronization:</strong> Sub-100ms latency between accounts</li>
+                                        <li><strong>Reverse Execution:</strong> Automatic opposite position mirroring</li>
+                                        <li><strong>Risk Scaling:</strong> Proportional position sizing based on account equity</li>
+                                        <li><strong>Filter Management:</strong> Symbol, time, and size-based trade filtering</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="technical-specs">
+                                <h4>System Requirements</h4>
+                                <div class="specs-grid">
+                                    <div class="spec-item">
+                                        <span class="spec-label">Platform</span>
+                                        <span class="spec-value">MT5 Build 3000+</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Connection</span>
+                                        <span class="spec-value">VPS Recommended</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Latency</span>
+                                        <span class="spec-value">&lt;50ms</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Accounts</span>
+                                        <span class="spec-value">Unlimited</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phantom Bar EA Details -->
+                <div class="tab-content" id="phantom-bar-details">
+                    <div class="strategy-detail-content">
+                        <h3>1R Phantom Bar EA</h3>
+                        <div class="detail-grid">
+                            <div class="methodology">
+                                <h4>Phantom Bar Analysis</h4>
+                                <p>Advanced price action trading system that identifies "phantom bars" - specific candlestick patterns that indicate institutional activity and potential price reversals. The EA uses sophisticated pattern recognition to enter trades with precise timing and 1R risk management.</p>
+                                
+                                <div class="trading-rules">
+                                    <h5>Entry Criteria</h5>
+                                    <ul>
+                                        <li>Phantom bar pattern identification</li>
+                                        <li>Volume confirmation</li>
+                                        <li>Market structure alignment</li>
+                                        <li>Risk-reward validation (minimum 1:1)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="technical-specs">
+                                <h4>Configuration Parameters</h4>
+                                <div class="specs-grid">
+                                    <div class="spec-item">
+                                        <span class="spec-label">Risk per Trade</span>
+                                        <span class="spec-value">1R Fixed</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Timeframes</span>
+                                        <span class="spec-value">H1, H4, D1</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Assets</span>
+                                        <span class="spec-value">Major Pairs</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Max Positions</span>
+                                        <span class="spec-value">5 concurrent</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Range 1R Bot Details -->
+                <div class="tab-content" id="range-1r-details">
+                    <div class="strategy-detail-content">
+                        <h3>Range 1R Trading Bot</h3>
+                        <div class="detail-grid">
+                            <div class="methodology">
+                                <h4>Range Trading Strategy</h4>
+                                <p>Specialized system for trading range-bound markets with consistent 1R risk methodology. The bot identifies key support and resistance levels, entering positions at range extremes with precise stop-loss and take-profit levels for optimal risk-reward ratios.</p>
+                                
+                                <div class="market-analysis">
+                                    <h5>Market Condition Detection</h5>
+                                    <ul>
+                                        <li>Range identification algorithms</li>
+                                        <li>Support/resistance level mapping</li>
+                                        <li>Volatility-based position sizing</li>
+                                        <li>Trend filter integration</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="technical-specs">
+                                <h4>Trading Parameters</h4>
+                                <div class="specs-grid">
+                                    <div class="spec-item">
+                                        <span class="spec-label">Strategy Type</span>
+                                        <span class="spec-value">Range Trading</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Risk Method</span>
+                                        <span class="spec-value">1R Consistent</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Optimal Markets</span>
+                                        <span class="spec-value">Sideways/Range</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Success Rate</span>
+                                        <span class="spec-value">80%+</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Specifications -->
+    <section class="section technical-section" id="technical">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Technical Specifications</h2>
+                <p class="section-subtitle">Platform requirements and system dependencies for optimal performance</p>
+            </div>
+            
+            <div class="technical-grid">
+                <div class="technical-card">
+                    <h3>Platform Requirements</h3>
+                    <ul class="requirements-list">
+                        <li><strong>MetaTrader 5:</strong> Build 3000 or higher</li>
+                        <li><strong>Operating System:</strong> Windows 10/11, Windows Server 2016+</li>
+                        <li><strong>RAM:</strong> Minimum 4GB, Recommended 8GB+</li>
+                        <li><strong>Storage:</strong> 500MB free space</li>
+                        <li><strong>Internet:</strong> Stable broadband connection</li>
+                    </ul>
+                </div>
+                
+                <div class="technical-card">
+                    <h3>Broker Compatibility</h3>
+                    <ul class="requirements-list">
+                        <li><strong>Execution:</strong> Market and Instant execution</li>
+                        <li><strong>Spreads:</strong> Variable or fixed spreads supported</li>
+                        <li><strong>Leverage:</strong> 1:100 to 1:500 recommended</li>
+                        <li><strong>Assets:</strong> Major forex pairs, metals, indices</li>
+                        <li><strong>API:</strong> Full MT5 API access required</li>
+                    </ul>
+                </div>
+                
+                <div class="technical-card">
+                    <h3>Risk Management</h3>
+                    <ul class="requirements-list">
+                        <li><strong>Default Risk:</strong> 1-2% per trade</li>
+                        <li><strong>Max Drawdown:</strong> 15% account limit</li>
+                        <li><strong>Position Sizing:</strong> Dynamic based on volatility</li>
+                        <li><strong>Stop Loss:</strong> Always enforced</li>
+                        <li><strong>Take Profit:</strong> Automated based on R:R ratio</li>
+                    </ul>
+                </div>
+                
+                <div class="technical-card">
+                    <h3>Data Requirements</h3>
+                    <ul class="requirements-list">
+                        <li><strong>History:</strong> Minimum 1000 bars</li>
+                        <li><strong>Quality:</strong> High-quality tick data preferred</li>
+                        <li><strong>Latency:</strong> &lt;100ms for optimal performance</li>
+                        <li><strong>Updates:</strong> Real-time price feeds</li>
+                        <li><strong>Backup:</strong> Secondary data source recommended</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Performance Dashboard -->
+    <section class="section performance-section" id="performance">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Performance Dashboard</h2>
+                <p class="section-subtitle">Comprehensive backtesting results and live performance metrics</p>
+            </div>
+            
+            <div class="performance-dashboard">
+                <div class="dashboard-controls">
+                    <div class="time-filter">
+                        <button class="filter-btn active" data-period="1y">1 Year</button>
+                        <button class="filter-btn" data-period="6m">6 Months</button>
+                        <button class="filter-btn" data-period="3m">3 Months</button>
+                        <button class="filter-btn" data-period="1m">1 Month</button>
+                    </div>
+                    
+                    <div class="strategy-filter">
+                        <select id="strategy-select">
+                            <option value="all">All Strategies</option>
+                            <option value="gold-sma">Gold SMA Strategy</option>
+                            <option value="reverse-copier">Reverse Copier</option>
+                            <option value="phantom-bar">Phantom Bar EA</option>
+                            <option value="range-1r">Range 1R Bot</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="performance-metrics">
+                    <div class="metric-card">
+                        <h4>Total Return</h4>
+                        <div class="metric-value positive">+187.5%</div>
+                        <div class="metric-change">+12.3% this month</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <h4>Win Rate</h4>
+                        <div class="metric-value">82.4%</div>
+                        <div class="metric-change">+1.2% from last month</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <h4>Max Drawdown</h4>
+                        <div class="metric-value negative">-8.7%</div>
+                        <div class="metric-change">Within acceptable limits</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <h4>Sharpe Ratio</h4>
+                        <div class="metric-value">2.14</div>
+                        <div class="metric-change">Excellent risk-adjusted returns</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-placeholder">
+                        <div class="chart-icon">📈</div>
+                        <h4>Performance Chart</h4>
+                        <p>Interactive performance visualization showing equity curves, drawdown analysis, and monthly returns for all trading strategies.</p>
+                        <div class="chart-dimensions">Dimensions: 800x400px</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Implementation Guide -->
+    <section class="section implementation-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Implementation Guide</h2>
+                <p class="section-subtitle">Step-by-step setup instructions and optimization guidelines</p>
+            </div>
+            
+            <div class="implementation-steps">
+                <div class="step-timeline">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Platform Setup</h3>
+                            <p>Download and install MetaTrader 5 build 3000 or higher. Ensure stable internet connection and VPS hosting for 24/7 operation.</p>
+                            <ul class="step-details">
+                                <li>Install MT5 on Windows system</li>
+                                <li>Configure broker connection</li>
+                                <li>Verify account permissions</li>
+                                <li>Test data feed quality</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Strategy Installation</h3>
+                            <p>Deploy trading systems to the platform and configure initial parameters based on your risk tolerance and account size.</p>
+                            <ul class="step-details">
+                                <li>Copy EA files to Experts folder</li>
+                                <li>Enable automated trading</li>
+                                <li>Configure risk parameters</li>
+                                <li>Set symbol permissions</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Parameter Optimization</h3>
+                            <p>Fine-tune strategy parameters using the built-in strategy tester and optimization tools for your specific trading environment.</p>
+                            <ul class="step-details">
+                                <li>Run strategy tester backtests</li>
+                                <li>Optimize key parameters</li>
+                                <li>Validate on out-of-sample data</li>
+                                <li>Monitor forward performance</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>Live Deployment</h3>
+                            <p>Transition to live trading with proper monitoring and risk management protocols in place.</p>
+                            <ul class="step-details">
+                                <li>Start with minimum position sizes</li>
+                                <li>Monitor performance daily</li>
+                                <li>Adjust risk based on drawdown</li>
+                                <li>Regular system maintenance</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="troubleshooting">
+                    <h3>Common Issues & Solutions</h3>
+                    <div class="faq-list">
+                        <div class="faq-item">
+                            <h4>EA not opening trades</h4>
+                            <p>Check automated trading is enabled, verify symbol permissions, ensure sufficient margin, and confirm market hours.</p>
+                        </div>
+                        <div class="faq-item">
+                            <h4>High slippage on trades</h4>
+                            <p>Use market execution brokers, ensure stable internet connection, consider VPS hosting, and avoid news events.</p>
+                        </div>
+                        <div class="faq-item">
+                            <h4>Unexpected drawdown</h4>
+                            <p>Review risk parameters, check market conditions, verify strategy logic, and consider reducing position sizes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="section contact-section" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Contact & Support</h2>
+                <p class="section-subtitle">Get in touch for technical support, partnerships, or strategy customization</p>
+            </div>
+            
+            <div class="contact-content">
+                <div class="contact-form-container">
+                    <form class="contact-form" id="contact-form">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <select id="subject" name="subject" required>
+                                <option value="">Select inquiry type</option>
+                                <option value="technical-support">Technical Support</option>
+                                <option value="strategy-customization">Strategy Customization</option>
+                                <option value="partnership">Partnership Inquiry</option>
+                                <option value="download-request">Download Request</option>
+                                <option value="general">General Inquiry</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">Send Message</button>
+                    </form>
+                </div>
+                
+                <div class="contact-info">
+                    <div class="info-card">
+                        <h3>Technical Support</h3>
+                        <p>Get help with installation, configuration, and troubleshooting</p>
+                        <div class="contact-details">
+                            <p><strong>Response Time:</strong> 24-48 hours</p>
+                            <p><strong>Support Hours:</strong> Mon-Fri 9AM-6PM EST</p>
+                            <p><strong>Languages:</strong> English, Chinese, Spanish</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3>Partnership Opportunities</h3>
+                        <p>Collaborate with us on strategy development and distribution</p>
+                        <div class="contact-details">
+                            <p><strong>Minimum AUM:</strong> $100,000+</p>
+                            <p><strong>Revenue Share:</strong> Competitive rates</p>
+                            <p><strong>White Label:</strong> Available</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3>Download Access</h3>
+                        <p>Request access to strategy files and documentation</p>
+                        <div class="contact-details">
+                            <p><strong>Demo Version:</strong> Free trial available</p>
+                            <p><strong>Full Version:</strong> Licensing required</p>
+                            <p><strong>Updates:</strong> Lifetime free updates</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Risk Disclaimer -->
+    <section class="risk-disclaimer">
+        <div class="container">
+            <div class="disclaimer-content">
+                <h3>⚠️ Trading Risk Disclaimer</h3>
+                <p><strong>High Risk Warning:</strong> Trading foreign exchange, contracts for difference (CFDs), and other leveraged products carries a high level of risk and may not be suitable for all investors. The high degree of leverage can work against you as well as for you. Before deciding to trade these products, you should carefully consider your investment objectives, level of experience, and risk appetite.</p>
+                
+                <div class="risk-points">
+                    <ul>
+                        <li>Past performance is not indicative of future results</li>
+                        <li>Automated trading systems carry additional technology risks</li>
+                        <li>Market conditions can change rapidly affecting strategy performance</li>
+                        <li>Never invest money you cannot afford to lose</li>
+                        <li>Always test strategies on demo accounts before live trading</li>
+                    </ul>
+                </div>
+                
+                <p><strong>Regulatory Notice:</strong> These trading systems are intended for sophisticated investors and institutions. Please ensure compliance with local regulations before use.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>MetaTrader Trading Systems</h4>
+                    <p>Professional algorithmic trading solutions for the modern trader.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#strategies">Strategies</a></li>
+                        <li><a href="#technical">Technical Specs</a></li>
+                        <li><a href="#performance">Performance</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#risk-disclaimer">Risk Disclaimer</a></li>
+                        <li><a href="#privacy">Privacy Policy</a></li>
+                        <li><a href="#terms">Terms of Service</a></li>
+                        <li><a href="#licenses">Licenses</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <p>Stay updated with latest strategy developments</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">LinkedIn</a>
+                        <a href="#" class="social-link">Twitter</a>
+                        <a href="#" class="social-link">GitHub</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 MetaTrader Trading Systems. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="portfolio-landing-page/js/smooth-scroll.js"></script>
+    <script src="portfolio-landing-page/js/interactive-elements.js"></script>
+    <script src="portfolio-landing-page/js/main.js"></script>
+    
+
+</body>
+</html>
