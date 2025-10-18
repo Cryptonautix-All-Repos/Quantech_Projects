@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1R Phantom Bar EA - Advanced Trading System Portfolio</title>
+    <style>
+        /* CSS Variables for Professional Trading Theme */
+        :root {
+            --primary-dark: #0a0e1a;
+            --secondary-dark: #1a1f2e;
+            --accent-blue: #00d4ff;
+            --accent-green: #00ff88;
+            --accent-red: #ff4757;
+            --accent-gold: #ffd700;
+            --text-primary: #ffffff;
+            --text-secondary: #b8bcc5;
+            --text-muted: #6c757d;
+            --border-color: #2c3e50;
+            --success: #28a745;
+            --warning: #ffc107;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-accent: linear-gradient(135deg, #00d4ff 0%, #091e3a 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--primary-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(26, 31, 46, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-blue);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-blue);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background: var(--gradient-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M0 0h100v50H0z" fill="rgba(0,212,255,0.05)"/><path d="M0 50h100v50H0z" fill="rgba(255,71,87,0.05)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-tagline {
+            font-size: 1.4rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .platform-badges {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: var(--secondary-dark);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            border: 1px solid var(--accent-blue);
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        /* Section Styling */
+        .section {
+            padding: 5rem 0;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .card {
+            background: var(--secondary-dark);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-accent);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: var(--accent-blue);
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Feature Lists */
+        .feature-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .feature-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .feature-list li::before {
+            content: '⚡';
+            position: absolute;
+            left: 0;
+            color: var(--accent-gold);
+        }
+
+        /* Technical Specs */
+        .tech-specs {
+            background: var(--secondary-dark);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .spec-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(0, 212, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .spec-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .spec-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        /* Visual Placeholders */
+        .visual-placeholder {
+            background: var(--secondary-dark);
+            border: 2px dashed var(--border-color);
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            margin: 2rem 0;
+            transition: border-color 0.3s ease;
+        }
+
+        .visual-placeholder:hover {
+            border-color: var(--accent-blue);
+        }
+
+        .placeholder-icon {
+            font-size: 3rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .placeholder-text {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .placeholder-caption {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Enhanced Flow Diagram */
+        .flow-diagram {
+            margin: 3rem 0;
+            background: var(--secondary-dark);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 2px solid var(--accent-blue);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flow-diagram::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-accent);
+        }
+
+        .flow-diagram-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .flow-diagram-title {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .flow-core {
+            background: var(--gradient-accent);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            margin: 0 auto 3rem;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+            border: 2px solid var(--accent-blue);
+        }
+
+        .core-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .core-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .core-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .flow-branches {
+            display: flex;
+            justify-content: space-between;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .flow-branch {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .branch-step {
+            background: var(--secondary-dark);
+            border: 2px solid var(--accent-blue);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .branch-step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 212, 255, 0.2);
+        }
+
+        .step-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .step-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .branch-arrow {
+            color: var(--accent-gold);
+            font-size: 1.5rem;
+            margin: 0.5rem 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .flow-bottom {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .risk-management {
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.1), rgba(255, 215, 0, 0.1));
+            border: 2px solid var(--accent-gold);
+            border-radius: 15px;
+            padding: 1.5rem;
+            display: inline-block;
+            max-width: 500px;
+        }
+
+        .risk-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .feedback-loop {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .loop-arrow {
+            font-size: 2rem;
+            color: var(--accent-green);
+            margin-bottom: 0.5rem;
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .loop-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        /* Legacy Flow Chart */
+        .flow-chart {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .flow-step {
+            background: var(--secondary-dark);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 2px solid var(--accent-blue);
+            min-width: 150px;
+            position: relative;
+        }
+
+        .flow-step::after {
+            content: '→';
+            position: absolute;
+            right: -2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-gold);
+            font-size: 1.5rem;
+        }
+
+        .flow-step:last-child::after {
+            display: none;
+        }
+
+        .step-number {
+            background: var(--accent-blue);
+            color: var(--primary-dark);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-weight: bold;
+        }
+
+        /* Risk Disclosure */
+        .risk-disclosure {
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.1), rgba(255, 193, 7, 0.1));
+            border: 1px solid var(--accent-red);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 3rem 0;
+        }
+
+        .risk-disclosure h3 {
+            color: var(--accent-red);
+            margin-bottom: 1rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--secondary-dark);
+            padding: 3rem 0;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .contact-section {
+            background: var(--gradient-accent);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .contact-section h3 {
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+        }
+
+        .contact-section p {
+            color: var(--primary-dark);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-tagline {
+                font-size: 1.2rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .flow-chart {
+                flex-direction: column;
+            }
+            
+            .flow-step::after {
+                content: '↓';
+                right: 50%;
+                top: 100%;
+                transform: translateX(50%);
+            }
+            
+            .spec-grid {
+                grid-template-columns: 1fr;
+            }
+
+            /* Enhanced Flow Diagram Responsive */
+            .flow-diagram {
+                padding: 1rem;
+                margin: 2rem 0;
+            }
+
+            .flow-diagram-title {
+                font-size: 1.4rem;
+            }
+
+            .flow-core {
+                max-width: 100%;
+                padding: 1.5rem;
+            }
+
+            .flow-branches {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .flow-branch {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: space-around;
+                gap: 1rem;
+            }
+
+            .branch-step {
+                flex: 1;
+                min-width: 150px;
+                margin-bottom: 0;
+            }
+
+            .branch-arrow {
+                transform: rotate(90deg);
+                margin: 0;
+            }
+
+            .risk-management {
+                max-width: 100%;
+            }
+
+            .loop-arrow {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .flow-diagram {
+                padding: 0.5rem;
+            }
+
+            .flow-diagram-title {
+                font-size: 1.2rem;
+            }
+
+            .core-icon {
+                font-size: 2rem;
+            }
+
+            .step-icon {
+                font-size: 1.5rem;
+            }
+
+            .branch-step {
+                padding: 1rem;
+                min-width: 120px;
+            }
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Code Styling */
+        .code-concept {
+            background: #2d3748;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid var(--accent-green);
+            font-family: 'Courier New', monospace;
+            color: var(--accent-green);
+        }
+
+        /* Performance Indicators */
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .performance-card {
+            background: var(--secondary-dark);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .perf-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .perf-title {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .perf-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--accent-green);
+        }
+
+        /* Contact Buttons */
+        .contact-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-btn {
+            background: var(--gradient-accent);
+            color: var(--primary-dark);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .contact-btn:active {
+            transform: translateY(0);
+        }
+
+        .contact-btn-icon {
+            font-size: 1.1rem;
+        }
+
+        .contact-btn.email {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .contact-btn.portfolio {
+            background: linear-gradient(135deg, #00d4ff 0%, #091e3a 100%);
+        }
+
+        @media (max-width: 480px) {
+            .contact-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .contact-btn {
+                width: 200px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">1R Phantom Bar EA</div>
+            <ul class="nav-links">
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#methodology">Methodology</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#specs">Specifications</a></li>
+                <li><a href="#visuals">Visuals</a></li>
+                <li><a href="#implementation">Implementation</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content fade-in">
+            <h1>1R Phantom Bar EA</h1>
+            <p class="hero-tagline">Revolutionary Real-Time Range Analysis with Ultra-Fast Execution Technology</p>
+            
+            <div class="platform-badges">
+                <span class="badge">MetaTrader 5</span>
+                <span class="badge">MQL5</span>
+                <span class="badge">Real-Time Processing</span>
+                <span class="badge">Ultra-Fast Execution</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Executive Summary -->
+    <section id="overview" class="section">
+        <div class="section-header">
+            <h2 class="section-title">Executive Summary</h2>
+            <p class="section-subtitle">Advanced trading system leveraging innovative phantom bar technology for precision market entry</p>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-icon">🔬</div>
+                <h3>Innovation Core</h3>
+                <p>The 1R Phantom Bar EA introduces a groundbreaking approach to market analysis by tracking "phantom bars" - real-time price ranges that form dynamically, independent of traditional time-based candlesticks. This allows for earlier signal detection and more precise market timing.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">⚡</div>
+                <h3>Execution Excellence</h3>
+                <p>Built with ultra-fast execution architecture featuring retry mechanisms, optimized order routing, and minimal latency processing. The system can execute trades in milliseconds with intelligent error handling and fallback procedures.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🛡️</div>
+                <h3>Risk Mastery</h3>
+                <p>Comprehensive multi-layer risk management system including daily loss limits, position sizing algorithms, time-based trading filters, and real-time monitoring. Designed to protect capital while maximizing opportunities.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Methodology & Logic -->
+    <section id="methodology" class="section">
+        <div class="section-header">
+            <h2 class="section-title">Methodology & Logic Framework</h2>
+            <p class="section-subtitle">Understanding the phantom bar concept and signal generation process</p>
+        </div>
+
+        <div class="tech-specs">
+            <h3>🔍 Conceptual Framework</h3>
+            <p>The system operates on the principle of "phantom bars" - fixed-range price movements that capture market sentiment more accurately than time-based intervals. Each phantom bar represents exactly $0.01 of price movement (optimized for Gold), allowing for consistent risk measurement and position sizing.</p>
+        </div>
+
+        <!-- Enhanced Flow Diagram -->
+        <div class="flow-diagram">
+            <div class="flow-diagram-container">
+                <div class="flow-diagram-title">Phantom Bar Trading System Flow</div>
+                
+                <!-- Central Processing Core -->
+                <div class="flow-core">
+                    <div class="core-icon">⚡</div>
+                    <div class="core-title">Real-Time Processing Engine</div>
+                    <div class="core-description">Tick-by-tick analysis with sub-50ms execution</div>
+                </div>
+
+                <!-- Flow Branches -->
+                <div class="flow-branches">
+                    <!-- Left Branch - Input & Analysis -->
+                    <div class="flow-branch left-branch">
+                        <div class="branch-step">
+                            <div class="step-icon">📊</div>
+                            <div class="step-title">Market Data Input</div>
+                            <div class="step-desc">Real-time price feeds from broker</div>
+                        </div>
+                        <div class="branch-arrow">↓</div>
+                        <div class="branch-step">
+                            <div class="step-icon">🎯</div>
+                            <div class="step-title">Range Detection</div>
+                            <div class="step-desc">$0.01 movement threshold monitoring</div>
+                        </div>
+                        <div class="branch-arrow">↓</div>
+                        <div class="branch-step">
+                            <div class="step-icon">📈</div>
+                            <div class="step-title">Direction Analysis</div>
+                            <div class="step-desc">Bullish/Bearish classification</div>
+                        </div>
+                    </div>
+
+                    <!-- Right Branch - Signal Generation -->
+                    <div class="flow-branch right-branch">
+                        <div class="branch-step">
+                            <div class="step-icon">🔄</div>
+                            <div class="step-title">Pattern Recognition</div>
+                            <div class="step-desc">Consecutive bar sequence analysis</div>
+                        </div>
+                        <div class="branch-arrow">↓</div>
+                        <div class="branch-step">
+                            <div class="step-icon">⚡</div>
+                            <div class="step-title">Signal Validation</div>
+                            <div class="step-desc">3-bar confirmation logic</div>
+                        </div>
+                        <div class="branch-arrow">↓</div>
+                        <div class="branch-step">
+                            <div class="step-icon">🚀</div>
+                            <div class="step-title">Execution Trigger</div>
+                            <div class="step-desc">Ultra-fast order placement</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom - Risk Management -->
+                <div class="flow-bottom">
+                    <div class="risk-management">
+                        <div class="risk-icon">🛡️</div>
+                        <div class="risk-title">Continuous Risk Monitoring</div>
+                        <div class="risk-desc">Real-time position sizing & loss limits</div>
+                    </div>
+                </div>
+
+                <!-- Feedback Loop -->
+                <div class="feedback-loop">
+                    <div class="loop-arrow">↻</div>
+                    <div class="loop-text">Performance Feedback & Optimization</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="code-concept">
+            <strong>Core Logic Principle:</strong><br>
+            IF (3 consecutive bullish phantom bars) → Execute BUY signal<br>
+            IF (3 consecutive bearish phantom bars) → Execute SELL signal<br>
+            <em>// Phantom bars analyzed in real-time, not waiting for completion</em>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <h3>🎯 Signal Generation</h3>
+                <p>Signals are generated when three consecutive phantom bars form in the same direction. Unlike traditional systems that wait for bar completion, this EA analyzes patterns as they develop, providing earlier entry opportunities.</p>
+            </div>
+
+            <div class="card">
+                <h3>📊 Range-Based Analysis</h3>
+                <p>Each phantom bar captures exactly $0.01 of price movement, creating consistent measurement units. This allows for precise risk calculation and enables the system to maintain uniform risk exposure across all trades.</p>
+            </div>
+
+            <div class="card">
+                <h3>⏱️ Real-Time Processing</h3>
+                <p>The system processes every tick to update phantom bar formation, track progress toward completion, and identify emerging patterns without waiting for traditional time-based intervals.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Features -->
+    <section id="features" class="section">
+        <div class="section-header">
+            <h2 class="section-title">Key Features & Capabilities</h2>
+            <p class="section-subtitle">Advanced functionality designed for professional trading operations</p>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-icon">🚀</div>
+                <h3>Ultra-Fast Execution Engine</h3>
+                <ul class="feature-list">
+                    <li>Market execution mode for minimum latency</li>
+                    <li>Intelligent retry logic with up to 3 attempts</li>
+                    <li>Automatic fallback execution methods</li>
+                    <li>Real-time price refresh for each attempt</li>
+                    <li>Optimized slippage control (30 points max)</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">⏰</div>
+                <h3>Time-Based Precision</h3>
+                <ul class="feature-list">
+                    <li>Mexican timezone trading window (8-9 AM)</li>
+                    <li>Automatic broker time offset calculation</li>
+                    <li>Daily reset functionality at market open</li>
+                    <li>Trading session validation on every tick</li>
+                    <li>Weekend and holiday protection</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">💰</div>
+                <h3>Advanced Risk Management</h3>
+                <ul class="feature-list">
+                    <li>Percentage-based position sizing (0.1% default)</li>
+                    <li>Daily loss limit protection (5% max)</li>
+                    <li>Daily profit target automation (5% max)</li>
+                    <li>Maximum trades per day control (50 max)</li>
+                    <li>Dynamic stop loss calculation</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🔄</div>
+                <h3>Intelligent Trade Management</h3>
+                <ul class="feature-list">
+                    <li>Automatic position reversal on opposite signals</li>
+                    <li>Emergency fast-close mechanisms</li>
+                    <li>Real-time equity monitoring</li>
+                    <li>Magic number trade identification</li>
+                    <li>Comprehensive trade logging</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Specifications -->
+    <section id="specs" class="section">
+        <div class="section-header">
+            <h2 class="section-title">Technical Specifications</h2>
+            <p class="section-subtitle">Platform requirements and system parameters</p>
+        </div>
+
+        <div class="tech-specs">
+            <h3>📋 System Requirements</h3>
+            <div class="spec-grid">
+                <div class="spec-item">
+                    <div class="spec-label">Platform</div>
+                    <div class="spec-value">MetaTrader 5</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Language</div>
+                    <div class="spec-value">MQL5</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Asset Class</div>
+                    <div class="spec-value">Gold (XAUUSD)</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Timeframe</div>
+                    <div class="spec-value">Tick-based</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Range Size</div>
+                    <div class="spec-value">$0.01</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Trading Window</div>
+                    <div class="spec-value">1 Hour Daily</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="performance-grid">
+            <div class="performance-card">
+                <div class="perf-icon">⚡</div>
+                <div class="perf-title">Execution Speed</div>
+                <div class="perf-value">< 50ms</div>
+            </div>
+            <div class="performance-card">
+                <div class="perf-icon">🎯</div>
+                <div class="perf-title">Max Slippage</div>
+                <div class="perf-value">30 Points</div>
+            </div>
+            <div class="performance-card">
+                <div class="perf-icon">🔄</div>
+                <div class="perf-title">Retry Attempts</div>
+                <div class="perf-value">3 Max</div>
+            </div>
+            <div class="performance-card">
+                <div class="perf-icon">📊</div>
+                <div class="perf-title">Daily Trade Limit</div>
+                <div class="perf-value">50 Trades</div>
+            </div>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <h3>🔧 Customizable Parameters</h3>
+                <ul class="feature-list">
+                    <li>Risk percentage per trade (0.1% default)</li>
+                    <li>Trading time window (8-9 AM Mexican)</li>
+                    <li>Range size for phantom bars ($0.01)</li>
+                    <li>Consecutive bars required (3 default)</li>
+                    <li>Daily loss/profit limits (5%/5%)</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>⚙️ Execution Settings</h3>
+                <ul class="feature-list">
+                    <li>Slippage tolerance (30 points)</li>
+                    <li>Maximum retry attempts (3)</li>
+                    <li>Retry delay timing (10ms)</li>
+                    <li>Market execution preference</li>
+                    <li>Magic number identification</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Visual Documentation -->
+    <section id="visuals" class="section">
+        <div class="section-header">
+            <h2 class="section-title">Visual Documentation</h2>
+            <p class="section-subtitle">Chart examples and system visualization</p>
+        </div>
+
+        <div class="visual-placeholder">
+            <div class="placeholder-icon">📈</div>
+            <div class="placeholder-text">Phantom Bar Formation Chart</div>
+            <div class="placeholder-caption">
+                Real-time visualization showing phantom bars forming with $0.01 ranges<br>
+                Dimensions: 1200x600px | Shows 3 consecutive bullish phantom bars leading to BUY signal
+            </div>
+        </div>
+
+        <div class="visual-placeholder">
+            <div class="placeholder-icon">🎯</div>
+            <div class="placeholder-text">Signal Generation Example</div>
+            <div class="placeholder-caption">
+                Chart demonstrating consecutive phantom bar pattern recognition<br>
+                Dimensions: 1200x500px | Highlights entry points and stop loss placement
+            </div>
+        </div>
+
+        <div class="visual-placeholder">
+            <div class="placeholder-icon">⚡</div>
+            <div class="placeholder-text">Execution Speed Comparison</div>
+            <div class="placeholder-caption">
+                Performance metrics showing execution times vs traditional systems<br>
+                Dimensions: 800x400px | Bar chart comparing latency measurements
+            </div>
+        </div>
+
+        <div class="visual-placeholder">
+            <div class="placeholder-icon">🛡️</div>
+            <div class="placeholder-text">Risk Management Dashboard</div>
+            <div class="placeholder-caption">
+                Real-time risk monitoring interface display<br>
+                Dimensions: 1000x600px | Shows daily P&L, trade count, and risk limits
+            </div>
+        </div>
+    </section>
+
+    <!-- Use Cases & Applications -->
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">Use Cases & Applications</h2>
+            <p class="section-subtitle">Optimal deployment scenarios and market conditions</p>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-icon">🌅</div>
+                <h3>Morning Volatility Trading</h3>
+                <p>Specifically designed for the high-volatility period during London market open (8-9 AM Mexican time). This window typically offers the best combination of volatility and liquidity for the phantom bar strategy to perform optimally.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🥇</div>
+                <h3>Gold Market Specialization</h3>
+                <p>Optimized for XAUUSD trading with $0.01 phantom bar ranges that align perfectly with Gold's typical intraday movements. The fixed range approach provides consistent risk measurement across different market conditions.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🔄</div>
+                <h3>Scalping & Momentum</h3>
+                <p>Ideal for traders focusing on quick momentum captures during high-volume periods. The system's ultra-fast execution and real-time analysis make it perfect for catching rapid directional moves in the Gold market.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">⚖️</div>
+                <h3>Risk-Controlled Day Trading</h3>
+                <p>Perfect for professional day traders who need strict risk controls with maximum 50 trades per day, daily loss limits, and automatic profit-taking. Designed for consistent, controlled trading operations.</p>
+            </div>
+        </div>
+
+        <div class="tech-specs">
+            <h3>🎯 Optimal Market Conditions</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>High Volatility Windows</h3>
+                    <p>Performs best during the London open when Gold typically experiences increased volatility and trading volume, providing clear directional moves for phantom bar pattern formation.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Trending Market Phases</h3>
+                    <p>The consecutive phantom bar logic excels when markets show clear directional bias, allowing the system to capture momentum moves with precision timing and execution.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Normal Spread Conditions</h3>
+                    <p>Designed to operate optimally when spreads are reasonable (system includes spread validation), ensuring execution costs don't erode the small but frequent profit targets.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Implementation Notes -->
+    <section id="implementation" class="section">
+        <div class="section-header">
+            <h2 class="section-title">Implementation & Optimization</h2>
+            <p class="section-subtitle">Setup considerations and best practices</p>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-icon">🔧</div>
+                <h3>Setup Requirements</h3>
+                <ul class="feature-list">
+                    <li>MetaTrader 5 platform with low-latency broker</li>
+                    <li>VPS recommended for consistent execution</li>
+                    <li>Gold (XAUUSD) symbol access required</li>
+                    <li>Minimum account size: $1,000 recommended</li>
+                    <li>ECN or STP broker for best execution</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">⚙️</div>
+                <h3>Optimization Tips</h3>
+                <ul class="feature-list">
+                    <li>Test different risk percentages (0.05% - 0.2%)</li>
+                    <li>Adjust consecutive bar count (2-4 bars)</li>
+                    <li>Monitor broker's execution quality</li>
+                    <li>Validate timezone settings for accuracy</li>
+                    <li>Regular performance monitoring recommended</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🛡️</div>
+                <h3>Risk Considerations</h3>
+                <ul class="feature-list">
+                    <li>Never risk more than you can afford to lose</li>
+                    <li>Monitor system during major news events</li>
+                    <li>Ensure adequate account equity buffer</li>
+                    <li>Regular backtesting on current data</li>
+                    <li>Consider broker execution quality impact</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">📊</div>
+                <h3>Performance Monitoring</h3>
+                <ul class="feature-list">
+                    <li>Daily P&L tracking and analysis</li>
+                    <li>Execution speed monitoring</li>
+                    <li>Win rate and average trade metrics</li>
+                    <li>Slippage analysis and optimization</li>
+                    <li>Risk-adjusted return calculations</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="code-concept">
+            <strong>Performance Optimization:</strong><br>
+            • Cache symbol information for faster access<br>
+            • Use synchronous execution for immediate confirmation<br>
+            • Implement tick-based processing for minimal latency<br>
+            • Optimize risk calculations for real-time performance<br>
+            <em>// All optimizations focused on sub-50ms execution targets</em>
+        </div>
+    </section>
+
+    <!-- Risk Disclosure -->
+    <div class="risk-disclosure">
+        <h3>⚠️ Important Risk Disclosure</h3>
+        <p><strong>Trading involves substantial risk of loss and is not suitable for all investors.</strong> Past performance is not indicative of future results. The 1R Phantom Bar EA is a trading tool that operates based on mathematical algorithms and market analysis. No trading system can guarantee profits, and all trading involves the risk of loss.</p>
+        
+        <p><strong>Key Risk Factors:</strong></p>
+        <ul class="feature-list">
+            <li>Market volatility can cause rapid losses</li>
+            <li>System performance depends on broker execution quality</li>
+            <li>Technical failures may impact trading operations</li>
+            <li>Market conditions may not align with system logic</li>
+            <li>Leverage amplifies both profits and losses</li>
+        </ul>
+        
+        <p><em>Always trade with funds you can afford to lose and consider seeking advice from an independent financial advisor.</em></p>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="contact-section">
+                <h3>Professional Trading System Development</h3>
+                <p>Interested in custom trading systems or collaboration opportunities? Connect for advanced algorithmic trading solutions and cutting-edge market analysis tools.</p>
+            </div>
+            
+            <div style="color: var(--text-muted); margin-top: 2rem;">
+                <p><strong>1R Phantom Bar EA</strong> | MetaTrader 5 Expert Advisor | Version 1.00</p>
+                <p>Copyright 2025, Range Bar Trading | Professional Trading System Portfolio</p>
+                <p style="margin-top: 1rem; font-size: 0.9rem;">
+                    <em>This portfolio page showcases trading system capabilities without revealing proprietary algorithms or implementation details.</em>
+                </p>
+                <div class="contact-buttons">
+                    <a href="mailto:contact@quantechinnovation.com" class="contact-btn email">
+                        <span class="contact-btn-icon">📧</span>
+                        Email Contact
+                    </a>
+                    <a href="https://portfolio.quantechinnovation.com/" target="_blank" class="contact-btn portfolio">
+                        <span class="contact-btn-icon">🌐</span>
+                        View Portfolio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add fade-in animation to cards when they come into view
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards and sections
+        document.querySelectorAll('.card, .visual-placeholder, .tech-specs').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Add hover effect to performance cards
+        document.querySelectorAll('.performance-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.transition = 'transform 0.3s ease';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+
+        // Add click-to-copy functionality for contact section
+        document.querySelector('.contact-section').addEventListener('click', function() {
+            const tempText = document.createElement('textarea');
+            tempText.value = 'Professional Trading System Developer - 1R Phantom Bar EA';
+            document.body.appendChild(tempText);
+            tempText.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempText);
+            
+            // Show feedback
+            const originalText = this.innerHTML;
+            this.innerHTML = '<h3>Contact Information Copied!</h3><p>Ready to paste for professional inquiries</p>';
+            setTimeout(() => {
+                this.innerHTML = originalText;
+            }, 2000);
+        });
+
+        // Dynamic navbar background on scroll
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.style.background = 'rgba(26, 31, 46, 0.98)';
+            } else {
+                navbar.style.background = 'rgba(26, 31, 46, 0.95)';
+            }
+        });
+    </script>
+</body>
+</html>
