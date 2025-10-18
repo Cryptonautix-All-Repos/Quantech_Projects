@@ -11,8 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
     <!-- Internal Stylesheets -->
-    <link rel="stylesheet" href="portfolio-landing-page/css/styles.css">
-    <link rel="stylesheet" href="portfolio-landing-page/css/responsive.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -23,24 +23,18 @@
                 MetaTrader Trading Systems
             </div>
             <ul class="nav-links" id="nav-links">
-                <li><a href="#home">Home</a></li>
+                <li><a href="https://portfolio.quantechinnovation.com/" target="_blank">Home</a></li>
                 <li><a href="#strategies">Strategies</a></li>
                 <li><a href="#technical">Technical</a></li>
-                <li><a href="#performance">Performance</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
-            <div class="mobile-menu-toggle" id="mobile-menu-toggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-content">
-            <h1 class="hero-title">Professional MetaTrader Trading Systems</h1>
+            <h1 class="hero-title">Quantech Innovation Professional MetaTrader Trading Systems</h1>
             <p class="hero-subtitle">Advanced Algorithmic Strategies for MT5 Platform</p>
             
             <div class="platform-badges">
@@ -53,7 +47,6 @@
             
             <div class="hero-cta">
                 <a href="#strategies" class="cta-button primary">Explore Strategies</a>
-                <a href="#contact" class="cta-button secondary">Contact Us</a>
             </div>
         </div>
         
@@ -82,17 +75,7 @@
                         <li>Gold market optimization</li>
                         <li>Risk-reward optimization</li>
                     </ul>
-                    <div class="card-stats">
-                        <div class="stat">
-                            <span class="stat-value">85%</span>
-                            <span class="stat-label">Win Rate</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-value">2.3:1</span>
-                            <span class="stat-label">Risk/Reward</span>
-                        </div>
-                    </div>
-                    <button class="learn-more-btn" data-target="gold-sma-details">Learn More</button>
+                    <a href="gold_sma_strategy_portfolio/gold_sma_strategy_portfolio.html" class="cta-button">Learn More</a>
                 </div>
 
                 <!-- MT5 Reverse Copier Card -->
@@ -116,7 +99,7 @@
                             <span class="stat-label">Latency</span>
                         </div>
                     </div>
-                    <button class="learn-more-btn" data-target="reverse-copier-details">Learn More</button>
+                    <a href="mt5_reverse_copier_portfolio/mt5_reverse_copier_portfolio.html" class="cta-button">Learn More</a>
                 </div>
 
                 <!-- Phantom Bar EA Card -->
@@ -130,17 +113,7 @@
                         <li>Precision entry timing</li>
                         <li>Multiple asset support</li>
                     </ul>
-                    <div class="card-stats">
-                        <div class="stat">
-                            <span class="stat-value">78%</span>
-                            <span class="stat-label">Success Rate</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-value">1:1</span>
-                            <span class="stat-label">Fixed R:R</span>
-                        </div>
-                    </div>
-                    <button class="learn-more-btn" data-target="phantom-bar-details">Learn More</button>
+                    <a href="phantom_bar_ea_portfolio/phantom_bar_ea_portfolio.html" class="cta-button">Learn More</a>
                 </div>
 
                 <!-- Range 1R Bot Card -->
@@ -154,17 +127,7 @@
                         <li>1R risk consistency</li>
                         <li>Market condition filtering</li>
                     </ul>
-                    <div class="card-stats">
-                        <div class="stat">
-                            <span class="stat-value">82%</span>
-                            <span class="stat-label">Win Rate</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-value">15%</span>
-                            <span class="stat-label">Monthly ROI</span>
-                        </div>
-                    </div>
-                    <button class="learn-more-btn" data-target="range-1r-details">Learn More</button>
+                    <a href="range-1r-bot-portfolio/range-1r-bot-portfolio.html" class="cta-button">Learn More</a>
                 </div>
             </div>
         </div>
@@ -294,23 +257,31 @@
                             </div>
                             
                             <div class="technical-specs">
-                                <h4>Configuration Parameters</h4>
+                                <h4>Technical Specifications</h4>
                                 <div class="specs-grid">
                                     <div class="spec-item">
-                                        <span class="spec-label">Risk per Trade</span>
-                                        <span class="spec-value">1R Fixed</span>
+                                        <span class="spec-label">Platform</span>
+                                        <span class="spec-value">MetaTrader 5</span>
                                     </div>
                                     <div class="spec-item">
-                                        <span class="spec-label">Timeframes</span>
+                                        <span class="spec-label">Language</span>
+                                        <span class="spec-value">MQL5</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Timeframe</span>
                                         <span class="spec-value">H1, H4, D1</span>
                                     </div>
                                     <div class="spec-item">
-                                        <span class="spec-label">Assets</span>
+                                        <span class="spec-label">Asset Class</span>
                                         <span class="spec-value">Major Pairs</span>
                                     </div>
                                     <div class="spec-item">
-                                        <span class="spec-label">Max Positions</span>
-                                        <span class="spec-value">5 concurrent</span>
+                                        <span class="spec-label">Execution Type</span>
+                                        <span class="spec-value">Market Orders</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Risk-Reward</span>
+                                        <span class="spec-value">1:1 Fixed</span>
                                     </div>
                                 </div>
                             </div>
@@ -339,23 +310,31 @@
                             </div>
                             
                             <div class="technical-specs">
-                                <h4>Trading Parameters</h4>
+                                <h4>Technical Specifications</h4>
                                 <div class="specs-grid">
                                     <div class="spec-item">
-                                        <span class="spec-label">Strategy Type</span>
-                                        <span class="spec-value">Range Trading</span>
+                                        <span class="spec-label">Platform</span>
+                                        <span class="spec-value">MetaTrader 5</span>
                                     </div>
                                     <div class="spec-item">
-                                        <span class="spec-label">Risk Method</span>
-                                        <span class="spec-value">1R Consistent</span>
+                                        <span class="spec-label">Language</span>
+                                        <span class="spec-value">MQL5</span>
                                     </div>
                                     <div class="spec-item">
-                                        <span class="spec-label">Optimal Markets</span>
-                                        <span class="spec-value">Sideways/Range</span>
+                                        <span class="spec-label">Timeframe</span>
+                                        <span class="spec-value">H1, H4</span>
                                     </div>
                                     <div class="spec-item">
-                                        <span class="spec-label">Success Rate</span>
-                                        <span class="spec-value">80%+</span>
+                                        <span class="spec-label">Asset Class</span>
+                                        <span class="spec-value">Range-bound Pairs</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Execution Type</span>
+                                        <span class="spec-value">Market Orders</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Risk-Reward</span>
+                                        <span class="spec-value">1:1 Consistent</span>
                                     </div>
                                 </div>
                             </div>
@@ -422,236 +401,8 @@
         </div>
     </section>
 
-    <!-- Performance Dashboard -->
-    <section class="section performance-section" id="performance">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Performance Dashboard</h2>
-                <p class="section-subtitle">Comprehensive backtesting results and live performance metrics</p>
-            </div>
-            
-            <div class="performance-dashboard">
-                <div class="dashboard-controls">
-                    <div class="time-filter">
-                        <button class="filter-btn active" data-period="1y">1 Year</button>
-                        <button class="filter-btn" data-period="6m">6 Months</button>
-                        <button class="filter-btn" data-period="3m">3 Months</button>
-                        <button class="filter-btn" data-period="1m">1 Month</button>
-                    </div>
-                    
-                    <div class="strategy-filter">
-                        <select id="strategy-select">
-                            <option value="all">All Strategies</option>
-                            <option value="gold-sma">Gold SMA Strategy</option>
-                            <option value="reverse-copier">Reverse Copier</option>
-                            <option value="phantom-bar">Phantom Bar EA</option>
-                            <option value="range-1r">Range 1R Bot</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="performance-metrics">
-                    <div class="metric-card">
-                        <h4>Total Return</h4>
-                        <div class="metric-value positive">+187.5%</div>
-                        <div class="metric-change">+12.3% this month</div>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <h4>Win Rate</h4>
-                        <div class="metric-value">82.4%</div>
-                        <div class="metric-change">+1.2% from last month</div>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <h4>Max Drawdown</h4>
-                        <div class="metric-value negative">-8.7%</div>
-                        <div class="metric-change">Within acceptable limits</div>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <h4>Sharpe Ratio</h4>
-                        <div class="metric-value">2.14</div>
-                        <div class="metric-change">Excellent risk-adjusted returns</div>
-                    </div>
-                </div>
-                
-                <div class="chart-container">
-                    <div class="chart-placeholder">
-                        <div class="chart-icon">📈</div>
-                        <h4>Performance Chart</h4>
-                        <p>Interactive performance visualization showing equity curves, drawdown analysis, and monthly returns for all trading strategies.</p>
-                        <div class="chart-dimensions">Dimensions: 800x400px</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Implementation Guide -->
-    <section class="section implementation-section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Implementation Guide</h2>
-                <p class="section-subtitle">Step-by-step setup instructions and optimization guidelines</p>
-            </div>
-            
-            <div class="implementation-steps">
-                <div class="step-timeline">
-                    <div class="step-item">
-                        <div class="step-number">1</div>
-                        <div class="step-content">
-                            <h3>Platform Setup</h3>
-                            <p>Download and install MetaTrader 5 build 3000 or higher. Ensure stable internet connection and VPS hosting for 24/7 operation.</p>
-                            <ul class="step-details">
-                                <li>Install MT5 on Windows system</li>
-                                <li>Configure broker connection</li>
-                                <li>Verify account permissions</li>
-                                <li>Test data feed quality</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="step-item">
-                        <div class="step-number">2</div>
-                        <div class="step-content">
-                            <h3>Strategy Installation</h3>
-                            <p>Deploy trading systems to the platform and configure initial parameters based on your risk tolerance and account size.</p>
-                            <ul class="step-details">
-                                <li>Copy EA files to Experts folder</li>
-                                <li>Enable automated trading</li>
-                                <li>Configure risk parameters</li>
-                                <li>Set symbol permissions</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="step-item">
-                        <div class="step-number">3</div>
-                        <div class="step-content">
-                            <h3>Parameter Optimization</h3>
-                            <p>Fine-tune strategy parameters using the built-in strategy tester and optimization tools for your specific trading environment.</p>
-                            <ul class="step-details">
-                                <li>Run strategy tester backtests</li>
-                                <li>Optimize key parameters</li>
-                                <li>Validate on out-of-sample data</li>
-                                <li>Monitor forward performance</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="step-item">
-                        <div class="step-number">4</div>
-                        <div class="step-content">
-                            <h3>Live Deployment</h3>
-                            <p>Transition to live trading with proper monitoring and risk management protocols in place.</p>
-                            <ul class="step-details">
-                                <li>Start with minimum position sizes</li>
-                                <li>Monitor performance daily</li>
-                                <li>Adjust risk based on drawdown</li>
-                                <li>Regular system maintenance</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="troubleshooting">
-                    <h3>Common Issues & Solutions</h3>
-                    <div class="faq-list">
-                        <div class="faq-item">
-                            <h4>EA not opening trades</h4>
-                            <p>Check automated trading is enabled, verify symbol permissions, ensure sufficient margin, and confirm market hours.</p>
-                        </div>
-                        <div class="faq-item">
-                            <h4>High slippage on trades</h4>
-                            <p>Use market execution brokers, ensure stable internet connection, consider VPS hosting, and avoid news events.</p>
-                        </div>
-                        <div class="faq-item">
-                            <h4>Unexpected drawdown</h4>
-                            <p>Review risk parameters, check market conditions, verify strategy logic, and consider reducing position sizes.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Contact Section -->
-    <section class="section contact-section" id="contact">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Contact & Support</h2>
-                <p class="section-subtitle">Get in touch for technical support, partnerships, or strategy customization</p>
-            </div>
-            
-            <div class="contact-content">
-                <div class="contact-form-container">
-                    <form class="contact-form" id="contact-form">
-                        <div class="form-group">
-                            <label for="name">Full Name</label>
-                            <input type="text" id="name" name="name" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" name="email" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="subject">Subject</label>
-                            <select id="subject" name="subject" required>
-                                <option value="">Select inquiry type</option>
-                                <option value="technical-support">Technical Support</option>
-                                <option value="strategy-customization">Strategy Customization</option>
-                                <option value="partnership">Partnership Inquiry</option>
-                                <option value="download-request">Download Request</option>
-                                <option value="general">General Inquiry</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="message">Message</label>
-                            <textarea id="message" name="message" rows="5" required></textarea>
-                        </div>
-                        
-                        <button type="submit" class="submit-btn">Send Message</button>
-                    </form>
-                </div>
-                
-                <div class="contact-info">
-                    <div class="info-card">
-                        <h3>Technical Support</h3>
-                        <p>Get help with installation, configuration, and troubleshooting</p>
-                        <div class="contact-details">
-                            <p><strong>Response Time:</strong> 24-48 hours</p>
-                            <p><strong>Support Hours:</strong> Mon-Fri 9AM-6PM EST</p>
-                            <p><strong>Languages:</strong> English, Chinese, Spanish</p>
-                        </div>
-                    </div>
-                    
-                    <div class="info-card">
-                        <h3>Partnership Opportunities</h3>
-                        <p>Collaborate with us on strategy development and distribution</p>
-                        <div class="contact-details">
-                            <p><strong>Minimum AUM:</strong> $100,000+</p>
-                            <p><strong>Revenue Share:</strong> Competitive rates</p>
-                            <p><strong>White Label:</strong> Available</p>
-                        </div>
-                    </div>
-                    
-                    <div class="info-card">
-                        <h3>Download Access</h3>
-                        <p>Request access to strategy files and documentation</p>
-                        <div class="contact-details">
-                            <p><strong>Demo Version:</strong> Free trial available</p>
-                            <p><strong>Full Version:</strong> Licensing required</p>
-                            <p><strong>Updates:</strong> Lifetime free updates</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Risk Disclaimer -->
     <section class="risk-disclaimer">
@@ -675,57 +426,98 @@
         </div>
     </section>
 
+    <!-- Contact Section -->
+    <section class="section contact-section" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Get In Touch</h2>
+                <p class="section-subtitle">Connect with Quantech Innovation for professional MetaTrader trading solutions</p>
+            </div>
+            
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Contact Information</h3>
+                    <p>Ready to enhance your trading performance with our professional MetaTrader systems?</p>
+                    
+                    <div class="contact-buttons">
+                        <a href="mailto:contact@quantechinnovation.com" class="cta-button secondary">
+                            📧 Email Us
+                        </a>
+                        <a href="https://portfolio.quantechinnovation.com/" target="_blank" class="cta-button primary">
+                            🌐 View Portfolio
+                        </a>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>MetaTrader Trading Systems</h4>
-                    <p>Professional algorithmic trading solutions for the modern trader.</p>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="#strategies">Strategies</a></li>
-                        <li><a href="#technical">Technical Specs</a></li>
-                        <li><a href="#performance">Performance</a></li>
-                        <li><a href="#contact">Contact</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Legal</h4>
-                    <ul>
-                        <li><a href="#risk-disclaimer">Risk Disclaimer</a></li>
-                        <li><a href="#privacy">Privacy Policy</a></li>
-                        <li><a href="#terms">Terms of Service</a></li>
-                        <li><a href="#licenses">Licenses</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Connect</h4>
-                    <p>Stay updated with latest strategy developments</p>
-                    <div class="social-links">
-                        <a href="#" class="social-link">LinkedIn</a>
-                        <a href="#" class="social-link">Twitter</a>
-                        <a href="#" class="social-link">GitHub</a>
-                    </div>
-                </div>
-            </div>
-            
             <div class="footer-bottom">
-                <p>&copy; 2024 MetaTrader Trading Systems. All rights reserved.</p>
+                <p>&copy; 2025 Quantech Innovation MetaTrader Professional Trading Systems. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <!-- Scripts -->
-    <script src="portfolio-landing-page/js/smooth-scroll.js"></script>
-    <script src="portfolio-landing-page/js/interactive-elements.js"></script>
-    <script src="portfolio-landing-page/js/main.js"></script>
+    <script src="js/smooth-scroll.js"></script>
+    <script src="js/interactive-elements.js"></script>
+    <script src="js/main.js"></script>
     
+    <script>
+        // Learn More button functionality
+        document.querySelectorAll('.learn-more-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetTab = this.getAttribute('data-target');
+                const strategyDetailsSection = document.getElementById('strategy-details');
+                
+                // Scroll to strategy details section
+                strategyDetailsSection.scrollIntoView({ behavior: 'smooth' });
+                
+                // Activate the target tab
+                setTimeout(() => {
+                    // Remove active class from all tabs and contents
+                    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to target tab
+                    const targetTabBtn = document.querySelector(`[data-tab="${targetTab}"]`);
+                    if (targetTabBtn) {
+                        targetTabBtn.classList.add('active');
+                    }
+                    
+                    // Add active class to target content
+                    const targetContent = document.getElementById(targetTab);
+                    if (targetContent) {
+                        targetContent.classList.add('active');
+                    }
+                }, 500);
+            });
+        });
+        
+        // Tab navigation functionality
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetTab = this.getAttribute('data-tab');
+                
+                // Remove active class from all tabs and contents
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Add active class to target content
+                const targetContent = document.getElementById(targetTab);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>
