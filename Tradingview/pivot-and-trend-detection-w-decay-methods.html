@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pivot & Trend Detection w/ Decay Methods - Quantech Innovation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0a0e27;
+            --secondary-dark: #131829;
+            --accent-cyan: #00d4ff;
+            --accent-blue: #0080ff;
+            --text-primary: #ffffff;
+            --text-secondary: #b8c5d6;
+            --card-bg: #1a1f3a;
+            --success: #00ff88;
+            --danger: #ff3366;
+            --border-color: rgba(0, 212, 255, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background: rgba(19, 24, 41, 0.95);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .back-btn {
+            padding: 0.6rem 1.2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--accent-cyan);
+            color: var(--primary-dark);
+            border-color: var(--accent-cyan);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                grid-template-columns: 240px 1fr;
+            }
+        }
+
+        /* Sidebar Navigation */
+        .sidebar-nav {
+            position: sticky;
+            top: 100px; /* Adjust based on header height */
+            align-self: start;
+        }
+
+        .sidebar-nav h3 {
+            font-size: 1.1rem;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.75rem;
+        }
+
+        .sidebar-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            display: block;
+            padding: 0.25rem 0;
+        }
+
+        .sidebar-nav a:hover {
+            color: var(--accent-cyan);
+            transform: translateX(5px);
+        }
+
+        /* Main Content Sections */
+        .content-main {
+            background: var(--card-bg);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+        }
+
+        .content-main h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+        }
+        
+        .content-section {
+            margin-bottom: 3rem;
+        }
+
+        .content-section h2 {
+            font-size: 1.8rem;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .content-section p, .content-section li {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .content-section ul {
+            list-style-position: inside;
+            padding-left: 1rem;
+        }
+
+        .content-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Parameter Table */
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+
+        .param-table th, .param-table td {
+            padding: 0.8rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .param-table th {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        .param-table code {
+            font-family: 'Courier New', Courier, monospace;
+            background: var(--secondary-dark);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: var(--accent-cyan);
+        }
+
+        /* Image Placeholders */
+        .img-placeholder {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            max-height: 600px;
+            background: var(--secondary-dark);
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .img-placeholder p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .caption {
+            display: block;
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        /* Risk Disclaimer */
+        .risk-disclaimer {
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .risk-disclaimer h3 {
+            color: var(--danger);
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-disclaimer p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary-dark);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            margin-top: 4rem;
+        }
+
+        .footer-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-btn {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: var(--primary-dark);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .footer-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+        
+        footer p {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-tagline {
+            color: var(--accent-cyan);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1023px) {
+            .sidebar-nav {
+                position: static;
+                border-bottom: 1px solid var(--border-color);
+                padding-bottom: 1rem;
+                margin-bottom: 2rem;
+            }
+            .sidebar-nav ul {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            .sidebar-nav li { margin-bottom: 0; }
+        }
+        @media (max-width: 768px) {
+            header { padding: 1rem; }
+            .content-main h1 { font-size: 2rem; }
+            .content-section h2 { font-size: 1.5rem; }
+            .container { padding: 0 1rem; margin-top: 1.5rem;}
+            .content-main { padding: 1.5rem; }
+            .param-table { font-size: 0.9rem; }
+            .param-table th, .param-table td { padding: 0.6rem 0.5rem; }
+            .img-placeholder p { font-size: 1rem; }
+        }
+    </style>
+    <script>
+        // Smooth scroll for navigation
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring;
+                    const targetElement = document.getElementById(targetId);
+                    if(targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">Quantech Innovation</div>
+            <a href="index.html" class="back-btn">← Back to Portfolio</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="sidebar-nav">
+            <h3>Quick Navigation</h3>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#methodology">Methodology & Logic</a></li>
+                <li><a href="#parameters">Parameters & Settings</a></li>
+                <li><a href="#specs">Technical Specifications</a></li>
+                <li><a href="#visuals">Visual Documentation</a></li>
+                <li><a href="#usage">Usage Guide</a></li>
+                <li><a href="#alerts">Alert Configuration</a></li>
+            </ul>
+        </nav>
+
+        <main class="content-main">
+            <h1>Pivot & Trend Detection w/ Decay Methods</h1>
+
+            <section id="overview" class="content-section">
+                <h2>Overview</h2>
+                <p>The Pivot & Trend Detection indicator employs a sophisticated, multi-method approach to identify significant market turning points (pivots) with high reliability and zero repainting. Unlike traditional indicators that rely solely on recent price highs and lows, this tool defines pivots based on a confirmed **change in the underlying trend**, analyzed from multiple perspectives.</p>
+                <p>It utilizes a unique **three-phase processing architecture** combined with a weighted blend of four distinct trend-analysis techniques: EMA Slope, Linear Decay, Exponential Decay, and Gaussian Decay. By assessing the trend consensus both *before* and *after* a potential pivot point, the indicator filters out noise and pinpoints only those highs and lows that represent genuine shifts in market direction.</p>
+                <p>The core innovation lies in its **anti-repainting buffer system**. By delaying the analysis of the most recent bars, the indicator ensures that its trend calculations are based on finalized price action, guaranteeing that once a pivot is identified and plotted, it will never change or disappear.</p>
+            </section>
+
+            <section id="methodology" class="content-section">
+                <h2>Methodology & Logic</h2>
+                <p>The indicator's non-repainting pivot detection follows a rigorous, multi-stage process:</p>
+                <ul>
+                    <li><strong>1. Three-Phase Processing Architecture:</strong>
+                        <ul>
+                            <li><strong>Phase 1 (Data Collection):</strong> All available historical and real-time bar data is collected and stored efficiently.</li>
+                            <li><strong>Phase 2 (Historical Processing):</strong> The script analyzes all collected data *except* for a recent "buffer zone" of bars determined by the `Window Size (Lookback Distance)` input. This phase identifies and plots historical pivots that are guaranteed not to repaint.</li>
+                            <li><strong>Phase 3 (Real-Time Processing):</strong> New bars are added to the data store, but analysis is only performed on bars that have aged out of the buffer zone. This ensures the trend analysis always has a stable, non-changing future reference, preventing repainting.</li>
+                        </ul>
+                    </li>
+                    <li><strong>2. Local High/Low Prescreening (Optional):</strong> Before performing the intensive trend analysis, the indicator can optionally check if a bar is a simple local high or low within a small window. This acts as an initial filter to speed up processing.</li>
+                    <li><strong>3. Multi-Method Trend Analysis (Core Engine):</strong>
+                        <ul>
+                            <li>For each candidate bar (that passed prescreening, if enabled), the script calculates the trend strength and direction *looking backwards* (Left Side) and *looking forwards* (Right Side) over the `Window Size`.</li>
+                            <li>This analysis uses a weighted average of up to four distinct methods, each giving different importance to bars based on their distance:
+                                <ol>
+                                    <li><strong>EMA Slope:</strong> Compares fast and slow EMAs, normalized by ATR.</li>
+                                    <li><strong>Linear Decay:</strong> Weights recent bars more heavily, decreasing linearly with distance.</li>
+                                    <li><strong>Exponential Decay:</strong> Weights recent bars much more heavily, decreasing exponentially with distance (controlled by `Exponential Decay Factor`).</li>
+                                    <li><strong>Gaussian Decay:</strong> Weights nearby bars most heavily, with influence decreasing symmetrically like a bell curve (controlled by `Gaussian Decay Spread`).</li>
+                                </ol>
+                            </li>
+                            <li>The user can enable/disable each method and adjust their contribution to the final trend score via `weight` inputs.</li>
+                        </ul>
+                    </li>
+                    <li><strong>4. Pivot Confirmation:</strong> A pivot is confirmed only when there is a clear reversal in the *combined* trend score:
+                        <ul>
+                            <li>A **Pivot High ("H")** is confirmed if the Left Side trend score indicates an uptrend (+1) and the Right Side score indicates a downtrend (-1).</li>
+                            <li>A **Pivot Low ("L")** is confirmed if the Left Side trend score indicates a downtrend (-1) and the Right Side score indicates an uptrend (+1).</li>
+                        </ul>
+                    </li>
+                     <li><strong>5. Visualization:</strong> Confirmed pivots are marked on the chart with "H" or "L" labels. Optionally, these labels can display the detailed breakdown of scores from all four trend methods for deeper analysis.</li>
+                </ul>
+            </section>
+
+            <section id="parameters" class="content-section">
+                <h2>Parameters & Settings</h2>
+                <p>Fine-tune the pivot detection engine with these key settings.</p>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter Group</th>
+                            <th>Key Inputs</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>Local High/Low Prescreening</code></td>
+                            <td><code>Enable Local High/Low Prescreening</code>, <code>Local Extreme Window Size</code></td>
+                            <td>Toggles the initial fast filter. When enabled, only bars that are highs/lows within the `Window Size` are considered for the full trend analysis.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Trend Detection Method Controls</code></td>
+                            <td><code>Price Source</code>, <code>Window Size (Lookback Distance)</code>, <code>Decay Factor</code>, <code>Sigma</code>, <code>Enable...</code> & <code>...Weight</code> (for all 4 methods)</td>
+                            <td>Defines the core analysis engine. <code>Window Size</code> is critical – it sets both the analysis range and the anti-repainting buffer size. Adjusting method weights allows customization of the trend definition.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Display</code></td>
+                            <td><code>Show Pivot Labels</code>, <code>Show Detailed Trend Scores</code>, <code>Show Phase Debug Labels</code>, <code>Data Storage Size</code></td>
+                            <td>Controls the visual output. <code>Show Pivot Labels</code> toggles the "H"/"L" markers. <code>Show Detailed Trend Scores</code> expands these labels to show individual method scores. <code>Data Storage Size</code> manages memory usage.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="specs" class="content-section">
+                <h2>Technical Specifications</h2>
+                <ul>
+                    <li><strong>PineScript Version:</strong> v6</li>
+                    <li><strong>Indicator Type:</strong> Overlay (plots directly on the main price chart)</li>
+                    <li><strong>Repainting:</strong> No. The three-phase architecture with its buffer zone (`Window Size`) explicitly prevents repainting by ensuring trend analysis only occurs on bars with a stable historical context.</li>
+                    <li><strong>Applicable Timeframes:</strong> All. Logic is based on relative price changes and trend analysis.</li>
+                    <li><strong>Asset Classes:</strong> All (Forex, Crypto, Stocks, Indices, Commodities).</li>
+                </ul>
+            </section>
+
+            <section id="visuals" class="content-section">
+                <h2>Visual Documentation</h2>
+                <p>The indicator plots clear markers for confirmed trend reversals.</p>
+                
+                <div class="img-placeholder">
+                    <p>Example 1: [Pivot & Trend Detection] on SPY Daily Chart<br>(Showing 'H' and 'L' labels marking significant swing highs and lows)</p>
+                </div>
+                <span class="caption">This placeholder demonstrates the primary output: objectively identified turning points based on trend reversals, not just simple price extremes.</span>
+
+                <div class="img-placeholder">
+                    <p>Example 2: Detailed Trend Scores Enabled<br>(Zoomed-in view showing an 'H' label expanded with the scores from EMA, LIN, EXP, GAU methods for Left/Right sides)</p>
+                </div>
+                <span class="caption">This placeholder illustrates the optional detailed view, providing insight into how the trend consensus shifted to confirm the pivot.</span>
+
+                <div class="img-placeholder">
+                    <p>Example 3: Anti-Repainting Buffer Zone<br>(Conceptual illustration showing the most recent bars in the 'buffer zone' where pivots are not yet analyzed or plotted)</p>
+                </div>
+                <span class="caption">This placeholder helps visualize the non-repainting mechanism. Pivots only appear after a delay equal to the `Window Size`, ensuring they are based on confirmed history.</span>
+            </section>
+
+            <section id="usage" class="content-section">
+                <h2>Usage Guide</h2>
+                <p>Use this indicator as a robust foundation for identifying market structure and potential reversal points.</p>
+                <ul>
+                    <li><strong>Market Structure Analysis:</strong> The sequence of "H" and "L" pivots defines the market structure. Higher highs and higher lows indicate an uptrend. Lower highs and lower lows indicate a downtrend. A break of a previous "L" in an uptrend (or "H" in a downtrend) can signal a change of character (CHoCH).</li>
+                    <li><strong>Support & Resistance Levels:</strong> Confirmed pivot highs ("H") act as potential resistance levels, while pivot lows ("L") act as potential support levels.</li>
+                    <li><strong>Entry Confirmation:</strong> Use the pivots as zones of interest. Wait for price to approach a significant pivot level and look for secondary confirmation (e.g., candlestick patterns, volume spikes) before considering an entry.</li>
+                    <li><strong>Parameter Tuning:</strong>
+                        <ul>
+                            <li><strong>`Window Size (Lookback Distance)`:</strong> This is the most critical parameter. Larger values (e.g., 15-25) will identify major, long-term pivots and ignore minor fluctuations, resulting in fewer signals but higher significance. Smaller values (e.g., 5-10) will detect more frequent, shorter-term pivots. This value also dictates the delay before a pivot appears due to the anti-repainting buffer.</li>
+                            <li><strong>Method Weights:</strong> Adjust the weights (`ema_weight`, `linear_weight`, etc.) to tailor the trend definition. For example, increasing `exponential_weight` makes the trend analysis more sensitive to recent price action. Setting one weight to 1.0 and others to 0.0 isolates a single trend detection method.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section id="alerts" class="content-section">
+                <h2>Alert Configuration</h2>
+                <p>This indicator is primarily a visual analysis tool for identifying market structure and does not contain built-in `alert()` or `alertcondition()` functions.</p>
+                <p>Since the pivots are non-repainting, you can manually set alerts based on the plotted levels:</p>
+                <ol>
+                    <li>Wait for the indicator to plot a new "H" or "L" label.</li>
+                    <li>Use TradingView's drawing tools to place a horizontal line at the exact price level of the pivot (the high of the "H" bar or the low of the "L" bar).</li>
+                    <li>Right-click on the drawn line and select "Add Alert".</li>
+                    <li>Configure the alert condition (e.g., "Crossing", "Greater Than") to be notified if price interacts with or breaks that significant structural level.</li>
+                </ol>
+            </section>
+
+            <div class="risk-disclaimer">
+                <h3>Risk Disclaimer</h3>
+                <p>Trading involves substantial risk. This indicator is a technical analysis tool and does not guarantee profitable trades. Past performance does not indicate future results. Users should conduct their own analysis and risk assessment before making any trading decisions.</p>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <div class="footer-buttons">
+            <a href="mailto:contact@quantechinnovation.com" class="footer-btn">✉ Contact Us</a>
+            <a href="https://portfolio.quantechinnovation.com/" class="footer-btn" target="_blank">🌐 View Portfolio</a>
+        </div>
+        <p>&copy; 2024 Quantech Innovation. All Rights Reserved.</p>
+        <p class="footer-tagline">Built for Professional Traders</p>
+    </footer>
+
+</body>
+</html>

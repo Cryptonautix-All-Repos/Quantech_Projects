@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EC + FVG + Volume V1 - Quantech Innovation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0a0e27;
+            --secondary-dark: #131829;
+            --accent-cyan: #00d4ff;
+            --accent-blue: #0080ff;
+            --text-primary: #ffffff;
+            --text-secondary: #b8c5d6;
+            --card-bg: #1a1f3a;
+            --success: #00ff88;
+            --danger: #ff3366;
+            --border-color: rgba(0, 212, 255, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background: rgba(19, 24, 41, 0.95);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .back-btn {
+            padding: 0.6rem 1.2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--accent-cyan);
+            color: var(--primary-dark);
+            border-color: var(--accent-cyan);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                grid-template-columns: 240px 1fr;
+            }
+        }
+
+        /* Sidebar Navigation */
+        .sidebar-nav {
+            position: sticky;
+            top: 100px; /* Adjust based on header height */
+            align-self: start;
+        }
+
+        .sidebar-nav h3 {
+            font-size: 1.1rem;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.75rem;
+        }
+
+        .sidebar-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            display: block;
+            padding: 0.25rem 0;
+        }
+
+        .sidebar-nav a:hover {
+            color: var(--accent-cyan);
+            transform: translateX(5px);
+        }
+
+        /* Main Content Sections */
+        .content-main {
+            background: var(--card-bg);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+        }
+
+        .content-main h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+        }
+        
+        .content-section {
+            margin-bottom: 3rem;
+        }
+
+        .content-section h2 {
+            font-size: 1.8rem;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .content-section p, .content-section li {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .content-section ul {
+            list-style-position: inside;
+            padding-left: 1rem;
+        }
+
+        .content-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Parameter Table */
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+
+        .param-table th, .param-table td {
+            padding: 0.8rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .param-table th {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        .param-table code {
+            font-family: 'Courier New', Courier, monospace;
+            background: var(--secondary-dark);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: var(--accent-cyan);
+        }
+
+        /* Image Placeholders */
+        .img-placeholder {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            max-height: 600px;
+            background: var(--secondary-dark);
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .img-placeholder p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .caption {
+            display: block;
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        /* Risk Disclaimer */
+        .risk-disclaimer {
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .risk-disclaimer h3 {
+            color: var(--danger);
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-disclaimer p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary-dark);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            margin-top: 4rem;
+        }
+
+        .footer-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-btn {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: var(--primary-dark);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .footer-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+        
+        footer p {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-tagline {
+            color: var(--accent-cyan);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1023px) {
+            .sidebar-nav {
+                position: static;
+                border-bottom: 1px solid var(--border-color);
+                padding-bottom: 1rem;
+                margin-bottom: 2rem;
+            }
+            .sidebar-nav ul {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            .sidebar-nav li { margin-bottom: 0; }
+        }
+        @media (max-width: 768px) {
+            header { padding: 1rem; }
+            .content-main h1 { font-size: 2rem; }
+            .content-section h2 { font-size: 1.5rem; }
+            .container { padding: 0 1rem; margin-top: 1.5rem;}
+            .content-main { padding: 1.5rem; }
+            .param-table { font-size: 0.9rem; }
+            .param-table th, .param-table td { padding: 0.6rem 0.5rem; }
+            .img-placeholder p { font-size: 1rem; }
+        }
+    </style>
+    <script>
+        // Smooth scroll for navigation
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring;
+                    const targetElement = document.getElementById(targetId);
+                    if(targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">Quantech Innovation</div>
+            <a href="index.html" class="back-btn">← Back to Portfolio</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="sidebar-nav">
+            <h3>Quick Navigation</h3>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#methodology">Methodology & Logic</a></li>
+                <li><a href="#parameters">Parameters & Settings</a></li>
+                <li><a href="#specs">Technical Specifications</a></li>
+                <li><a href="#visuals">Visual Documentation</a></li>
+                <li><a href="#usage">Usage Guide</a></li>
+                <li><a href="#alerts">Alert Configuration</a></li>
+            </ul>
+        </nav>
+
+        <main class="content-main">
+            <h1>EC + FVG + Volume V1</h1>
+
+            <section id="overview" class="content-section">
+                <h2>Overview</h2>
+                <p>The EC + FVG + Volume V1 indicator is an institutional-grade, multi-factor confluence tool designed to pinpoint high-probability reversal setups. It synthesizes three critical components of price action analysis: candlestick patterns (Engulfing Candles), market imbalances (Fair Value Gaps), and transactional pressure (Volume).</p>
+                <p>This indicator operates on the premise that the most powerful trading signals occur when these three elements align. It identifies highly-filtered Engulfing Candles, validates them against Fair Value Gaps, and, most importantly, qualifies them with a sophisticated, sequential **Volume Pattern Recognition Filter**. This filter is designed to detect a specific narrative of institutional activity: an initial high-volume stop hunt, followed by a liquidity grab, and culminating in a reversal.</p>
+                <p>In addition to its core confluence signal, the indicator also functions as a comprehensive, standalone volume analysis tool, identifying and alerting on four distinct types of significant volume activity. The entire system is built for automation, with full support for Pine Connector to execute trades based on the highest-conviction signals.</p>
+            </section>
+
+            <section id="methodology" class="content-section">
+                <h2>Methodology & Logic</h2>
+                <p>The indicator's logic is a powerful funnel that combines three independent analysis streams into one unified signal.</p>
+                <ul>
+                    <li><strong>Stream 1: Engulfing Candle (EC) Analysis:</strong>
+                        <ul>
+                            <li>The script begins by identifying standard Bullish and Bearish Engulfing patterns, which must pass a rigorous set of user-defined quality filters (e.g., swing point location, candle size, wick-to-body ratios). This ensures only strong, decisive engulfing candles are considered.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Stream 2: Fair Value Gap (FVG) Analysis:</strong>
+                        <ul>
+                            <li>The indicator simultaneously detects all FVGs, tracks their mitigation, and supports dual-mode filtering (validating against both active and recently-deleted FVGs). An EC must interact with a relevant FVG to pass this stage.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Stream 3: Volume Analysis (Core Innovation):</strong>
+                        <ul>
+                            <li><strong>Volume Spike Detection:</strong> The indicator constantly monitors volume, identifying four key events: <em>New Highest Volume</em>, <em>Follow-Up Volume</em>, <em>Average Volume Breakout</em>, and <em>Unusual Volume Spikes</em>. These are plotted as colored circles at the bottom of the chart.</li>
+                            <li><strong>Sequential Volume Pattern Filter:</strong> This is the most advanced feature. For a signal to be valid, a specific 3-step volume narrative must unfold in the 11 bars preceding the Engulfing Candle:
+                                <ol>
+                                    <li><strong>The Stop Hunt:</strong> A high-volume bar of the *opposite* color must have occurred (e.g., a high-volume red bar before a bullish signal).</li>
+                                    <li><strong>The Liquidity Grab:</strong> After the high-volume bar, price must break its low (for a bullish setup) or high (for a bearish setup).</li>
+                                    <li><strong>The FVG Reaction:</strong> The candle that created the new lowest low (or highest high) during the liquidity grab must have historically tapped into a valid FVG.</li>
+                                </ol>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Final Confluence Signal:</strong>
+                        <ul>
+                            <li>A final "setup" signal (green/red triangle) is generated only when a high-quality **EC** (Stream 1) occurs within a valid **FVG** (Stream 2), and the entire **Volume Pattern** (Stream 3) is confirmed.</li>
+                            <li>An "activation" signal (blue diamond) follows if the next candle confirms momentum, triggering automated alerts.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section id="parameters" class="content-section">
+                <h2>Parameters & Settings</h2>
+                <p>This indicator provides extensive customization across all three of its analysis modules.</p>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter Group</th>
+                            <th>Key Inputs</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>Engulfing Candle Filters</code></td>
+                            <td><code>Swing High/Low Filter</code>, <code>Candle Size Filters</code>, <code>Wick To Body Ratio Filters</code>, etc.</td>
+                            <td>A comprehensive suite of over 20 inputs to define what constitutes a "high-quality" Engulfing Candle. These allow you to filter for specific candle anatomy and location.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Fair Value Gap (FVG) Filter</code></td>
+                            <td><code>Enable FVG Filter</code>, <code>Enable Delayed Intercept Filter</code></td>
+                            <td>Controls the FVG validation. You can require the EC to form in an active FVG, a recently deleted FVG, or either.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Volume Signals (Core Filter)</code></td>
+                            <td><code>Enable Volume Pattern Recognition Filter</code>, <code>highestVolumeLookback</code>, <code>followUpVolumeThreshold</code>, <code>avgVolumeMultiplier</code>, <code>specialVolFilter...</code></td>
+                            <td><code>Enable Volume Pattern...</code> is the master switch for the sequential volume filter. The other inputs control the four standalone volume spike signals (the colored circles).</td>
+                        </tr>
+                        <tr>
+                            <td><code>Display Settings</code></td>
+                            <td><code>Plot Shape Size</code>, <code>Enable Swing/Activation/Volume Plots</code></td>
+                            <td>Controls the visibility of all on-chart markers, including the EC triangles, activation diamonds, and the various volume circles.</td>
+                        </tr>
+                         <tr>
+                            <td><code>Pine Connector Settings</code></td>
+                            <td><code>Enable Pine Connector</code>, <code>License ID</code>, <code>Risk</code>, <code>Risk:Reward Ratio</code>, etc.</td>
+                            <td>Activates and configures the automated alert messages for Pine Connector, allowing for fully automated trade execution.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="specs" class="content-section">
+                <h2>Technical Specifications</h2>
+                <ul>
+                    <li><strong>PineScript Version:</strong> v6</li>
+                    <li><strong>Indicator Type:</strong> Overlay (plots directly on the main price chart)</li>
+                    <li><strong>Repainting:</strong> No. All signals are confirmed on candle close and do not change.</li>
+                    <li><strong>Applicable Timeframes:</strong> All, though the volume pattern is generally more reliable on 1H timeframes and above.</li>
+                    <li><strong>Asset Classes:</strong> All (Forex, Crypto, Stocks, Indices, Commodities).</li>
+                </ul>
+            </section>
+
+            <section id="visuals" class="content-section">
+                <h2>Visual Documentation</h2>
+                <p>The indicator uses a multi-layered visual system to provide a complete market picture.</p>
+                
+                <div class="img-placeholder">
+                    <p>Example 1: [EC+FVG+VOL V1] Full Bullish Confluence Signal<br>(Showing the purple label, green triangle, blue diamond, and underlying volume spikes leading to the setup)</p>
+                </div>
+                <span class="caption">This placeholder illustrates the ideal bullish setup: a high-volume stop hunt (orange circle), a liquidity grab, and finally the engulfing candle (green triangle) that passes all filters, confirmed by the purple label.</span>
+
+                <div class="img-placeholder">
+                    <p>Example 2: [EC+FVG+VOL V1] Standalone Volume Analysis<br>(Chart showing various colored circles at the bottom, indicating different types of volume spikes)</p>
+                </div>
+                <span class="caption">This placeholder demonstrates the indicator's secondary function as a volume analysis tool. Orange = New Highest Volume, Fuchsia = Follow-Up, Teal = Average Breakout, Red = Unusual Spike.</span>
+
+                <div class="img-placeholder">
+                    <p>Example 3: Volume Pattern Filter Rejection<br>(An Engulfing Candle with FVG is present, but no purple label or triangle appears because the sequential volume pattern was not detected)</p>
+                </div>
+                <span class="caption">This placeholder shows the filter in action. A seemingly good EC+FVG setup is rejected because the underlying institutional volume narrative was missing, saving the trader from a lower-probability trade.</span>
+            </section>
+
+            <section id="usage" class="content-section">
+                <h2>Usage Guide</h2>
+                <p>This indicator is designed for traders seeking the highest level of confirmation before entering a trade.</p>
+                <ul>
+                    <li><strong>Primary Signal (Purple Label):</strong> The purple "Babel" label is the highest-conviction signal. It confirms that the EC, FVG, and sequential Volume Pattern have all aligned. This is the primary signal to watch for.
+                        <ul>
+                            <li><strong>Setup:</strong> The appearance of the green/red triangle alongside the purple label.</li>
+                            <li><strong>Entry Trigger:</strong> The appearance of the blue diamond on the next bar.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Secondary Signals (Volume Circles):</strong> The colored circles at the bottom of the chart provide crucial context about market activity, even without a full setup.
+                        <ul>
+                            <li>An **Orange Circle (New Highest Volume)** often marks the start of a significant move or a climax/reversal.</li>
+                            <li>A **Teal Circle (Average Volume Breakout)** can confirm the strength of a breakout from a range or pattern.</li>
+                            <li>A **Red Circle (Unusual Spike)** alerts you to potentially climactic, news-driven, or anomalous activity that requires caution.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Strategy & Filtering:</strong>
+                        <ul>
+                            <li><strong>Maximum Confluence (Recommended):</strong> Keep `Enable Volume Pattern Recognition Filter` turned ON. This will provide the fewest but highest-quality signals.</li>
+                            <li><strong>EC + FVG Only:</strong> Turn `Enable Volume Pattern Recognition Filter` OFF. The indicator will then function like the "Engulfing Candles + FVG V8" script, providing more frequent signals based only on candle patterns and FVGs.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section id="alerts" class="content-section">
+                <h2>Alert Configuration</h2>
+                <p>The indicator is fully equipped for both standard and automated alerting.</p>
+                
+                <h3>1. Standard TradingView Alerts</h3>
+                <p>If `Enable Pine Connector Alerts` is **OFF**, you can create manual alerts in TradingView for:</p>
+                <ul>
+                    <li><strong>Bullish/Bearish Engulfing Candle Alert:</strong> Triggers on the final, fully-filtered setup signal (triangle + purple label).</li>
+                    <li><strong>Bullish/Bearish Trade Activation Alert:</strong> Triggers on the confirmation signal (blue diamond).</li>
+                </ul>
+
+                <h3>2. Pine Connector Automated Alerts</h3>
+                <p>If `Enable Pine Connector Alerts` is **ON**, the system is ready for full automation.</p>
+                <ol>
+                    <li>Configure your <strong>License ID, Secret Key, Risk,</strong> and <strong>Risk:Reward Ratio</strong> in the settings.</li>
+                    <li>Create a new alert in TradingView for the "EC_FVG_VOL_V1" indicator.</li>
+                    <li>Select <strong>"Any alert() function call"</strong> as the condition.</li>
+                    <li>Set it to trigger <strong>"Once Per Bar"</strong> or <strong>"Once Per Bar Close"</strong>.</li>
+                </ol>
+                <p>When a **Trade Activation** (blue diamond) occurs, the script fires a precisely formatted alert that Pine Connector uses to execute the trade automatically in your MT4/MT5 terminal with the pre-calculated Stop Loss and Take Profit.</p>
+            </section>
+
+            <div class="risk-disclaimer">
+                <h3>Risk Disclaimer</h3>
+                <p>Trading involves substantial risk. This indicator is a technical analysis tool and does not guarantee profitable trades. Past performance does not indicate future results. Users should conduct their own analysis and risk assessment before making any trading decisions.</p>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <div class="footer-buttons">
+            <a href="mailto:contact@quantechinnovation.com" class="footer-btn">✉ Contact Us</a>
+            <a href="https://portfolio.quantechinnovation.com/" class="footer-btn" target="_blank">🌐 View Portfolio</a>
+        </div>
+        <p>&copy; 2024 Quantech Innovation. All Rights Reserved.</p>
+        <p class="footer-tagline">Built for Professional Traders</p>
+    </footer>
+
+</body>
+</html>

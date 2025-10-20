@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Timeframe FVG V2 - Quantech Innovation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0a0e27;
+            --secondary-dark: #131829;
+            --accent-cyan: #00d4ff;
+            --accent-blue: #0080ff;
+            --text-primary: #ffffff;
+            --text-secondary: #b8c5d6;
+            --card-bg: #1a1f3a;
+            --success: #00ff88;
+            --danger: #ff3366;
+            --border-color: rgba(0, 212, 255, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background: rgba(19, 24, 41, 0.95);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .back-btn {
+            padding: 0.6rem 1.2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--accent-cyan);
+            color: var(--primary-dark);
+            border-color: var(--accent-cyan);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                grid-template-columns: 240px 1fr;
+            }
+        }
+
+        /* Sidebar Navigation */
+        .sidebar-nav {
+            position: sticky;
+            top: 100px; /* Adjust based on header height */
+            align-self: start;
+        }
+
+        .sidebar-nav h3 {
+            font-size: 1.1rem;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.75rem;
+        }
+
+        .sidebar-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            display: block;
+            padding: 0.25rem 0;
+        }
+
+        .sidebar-nav a:hover {
+            color: var(--accent-cyan);
+            transform: translateX(5px);
+        }
+
+        /* Main Content Sections */
+        .content-main {
+            background: var(--card-bg);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+        }
+
+        .content-main h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+        }
+        
+        .content-section {
+            margin-bottom: 3rem;
+        }
+
+        .content-section h2 {
+            font-size: 1.8rem;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .content-section p, .content-section li {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .content-section ul {
+            list-style-position: inside;
+            padding-left: 1rem;
+        }
+
+        .content-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Parameter Table */
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+
+        .param-table th, .param-table td {
+            padding: 0.8rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .param-table th {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        .param-table code {
+            font-family: 'Courier New', Courier, monospace;
+            background: var(--secondary-dark);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: var(--accent-cyan);
+        }
+
+        /* Image Placeholders */
+        .img-placeholder {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            max-height: 600px;
+            background: var(--secondary-dark);
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .img-placeholder p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .caption {
+            display: block;
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        /* Risk Disclaimer */
+        .risk-disclaimer {
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .risk-disclaimer h3 {
+            color: var(--danger);
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-disclaimer p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary-dark);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            margin-top: 4rem;
+        }
+
+        .footer-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-btn {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: var(--primary-dark);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .footer-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+        
+        footer p {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-tagline {
+            color: var(--accent-cyan);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1023px) {
+            .sidebar-nav {
+                position: static;
+                border-bottom: 1px solid var(--border-color);
+                padding-bottom: 1rem;
+                margin-bottom: 2rem;
+            }
+            .sidebar-nav ul {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            .sidebar-nav li { margin-bottom: 0; }
+        }
+        @media (max-width: 768px) {
+            header { padding: 1rem; }
+            .content-main h1 { font-size: 2rem; }
+            .content-section h2 { font-size: 1.5rem; }
+            .container { padding: 0 1rem; margin-top: 1.5rem;}
+            .content-main { padding: 1.5rem; }
+            .param-table { font-size: 0.9rem; }
+            .param-table th, .param-table td { padding: 0.6rem 0.5rem; }
+            .img-placeholder p { font-size: 1rem; }
+        }
+    </style>
+    <script>
+        // Smooth scroll for navigation
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring;
+                    const targetElement = document.getElementById(targetId);
+                    if(targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">Quantech Innovation</div>
+            <a href="index.html" class="back-btn">← Back to Portfolio</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="sidebar-nav">
+            <h3>Quick Navigation</h3>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#methodology">Methodology & Logic</a></li>
+                <li><a href="#parameters">Parameters & Settings</a></li>
+                <li><a href="#specs">Technical Specifications</a></li>
+                <li><a href="#visuals">Visual Documentation</a></li>
+                <li><a href="#usage">Usage Guide</a></li>
+                <li><a href="#alerts">Alert Configuration</a></li>
+            </ul>
+        </nav>
+
+        <main class="content-main">
+            <h1>Multi-Timeframe FVG V2</h1>
+
+            <section id="overview" class="content-section">
+                <h2>Overview</h2>
+                <p>The Multi-Timeframe FVG V2 indicator is an essential tool for traders who practice top-down analysis. Its primary function is to detect and display Fair Value Gaps (FVGs) from up to **three separate, user-defined timeframes** simultaneously on a single chart. This provides a comprehensive, layered view of market imbalances, allowing traders to see how lower-timeframe price action interacts with significant higher-timeframe zones of interest.</p>
+                <p>A Fair Value Gap represents a price inefficiency or imbalance created by aggressive market participants. These gaps often act as powerful magnets for price, which tends to revisit them to "rebalance" the market. By visualizing FVGs from multiple timeframes at once, traders can identify high-probability reversal or continuation zones where imbalances from different market perspectives overlap.</p>
+                <p>The key innovation of this indicator is its intelligent, non-repainting FVG detection and its dynamic visualization system. It fetches data from higher timeframes, correctly identifies FVGs, and tracks their mitigation in real-time. To maintain chart clarity, it automatically filters the display to show only the most relevant, nearby FVGs for each timeframe.</p>
+            </section>
+
+            <section id="methodology" class="content-section">
+                <h2>Methodology & Logic</h2>
+                <p>The indicator's logic is structured to be both accurate and efficient, handling data from multiple timeframes without cluttering the chart.</p>
+                <ul>
+                    <li><strong>1. Multi-Timeframe Data Fetching:</strong> The script uses `request.security` to pull historical and real-time candle data (Open, High, Low, Close) from up to three user-specified higher timeframes (e.g., 5m, 30m, and 1H). It includes validation to prevent users from selecting a timeframe lower than the current chart's, which would be invalid.</li>
+                    
+                    <li><strong>2. FVG Detection:</strong> For each enabled timeframe, the script analyzes its unique stream of candle data. An FVG is identified based on the classic three-bar pattern:
+                        <ul>
+                            <li>A **Bullish FVG** is formed when the low of the current bar is higher than the high of the bar two periods ago. The gap is the space between these two candles.</li>
+                            <li>A **Bearish FVG** is formed when the high of the current bar is lower than the low of the bar two periods ago. The gap is the space between these two candles.</li>
+                        </ul>
+                    </li>
+
+                    <li><strong>3. Dynamic Box Visualization:</strong> Each detected FVG is drawn on the chart as a colored box.
+                        <ul>
+                            <li>The boxes are color-coded per timeframe and direction (e.g., TF1 Bullish, TF1 Bearish, TF2 Bullish, etc.).</li>
+                            <li>The boxes are drawn using `xloc.bar_time`, ensuring they align perfectly with the higher-timeframe candles they originated from, regardless of the current chart's timeframe.</li>
+                            <li>The right edge of the boxes can be set to extend infinitely or for a fixed number of bars into the future.</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>4. Real-Time FVG Mitigation:</strong> The script continuously monitors price action as it interacts with the drawn FVG boxes.
+                        <ul>
+                            <li>If price penetrates a portion of an FVG, the box is dynamically resized to show the remaining unfilled portion.</li>
+                            <li>If price completely fills an FVG (trades through its entire range), the corresponding box is deleted from the chart.</li>
+                        </ul>
+                    </li>
+
+                    <li><strong>5. Proximity & Transparency Filtering (Clarity Engine):</strong> To prevent the chart from becoming unreadable, an optional filter can be enabled. When active, the indicator calculates the distance of every FVG from the current price. It then intelligently hides all but the N closest bullish and N closest bearish FVGs for each timeframe, where N is user-configurable. This ensures that only the most relevant, actionable zones are visible.</li>
+                </ul>
+            </section>
+
+            <section id="parameters" class="content-section">
+                <h2>Parameters & Settings</h2>
+                <p>The indicator is organized into clear sections for each timeframe, allowing for granular control over its appearance and behavior.</p>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter Group</th>
+                            <th>Key Inputs</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>Timeframe 1/2/3 Inputs</code></td>
+                            <td><code>Enable TF</code>, <code>Timeframe</code>, <code>Bull/Bear Color</code>, <code>Max FVG Boxes</code>, <code>Visible FVGs per Side</code></td>
+                            <td>Each of the three timeframes has its own dedicated section. You can enable/disable each one, set the desired timeframe (e.g., "5", "30", "60", "D"), customize the colors, and control the memory/display settings for that specific layer.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Fair Value Gap (FVG) Filter</code></td>
+                            <td><code>Enable FVG Transparency Filter</code>, <code>Mode Selection for FVG Bars right edge</code>, <code>Offset for FVG Bars...</code></td>
+                            <td>These global settings control the visualization. `Enable FVG Transparency Filter` activates the proximity-based hiding of distant FVGs. `Mode Selection` determines if boxes extend infinitely or for a set number of bars.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="specs" class="content-section">
+                <h2>Technical Specifications</h2>
+                <ul>
+                    <li><strong>PineScript Version:</strong> v6</li>
+                    <li><strong>Indicator Type:</strong> Overlay (plots directly on the main price chart)</li>
+                    <li><strong>Repainting:</strong> No. FVGs are based on confirmed closed candles from their respective timeframes and do not repaint. Mitigation is updated in real-time but does not alter historical gaps.</li>
+                    <li><strong>Applicable Timeframes:</strong> Can be placed on any chart timeframe. The selected higher timeframes for FVG detection must be equal to or greater than the chart's timeframe.</li>
+                    <li><strong>Asset Classes:</strong> All (Forex, Crypto, Stocks, Indices, Commodities). Includes an adaptive pip-size calculation for accurate display across different markets.</li>
+                </ul>
+            </section>
+
+            <section id="visuals" class="content-section">
+                <h2>Visual Documentation</h2>
+                <p>The indicator provides a rich, multi-layered view of market structure.</p>
+                
+                <div class="img-placeholder">
+                    <p>Example 1: [Multi-Timeframe FVG] on a 5-minute Chart<br>(Showing 5m (Green/Red), 30m (Blue/Orange), and 1H (Purple/Yellow) FVGs all on one chart)</p>
+                </div>
+                <span class="caption">This placeholder demonstrates the core functionality: viewing imbalances from multiple market perspectives at once. Note how the higher-timeframe boxes (e.g., 1H Purple) are larger and often contain smaller, lower-timeframe FVGs.</span>
+
+                <div class="img-placeholder">
+                    <p>Example 2: [Multi-Timeframe FVG] Price Reacting to a Higher-Timeframe FVG<br>(Lower-timeframe price action is seen reversing sharply after entering a 1H Bearish FVG zone)</p>
+                </div>
+                <span class="caption">This placeholder illustrates the primary use case: identifying higher-timeframe zones as high-probability areas for lower-timeframe reversals or continuations.</span>
+
+                <div class="img-placeholder">
+                    <p>Example 3: [Multi-Timeframe FVG] FVG Mitigation<br>(Showing how a Bearish FVG box is partially filled (resized) and then fully filled (deleted) as price trades through it)</p>
+                </div>
+                <span class="caption">This placeholder shows the dynamic nature of the indicator, which provides a real-time visual of how market imbalances are being resolved.</span>
+            </section>
+
+            <section id="usage" class="content-section">
+                <h2>Usage Guide</h2>
+                <p>This indicator is a powerful context tool for refining entries and identifying key market levels.</p>
+                <ul>
+                    <li><strong>Top-Down Analysis:</strong> The primary use is to identify higher-timeframe (HTF) points of interest. An FVG on the 1-hour or 4-hour chart is a significant level. When price on a lower timeframe (e.g., 5-minute) enters this HTF FVG, traders can look for their specific entry models (e.g., market structure shifts, engulfing candles) for a high-probability trade.</li>
+                    <li><strong>Confluence & Stacking:</strong> Look for areas where FVGs from multiple timeframes overlap or are tightly clustered. A 5-minute FVG that exists inside a 1-hour FVG is a very high-probability zone, as both short-term and long-term imbalances are aligned.</li>
+                    <li><strong>Drawing Liquidity:</strong> FVGs act as price magnets. If you see a clear FVG above the market, it can be considered a likely target for price to move towards. Conversely, an FVG below the market can act as a support or a downside target.</li>
+                    <li><strong>Entry & Invalidation:</strong>
+                        <ul>
+                            <li><strong>Entry:</strong> A common strategy is to wait for price to enter an HTF FVG and then look for a confirmation signal on a lower timeframe.</li>
+                            <li><strong>Invalidation:</strong> If price trades completely through an FVG and closes on the other side without reacting, that level is considered invalidated. This can be used to determine where a trade idea is wrong.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section id="alerts" class="content-section">
+                <h2>Alert Configuration</h2>
+                <p>This indicator is designed for visual analysis of market structure and does not include built-in `alert()` or `alertcondition()` functions.</p>
+                <p>The most effective way to use this tool with alerts is in combination with another entry-trigger indicator. For example:</p>
+                <ol>
+                    <li>Identify a significant Higher-Timeframe FVG using this indicator (e.g., a 1H Bullish FVG).</li>
+                    <li>Use TradingView's drawing tools to place a horizontal line or price alert at the boundary of that FVG.</li>
+                    <li>Create an alert for "Crossing" that price level to be notified when price enters your zone of interest.</li>
+                    <li>When the alert triggers, you can then watch the lower timeframes for a specific entry signal from a different indicator (like an Engulfing Candle or BOS/CHoCH).</li>
+                </ol>
+            </section>
+
+            <div class="risk-disclaimer">
+                <h3>Risk Disclaimer</h3>
+                <p>Trading involves substantial risk. This indicator is a technical analysis tool and does not guarantee profitable trades. Past performance does not indicate future results. Users should conduct their own analysis and risk assessment before making any trading decisions.</p>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <div class="footer-buttons">
+            <a href="mailto:contact@quantechinnovation.com" class="footer-btn">✉ Contact Us</a>
+            <a href="https://portfolio.quantechinnovation.com/" class="footer-btn" target="_blank">🌐 View Portfolio</a>
+        </div>
+        <p>&copy; 2024 Quantech Innovation. All Rights Reserved.</p>
+        <p class="footer-tagline">Built for Professional Traders</p>
+    </footer>
+
+</body>
+</html>

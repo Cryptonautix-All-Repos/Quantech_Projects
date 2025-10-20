@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volume Indicator V3 - Quantech Innovation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0a0e27;
+            --secondary-dark: #131829;
+            --accent-cyan: #00d4ff;
+            --accent-blue: #0080ff;
+            --text-primary: #ffffff;
+            --text-secondary: #b8c5d6;
+            --card-bg: #1a1f3a;
+            --success: #00ff88;
+            --danger: #ff3366;
+            --border-color: rgba(0, 212, 255, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background: rgba(19, 24, 41, 0.95);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .back-btn {
+            padding: 0.6rem 1.2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--accent-cyan);
+            color: var(--primary-dark);
+            border-color: var(--accent-cyan);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                grid-template-columns: 240px 1fr;
+            }
+        }
+
+        /* Sidebar Navigation */
+        .sidebar-nav {
+            position: sticky;
+            top: 100px; /* Adjust based on header height */
+            align-self: start;
+        }
+
+        .sidebar-nav h3 {
+            font-size: 1.1rem;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.75rem;
+        }
+
+        .sidebar-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            display: block;
+            padding: 0.25rem 0;
+        }
+
+        .sidebar-nav a:hover {
+            color: var(--accent-cyan);
+            transform: translateX(5px);
+        }
+
+        /* Main Content Sections */
+        .content-main {
+            background: var(--card-bg);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+        }
+
+        .content-main h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+        }
+        
+        .content-section {
+            margin-bottom: 3rem;
+        }
+
+        .content-section h2 {
+            font-size: 1.8rem;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .content-section p, .content-section li {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .content-section ul {
+            list-style-position: inside;
+            padding-left: 1rem;
+        }
+        
+        .content-section ol {
+            list-style-position: inside;
+            padding-left: 1rem;
+        }
+
+        .content-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Parameter Table */
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+
+        .param-table th, .param-table td {
+            padding: 0.8rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .param-table th {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        .param-table code {
+            font-family: 'Courier New', Courier, monospace;
+            background: var(--secondary-dark);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: var(--accent-cyan);
+        }
+
+        /* Image Placeholders */
+        .img-placeholder {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            max-height: 600px;
+            background: var(--secondary-dark);
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .img-placeholder p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .caption {
+            display: block;
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        /* Risk Disclaimer */
+        .risk-disclaimer {
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .risk-disclaimer h3 {
+            color: var(--danger);
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-disclaimer p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary-dark);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            margin-top: 4rem;
+        }
+
+        .footer-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-btn {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: var(--primary-dark);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .footer-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+        
+        footer p {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-tagline {
+            color: var(--accent-cyan);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1023px) {
+            .sidebar-nav {
+                position: static;
+                border-bottom: 1px solid var(--border-color);
+                padding-bottom: 1rem;
+                margin-bottom: 2rem;
+            }
+            .sidebar-nav ul {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            .sidebar-nav li { margin-bottom: 0; }
+        }
+        @media (max-width: 768px) {
+            header { padding: 1rem; }
+            .content-main h1 { font-size: 2rem; }
+            .content-section h2 { font-size: 1.5rem; }
+            .container { padding: 0 1rem; margin-top: 1.5rem;}
+            .content-main { padding: 1.5rem; }
+            .param-table { font-size: 0.9rem; }
+            .param-table th, .param-table td { padding: 0.6rem 0.5rem; }
+            .img-placeholder p { font-size: 1rem; }
+        }
+    </style>
+    <script>
+        // Smooth scroll for navigation
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring;
+                    const targetElement = document.getElementById(targetId);
+                    if(targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">Quantech Innovation</div>
+            <a href="index.html" class="back-btn">← Back to Portfolio</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="sidebar-nav">
+            <h3>Quick Navigation</h3>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#methodology">Methodology & Logic</a></li>
+                <li><a href="#parameters">Parameters & Settings</a></li>
+                <li><a href="#specs">Technical Specifications</a></li>
+                <li><a href="#visuals">Visual Documentation</a></li>
+                <li><a href="#usage">Usage Guide</a></li>
+                <li><a href="#alerts">Alert Configuration</a></li>
+            </ul>
+        </nav>
+
+        <main class="content-main">
+            <h1>Volume Indicator V3</h1>
+
+            <section id="overview" class="content-section">
+                <h2>Overview</h2>
+                <p>The Volume Indicator V3 is a comprehensive and highly customizable volume analysis toolkit designed to alert traders to significant market activity. Instead of providing a single, one-size-fits-all signal, this indicator monitors for **four distinct types of volume events**, each representing a different aspect of institutional interest, momentum, or market exhaustion. This allows traders to build a nuanced understanding of the forces driving price action.</p>
+                <p>The indicator can be configured to monitor the volume on the current chart's symbol or, uniquely, to pull volume data from a **different, user-selected symbol**. This allows for sophisticated inter-market analysis, such as monitoring the volume of an index (like SPY) while trading a related stock.</p>
+                <p>Each of the four signal types is independent, with its own dedicated logic and alert conditions. They can be enabled or disabled individually, allowing traders to focus only on the volume signatures that are most relevant to their strategy.</p>
+            </section>
+
+            <section id="methodology" class="content-section">
+                <h2>Methodology & Logic</h2>
+                <p>The indicator is built around four independent detection modules. Each module analyzes the selected symbol's volume stream to identify a specific condition and, if found, plots a colored circle on the chart and triggers an alert.</p>
+                <ol>
+                    <li>
+                        <strong>Signal 1: New Highest Volume (Orange Circle)</strong>
+                        <p>This is the simplest yet most powerful signal. It identifies when the volume of the current bar is the absolute highest within a user-defined lookback period. Such events often mark climactic tops/bottoms, the start of a major trend, or significant news-driven moves.</p>
+                    </li>
+                    <li>
+                        <strong>Signal 2: Follow-Up Volume (Fuchsia Circle)</strong>
+                        <p>This signal looks for confirmation after a "New Highest Volume" event. It triggers on the *very next bar* if its volume is greater than a specified percentage of the preceding peak volume. High follow-up volume confirms continued institutional interest and suggests the move initiated by the peak volume bar has strength and is likely to continue.</p>
+                    </li>
+                    <li>
+                        <strong>Signal 3: High Volume with Large Candle (Blue Circle)</strong>
+                        <p>This signal seeks confluence between volume and price momentum. It triggers only when two conditions are met simultaneously:
+                            <ul>
+                                <li><strong>Volume Condition:</strong> The current bar's volume must exceed a threshold (e.g., a multiple of the average volume, the highest volume in a lookback, or an absolute value).</li>
+                                <li><strong>Candle Size Condition:</strong> The body size (open-to-close) of the current candle must also exceed its own threshold (e.g., a multiple of the average body size or an absolute pip/point value).</li>
+                            </ul>
+                            This combination signals strong, committed momentum in a single direction.
+                        </p>
+                    </li>
+                    <li>
+                        <strong>Signal 4: Unusual Volume Spike (Red Circle)</strong>
+                        <p>This signal is designed to catch extreme, anomalous volume events. It triggers when the current volume exceeds a high threshold, typically a large multiple of the average volume (e.g., 5x or more) or a very high absolute value. These spikes often correspond to major news events, market open/close volatility, or potential exhaustion points ("blow-off tops/bottoms").</p>
+                    </li>
+                </ol>
+            </section>
+
+            <section id="parameters" class="content-section">
+                <h2>Parameters & Settings</h2>
+                <p>Each of the four signals is fully customizable via the indicator settings.</p>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter Group</th>
+                            <th>Key Inputs</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>Pair Selection</code></td>
+                            <td><code>Select Symbol for Volume Analysis</code></td>
+                            <td>The core input for inter-market analysis. Leave blank to use the current chart's symbol, or enter another symbol (e.g., "SPY") to analyze its volume.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Activation Switches</code></td>
+                            <td><code>Enable...</code> (for all 4 signals)</td>
+                            <td>Four separate checkboxes to turn each of the four signal types ON or OFF.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Signal 1: New Highest Volume</code></td>
+                            <td><code>Highest Volume Lookback Period</code></td>
+                            <td>Sets the number of past bars to compare against to find a new highest volume.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Signal 2: Follow-Up Volume</code></td>
+                            <td><code>Next Bar Volume Threshold (%)</code></td>
+                            <td>Sets the minimum volume required for the follow-up bar, as a percentage of the preceding peak volume bar.</td>
+                        </tr>
+                         <tr>
+                            <td><code>Signal 3: High Volume + Large Candle</code></td>
+                            <td><code>Volume Check...</code> & <code>Candle Size...</code> inputs</td>
+                            <td>Provides granular control over both the volume and candle size thresholds, including using average multipliers or absolute values.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Signal 4: Unusual Volume Spike</code></td>
+                            <td><code>Unusual Spike...</code> inputs</td>
+                            <td>Defines what constitutes an "unusual" spike, either as a multiple of the average volume or a fixed absolute threshold.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="specs" class="content-section">
+                <h2>Technical Specifications</h2>
+                <ul>
+                    <li><strong>PineScript Version:</strong> v6</li>
+                    <li><strong>Indicator Type:</strong> Overlay (plots colored circles above/below the price bars)</li>
+                    <li><strong>Repainting:</strong> No. All volume signals are based on confirmed, closed-bar data and do not change.</li>
+                    <li><strong>Cross-Symbol Analysis:</strong> Yes. The indicator can analyze volume from any symbol available on TradingView and plot the signals on your current chart.</li>
+                    <li><strong>Asset Classes:</strong> All assets that provide volume data. Includes an adaptive pip-size calculation for the Large Candle signal to work correctly across different markets.</li>
+                </ul>
+            </section>
+
+            <section id="visuals" class="content-section">
+                <h2>Visual Documentation</h2>
+                <p>The indicator uses a simple, color-coded system of circles to denote different volume events.</p>
+                
+                <div class="img-placeholder">
+                    <p>Example 1: All Four Volume Signals on a Chart<br>(Chart showing the Orange, Fuchsia, Blue, and Red circles, each corresponding to a different volume event)</p>
+                </div>
+                <span class="caption">This placeholder illustrates the full visual output, allowing traders to quickly identify and differentiate between the four types of volume activity.</span>
+
+                <div class="img-placeholder">
+                    <p>Example 2: New Highest Volume and Follow-Up<br>(An Orange circle marking a peak volume bar, followed immediately by a Fuchsia circle, confirming the move's strength)</p>
+                </div>
+                <span class="caption">This placeholder shows a classic institutional footprint: a massive volume spike to initiate a move, followed by strong, sustained volume to continue it.</span>
+
+                <div class="img-placeholder">
+                    <p>Example 3: Cross-Symbol Analysis in Action<br>(Trading AAPL chart, but Orange circles appear based on SPY's volume, indicating market-wide buying/selling pressure)</p>
+                </div>
+                <span class="caption">This placeholder demonstrates the powerful cross-symbol feature, allowing a trader to see when broad market volume is affecting their individual stock.</span>
+            </section>
+
+            <section id="usage" class="content-section">
+                <h2>Usage Guide</h2>
+                <p>This indicator provides actionable context by revealing the conviction behind price moves.</p>
+                <ul>
+                    <li><strong>Confirmation Tool:</strong> Use the volume signals to confirm other technical patterns. A breakout from a consolidation range is much more reliable if accompanied by a **Blue Circle (High Volume + Large Candle)** or a **Teal Circle (Average Volume Breakout)** in older versions.</li>
+                    <li><strong>Reversal Spotting:</strong> An **Orange Circle (New Highest Volume)**, especially after a long trend, can often signal a climax or exhaustion point, warning of a potential reversal. This is particularly potent if the candle has a large wick.</li>
+                    <li><strong>Trend Strength:</strong> A series of **Fuchsia Circles (Follow-Up Volume)** during a trend indicates strong, sustained participation and suggests the trend is healthy and likely to continue. The absence of follow-up volume after a breakout can be a warning sign.</li>
+                    <li><strong>News & Anomaly Detection:</strong> A **Red Circle (Unusual Spike)** is a clear signal to be cautious. It indicates that volume is far outside the recent norm, often due to a major news release or event. It's a sign to assess the context before taking a trade.</li>
+                    <li><strong>Inter-Market Context:</strong> Set the `Select Symbol` to a market index (like SPY for stocks or DXY for forex) to gauge overall market sentiment. A volume spike on the index can give you a heads-up about potential moves in correlated assets.</li>
+                </ul>
+            </section>
+
+            <section id="alerts" class="content-section">
+                <h2>Alert Configuration</h2>
+                <p>The indicator is designed for seamless alerting. Each of the four signal types has its own independent `alertcondition`.</p>
+                <p>To create an alert:</p>
+                <ol>
+                    <li>Go to TradingView's "Alert" panel.</li>
+                    <li>Set the "Condition" to the "Volume Alert Indicator".</li>
+                    <li>You will see a dropdown menu with four distinct alert options:
+                        <ul>
+                            <li><strong>New Highest Volume Alert:</strong> Triggers on an Orange Circle.</li>
+                            <li><strong>Volume Follow-Up Alert:</strong> Triggers on a Fuchsia Circle.</li>
+                            <li><strong>High Volume with Large Candle Size Alert:</strong> Triggers on a Blue Circle.</li>
+                            <li><strong>Unusual Volume Spike Alert:</strong> Triggers on a Red Circle.</li>
+                        </ul>
+                    </li>
+                    <li>Select the desired alert condition, choose your trigger settings (e.g., "Once Per Bar Close"), and create the alert. You can create separate alerts for each of the four conditions.</li>
+                </ol>
+            </section>
+
+            <div class="risk-disclaimer">
+                <h3>Risk Disclaimer</h3>
+                <p>Trading involves substantial risk. This indicator is a technical analysis tool and does not guarantee profitable trades. Past performance does not indicate future results. Users should conduct their own analysis and risk assessment before making any trading decisions.</p>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <div class="footer-buttons">
+            <a href="mailto:contact@quantechinnovation.com" class="footer-btn">✉ Contact Us</a>
+            <a href="https://portfolio.quantechinnovation.com/" class="footer-btn" target="_blank">🌐 View Portfolio</a>
+        </div>
+        <p>&copy; 2024 Quantech Innovation. All Rights Reserved.</p>
+        <p class="footer-tagline">Built for Professional Traders</p>
+    </footer>
+
+</body>
+</html>

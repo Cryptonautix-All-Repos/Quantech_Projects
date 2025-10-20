@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engulfing Candles + FVG V8 - Quantech Innovation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0a0e27;
+            --secondary-dark: #131829;
+            --accent-cyan: #00d4ff;
+            --accent-blue: #0080ff;
+            --text-primary: #ffffff;
+            --text-secondary: #b8c5d6;
+            --card-bg: #1a1f3a;
+            --success: #00ff88;
+            --danger: #ff3366;
+            --border-color: rgba(0, 212, 255, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background: rgba(19, 24, 41, 0.95);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .back-btn {
+            padding: 0.6rem 1.2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--accent-cyan);
+            color: var(--primary-dark);
+            border-color: var(--accent-cyan);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                grid-template-columns: 240px 1fr;
+            }
+        }
+
+        /* Sidebar Navigation */
+        .sidebar-nav {
+            position: sticky;
+            top: 100px; /* Adjust based on header height */
+            align-self: start;
+        }
+
+        .sidebar-nav h3 {
+            font-size: 1.1rem;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.75rem;
+        }
+
+        .sidebar-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            display: block;
+            padding: 0.25rem 0;
+        }
+
+        .sidebar-nav a:hover {
+            color: var(--accent-cyan);
+            transform: translateX(5px);
+        }
+
+        /* Main Content Sections */
+        .content-main {
+            background: var(--card-bg);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+        }
+
+        .content-main h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+        }
+
+        .content-section {
+            margin-bottom: 3rem;
+        }
+
+        .content-section h2 {
+            font-size: 1.8rem;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .content-section p, .content-section li {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .content-section ul {
+            list-style-position: inside;
+            padding-left: 1rem;
+        }
+
+        .content-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Parameter Table */
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+
+        .param-table th, .param-table td {
+            padding: 0.8rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .param-table th {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        .param-table code {
+            font-family: 'Courier New', Courier, monospace;
+            background: var(--secondary-dark);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: var(--accent-cyan);
+        }
+
+        /* Image Placeholders */
+        .img-placeholder {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            max-height: 600px;
+            background: var(--secondary-dark);
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .img-placeholder p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .caption {
+            display: block;
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        /* Risk Disclaimer */
+        .risk-disclaimer {
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .risk-disclaimer h3 {
+            color: var(--danger);
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-disclaimer p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary-dark);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            margin-top: 4rem;
+        }
+
+        .footer-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-btn {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: var(--primary-dark);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .footer-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        footer p {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-tagline {
+            color: var(--accent-cyan);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1023px) {
+            .sidebar-nav {
+                position: static;
+                border-bottom: 1px solid var(--border-color);
+                padding-bottom: 1rem;
+                margin-bottom: 2rem;
+            }
+            .sidebar-nav ul {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            .sidebar-nav li { margin-bottom: 0; }
+        }
+        @media (max-width: 768px) {
+            header { padding: 1rem; }
+            .content-main h1 { font-size: 2rem; }
+            .content-section h2 { font-size: 1.5rem; }
+            .container { padding: 0 1rem; margin-top: 1.5rem;}
+            .content-main { padding: 1.5rem; }
+            .param-table { font-size: 0.9rem; }
+            .param-table th, .param-table td { padding: 0.6rem 0.5rem; }
+            .img-placeholder p { font-size: 1rem; }
+        }
+    </style>
+    <script>
+        // Smooth scroll for navigation
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    if(targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">Quantech Innovation</div>
+            <a href="index.html" class="back-btn">← Back to Portfolio</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="sidebar-nav">
+            <h3>Quick Navigation</h3>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#methodology">Methodology & Logic</a></li>
+                <li><a href="#parameters">Parameters & Settings</a></li>
+                <li><a href="#specs">Technical Specifications</a></li>
+                <li><a href="#visuals">Visual Documentation</a></li>
+                <li><a href="#usage">Usage Guide</a></li>
+                <li><a href="#alerts">Alert Configuration</a></li>
+            </ul>
+        </nav>
+
+        <main class="content-main">
+            <h1>Engulfing Candles + FVG V8</h1>
+
+            <section id="overview" class="content-section">
+                <h2>Overview</h2>
+                <p>The Engulfing Candles + FVG V8 indicator is an advanced pattern recognition system designed to identify high-probability trading setups. It combines two powerful concepts: **Engulfing Candle (EC)** patterns and **Fair Value Gap (FVG)** analysis. The core premise is that an engulfing candle is a strong signal, but an engulfing candle that forms *within* or *reacts to* an FVG is a significantly higher-probability event.</p>
+                <p>This tool meticulously detects both bullish and bearish engulfing patterns and then subjects them to a rigorous, multi-stage filtering process. Traders can apply numerous filters, including swing point validation, minimum candle sizes, and specific wick-to-body ratios to reject low-quality signals.</p>
+                <p>Its most innovative feature is its dual-mode FVG filtering, which can validate a signal against both *active* (current) FVGs and *deleted* (recently mitigated) FVGs. Furthermore, the indicator is fully equipped for trade automation via Pine Connector, generating precise alert messages with pre-calculated Stop Loss and Take Profit levels.</p>
+            </section>
+
+            <section id="methodology" class="content-section">
+                <h2>Methodology & Logic</h2>
+                <p>The indicator's logic operates through a sequential filtering funnel to isolate only the most promising setups.</p>
+                <ul>
+                    <li><strong>1. Engulfing Candle (EC) Detection:</strong> The script first identifies standard Bullish (green body engulfs prior red body) and Bearish (red body engulfs prior green body) candlestick patterns. A small pip allowance can be set to catch patterns that are not "perfect".</li>
+
+                    <li><strong>2. Multi-Stage Candle Filtering:</strong> Before checking FVGs, the EC must pass numerous user-defined checks:
+                        <ul>
+                            <li><strong>Swing Point Filter:</strong> Optionally requires the EC to form at a significant swing high or low, as defined by one of three methods (Highest Lookback, Morning/Evening Star, or Symmetric).</li>
+                            <li><strong>Size & Position Filters:</strong> Can reject signals if the EC or its preceding candle is too small, or if it has excessive wicks relative to its body, indicating indecision.</li>
+                            <li><strong>Gap Filters:</strong> Provides advanced control to measure the gap between the EC's close and the previous candle's open, filtering for specific entry mechanics.</li>
+                        </ul>
+                    </li>
+
+                    <li><strong>3. Fair Value Gap (FVG) Detection:</strong> The indicator concurrently identifies all FVGs (price imbalances across three bars) and plots them as green (bullish) or red (bearish) boxes. It tracks their mitigation state, editing or deleting boxes as price fills the imbalance.</li>
+
+                    <li><strong>4. Dual-Mode FVG Filtering (Core Innovation):</strong> This is the primary signal filter.
+                        <ul>
+                            <li><strong>Active FVG Filter:</strong> Checks if the EC (or N preceding bars) physically overlaps with an *active, unfilled* FVG on the chart. A signal forming inside an FVG suggests price is reacting to that zone of imbalance.</li>
+                            <li><strong>Delayed Intercept Filter:</strong> The script *remembers* recently mitigated/deleted FVGs. This unique filter can validate a signal if the EC or its preceding bars interacted with an FVG that has *since been filled*. This identifies setups where price was drawn to a liquidity zone, filled it, and is now potentially starting a new move from that reaction.</li>
+                        </ul>
+                    </li>
+
+                    <li><strong>5. Trade Activation & Automation:</strong> The indicator generates two signals:
+                        <ul>
+                            <li><strong>Setup Signal (Triangle):</strong> A green/red triangle appears when an EC passes *all* enabled filters. This is the "setup."</li>
+                            <li><strong>Activation Signal (Diamond):</strong> A blue diamond appears when the *next* candle breaks the high (for bullish) or low (for bearish) of the setup candle. This confirms momentum and is the primary trigger for alerts.</li>
+                            <li><strong>Pine Connector Output:</strong> When an "Activation" occurs, the script generates a formatted `alert()` message containing all necessary data (License ID, Pair, Risk, SL, TP) for automated execution via Pine Connector.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section id="parameters" class="content-section">
+                <h2>Parameters & Settings</h2>
+                <p>This indicator is highly customizable. Key parameters are grouped for ease of use.</p>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter Group</th>
+                            <th>Key Inputs</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>General & Display</code></td>
+                            <td><code>Plot Shape Size</code>, <code>Enable Swing/Activation Plots</code></td>
+                            <td>Controls the size and visibility of the on-chart signals (triangles, diamonds, crosses).</td>
+                        </tr>
+                        <tr>
+                            <td><code>Core EC Pattern</code></td>
+                            <td><code>Enable Bullish/Bearish</code>, <code>Point Allowance</code>, <code>Swing High/Low Filter</code></td>
+                            <td>Toggles the basic pattern detection and links it to significant market swing points.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Candle Quality Filters</code></td>
+                            <td><code>Candle Size Filters</code>, <code>Wick-to-Body Ratio Filters</code></td>
+                            <td>A large set of filters to reject signals based on candle anatomy. Use these to find decisive, high-momentum patterns and avoid indecisive (large wick) candles.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Fair Value Gap (FVG) Filters</code></td>
+                            <td><code>Enable FVG Filter (Active)</code>, <code>Enable Delayed Intercept Filter (Deleted)</code>, <code>Lookback Candles for FVG Check</code>, <code>FVG 2nd Candle Distance Threshold</code>, <code>Enable FVG Transparency</code></td>
+                            <td>The most important filter group. Toggles the FVG filters, controls how many bars back to check for a tap, and filters FVG "proximity" to avoid old signals. The transparency filter shows only the 10 nearest FVGs.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Trade Activation</code></td>
+                            <td><code>Enable Bullish/Bearish Trade Activation</code></td>
+                            <td>Toggles the "Activation" signal (blue diamond), which confirms the setup by breaking the prior candle's high/low.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Pine Connector Automation</code></td>
+                            <td><code>Enable Pine Connector</code>, <code>License ID</code>, <code>Chart Pair</code>, <code>Secret Key</code>, <code>Risk/Volume</code>, <code>Risk:Reward Ratio</code>, <code>Stop Loss Extra Multiplier</code>, <code>Enable Trade Zone Visuals</code></td>
+                            <td>Activates and configures the automated alert messages for Pine Connector. Allows full customization of trade parameters (risk, R:R) and SL placement.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="specs" class="content-section">
+                <h2>Technical Specifications</h2>
+                <ul>
+                    <li><strong>PineScript Version:</strong> v6</li>
+                    <li><strong>Indicator Type:</strong> Overlay (plots directly on the main price chart)</li>
+                    <li><strong>Repainting:</strong> No. Signals are confirmed on candle close and do not change.</li>
+                    <li><strong>Applicable Timeframes:</strong> All. Logic is price-action based.</li>
+                    <li><strong>Asset Classes:</strong> All. Includes an adaptive pip calculation logic to work correctly on Forex, Crypto, Stocks, and Indices.</li>
+                </ul>
+            </section>
+
+            <section id="visuals" class="content-section">
+                <h2>Visual Documentation</h2>
+                <p>The indicator uses a clear visual system to communicate market events.</p>
+
+                <div class="img-placeholder">
+                    <p>Example 1: [Engulfing Candles + FVG V8] on ETH/USD 1H Chart<br>(Showing a Bullish EC signal (green triangle) forming inside an active Bullish FVG (green box))</p>
+                </div>
+                <span class="caption">This placeholder demonstrates the primary use case: a high-quality reversal signal (EC) forming at a significant level of imbalance (FVG).</span>
+
+                <div class="img-placeholder">
+                    <p>Example 2: [Engulfing Candles + FVG V8] on EUR/USD 4H Chart<br>(Showing a Bearish EC (red triangle) validated by a "Delayed Intercept" (yellow box))</p>
+                </div>
+                <span class="caption">This placeholder illustrates the advanced "Delayed Intercept" filter. The signal is validated because price reacted to a recently *mitigated* FVG (yellow box), confirming a reaction at that level.</span>
+
+                <div class="img-placeholder">
+                    <p>Example 3: [Engulfing Candles + FVG V8] Trade Activation<br>(Showing the full automation sequence: 1. EC Signal, 2. Activation Diamond, 3. Plotted SL/TP Zones)</p>
+                </div>
+                <span class="caption">This placeholder shows the trade automation visuals: the Bearish EC (red triangle) is the setup, the Blue Diamond confirms the trade is active, and the (optional) cyan and magenta boxes show the calculated R:R trade zone.</span>
+            </section>
+
+            <section id="usage" class="content-section">
+                <h2>Usage Guide</h2>
+                <p>This indicator provides a complete workflow from setup to execution.</p>
+                <ul>
+                    <li><strong>Signal Interpretation:</strong>
+                        <ul>
+                            <li><strong>Green/Red Triangle:</strong> This is your "Setup." A valid EC has passed all your filters. Do not enter yet.</li>
+                            <li><strong>Blue Diamond:</strong> This is your "Activation" or "Confirmation." The high/low of the setup candle has been broken, confirming momentum. This is the intended signal for entry.</li>
+                            <li><strong>Yellow Cross:</strong> Indicates a valid swing point, adding confluence to an EC signal that forms there.</li>
+                        </ul>
+                    </li>
+                    <li><strong>FVG Interpretation:</strong>
+                        <ul>
+                            <li><strong>Green/Red Boxes:</strong> Active, unfilled FVGs. These are price magnets. Look for signals to form as price *enters* these zones.</li>
+                            <li><strong>Yellow Boxes:</strong> Mitigated/Deleted FVGs. These show where a reaction *already occurred*. A signal forming *after* tapping one of these can be very strong, as the "business" at that level is finished.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Strategy & Filtering:</strong>
+                        <ul>
+                            <li><strong>Standard:</strong> Enable `Enable FVG Filter` and disable `Enable Delayed Intercept`. This will only show signals that occur inside *active* FVGs.</li>
+                            <li><strong>Advanced:</strong> Enable *both* FVG filters. This will show signals from active FVGs *or* signals that just reacted to a *deleted* FVG.</li>
+                            <li><strong>Quality Control:</strong> Use the Wick-to-Body and Candle Size filters to match your style. For example, enabling `enableisBullishECUpperWickTooBig` will reject bullish signals that have a large upper wick, which signals selling pressure and indecision.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section id="alerts" class="content-section">
+                <h2>Alert Configuration</h2>
+                <p>The indicator features two distinct alert systems, controlled by the <code>Enable Pine Connector Alerts</code> input.</p>
+
+                <h3>1. Standard TradingView Alerts</h3>
+                <p>If <code>Enable Pine Connector Alerts</code> is **OFF**, the script uses standard <code>alertcondition()</code> functions. You can create alerts manually in TradingView for:</p>
+                <ul>
+                    <li><strong>Bullish Engulfing Candle Alert:</strong> Triggers on the close of the setup candle (green triangle).</li>
+                    <li><strong>Bearish Engulfing Candle Alert:</strong> Triggers on the close of the setup candle (red triangle).</li>
+                    <li><strong>Bullish Engulfing Trade Activation Alert:</strong> Triggers when the trade is confirmed (blue diamond).</li>
+                    <li><strong>Bearish Engulfing Trade Activation Alert:</strong> Triggers when the trade is confirmed (blue diamond).</li>
+                </ul>
+
+                <h3>2. Pine Connector Automated Alerts</h3>
+                <p>If <code>Enable Pine Connector Alerts</code> is **ON**, the script is ready for full automation.</p>
+                <ol>
+                    <li>Fill in your <strong>License ID, Chart Pair,</strong> and <strong>Secret Key</strong> in the indicator settings.</li>
+                    <li>Configure your desired <strong>Risk</strong> and <strong>Risk:Reward Ratio</strong>.</li>
+                    <li>In TradingView, create a new alert for the "Engulfing Candles + FVG V8" indicator.</li>
+                    <li>Select <strong>"Any alert() function call"</strong> as the condition.</li>
+                    <li>Set it to trigger <strong>"Once Per Bar"</strong> or <strong>"Once Per Bar Close"</strong> (depending on your strategy).</li>
+                </ol>
+                <p>When a **Trade Activation** (blue diamond) occurs, the script will fire an `alert()` with a custom message (e.g., <code>LICENSE,buy,EURUSD,risk=1,sl=20,tp=40,secret=KEY</code>). Pine Connector will read this message and automatically execute the trade with the exact parameters in your MT4/MT5 terminal.</p>
+            </section>
+
+            <div class="risk-disclaimer">
+                <h3>Risk Disclaimer</h3>
+                <p>Trading involves substantial risk. This indicator is a technical analysis tool and does not guarantee profitable trades. Past performance does not indicate future results. Users should conduct their own analysis and risk assessment before making any trading decisions.</p>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <div class="footer-buttons">
+            <a href="mailto:contact@quantechinnovation.com" class="footer-btn">✉ Contact Us</a>
+            <a href="https://portfolio.quantechinnovation.com/" class="footer-btn" target="_blank">🌐 View Portfolio</a>
+        </div>
+        <p>&copy; 2024 Quantech Innovation. All Rights Reserved.</p>
+        <p class="footer-tagline">Built for Professional Traders</p>
+    </footer>
+
+</body>
+</html>

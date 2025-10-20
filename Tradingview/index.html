@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantech Innovation - Trading Systems Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0a0e27;
+            --secondary-dark: #131829;
+            --accent-cyan: #00d4ff;
+            --accent-blue: #0080ff;
+            --text-primary: #ffffff;
+            --text-secondary: #b8c5d6;
+            --card-bg: #1a1f3a;
+            --success: #00ff88;
+            --danger: #ff3366;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background: rgba(19, 24, 41, 0.95);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .platform-badge {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent-cyan);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            border: 1px solid var(--accent-cyan);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* About Section */
+        .about {
+            max-width: 1200px;
+            margin: 0 auto 4rem;
+            padding: 0 2rem;
+        }
+
+        .about h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-cyan);
+        }
+
+        .about p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        /* Filters & Search */
+        .controls {
+            max-width: 1400px;
+            margin: 0 auto 3rem;
+            padding: 0 2rem;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: var(--card-bg);
+            border: 2px solid rgba(0, 212, 255, 0.2);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--card-bg);
+            border: 2px solid rgba(0, 212, 255, 0.2);
+            color: var(--text-secondary);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--accent-cyan);
+            color: var(--primary-dark);
+            border-color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+
+        /* Indicator Grid */
+        .indicators-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 2rem;
+        }
+
+        .indicator-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .indicator-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+            border-color: var(--accent-cyan);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .category-badge {
+            background: rgba(0, 212, 255, 0.15);
+            color: var(--accent-cyan);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .card-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-features li {
+            color: var(--text-secondary);
+            padding: 0.4rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            font-size: 0.9rem;
+        }
+
+        .card-features li:before {
+            content: "â–¸";
+            color: var(--accent-cyan);
+            position: absolute;
+            left: 0;
+        }
+
+        .view-btn {
+            display: inline-block;
+            width: 100%;
+            padding: 0.9rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: var(--primary-dark);
+            text-decoration: none;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .view-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        /* Contact Section */
+        .contact-section {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 3rem 2rem;
+            text-align: center;
+            background: var(--card-bg);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .contact-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-cyan);
+        }
+
+        .contact-section p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .contact-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .contact-btn {
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: var(--primary-dark);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary-dark);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        footer p {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-tagline {
+            color: var(--accent-cyan);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .indicators-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-row {
+                gap: 1.5rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">Quantech Innovation</div>
+            <div class="platform-badge">PineScript v6</div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>Trading Systems Portfolio</h1>
+        <p>Professional algorithmic trading indicators for market structure, volume analysis, and pattern recognition</p>
+        <div class="stats-row">
+            <div class="stat-item">
+                <div class="stat-number">9</div>
+                <div class="stat-label">Professional Indicators</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">6</div>
+                <div class="stat-label">Categories Covered</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">PineScript v6</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="about">
+        <h2>About Quantech Innovation</h2>
+        <p>Quantech Innovation specializes in developing sophisticated algorithmic trading systems for the TradingView platform. Our indicators focus on market structure analysis, volume profiling, and pattern recognition using advanced mathematical methods.</p>
+        <p>Each indicator is built with professional traders in mind, offering extensive customization options, multi-timeframe analysis capabilities, and robust signal generation methodologies. Our systems are designed to identify high-probability trading opportunities while minimizing false signals through comprehensive filtering mechanisms.</p>
+    </section>
+
+    <section class="controls">
+        <input type="text" class="search-bar" id="searchBar" placeholder="Search indicators by name or description...">
+        
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-category="all">All Indicators</button>
+            <button class="filter-btn" data-category="Market Structure">Market Structure</button>
+            <button class="filter-btn" data-category="Volume">Volume Analysis</button>
+            <button class="filter-btn" data-category="Pattern Recognition">Pattern Recognition</button>
+            <button class="filter-btn" data-category="Trend">Trend Analysis</button>
+            <button class="filter-btn" data-category="Multi-Timeframe">Multi-Timeframe</button>
+        </div>
+    </section>
+
+    <section class="indicators-grid" id="indicatorsGrid">
+        <!-- Indicator 1 -->
+        <div class="indicator-card" data-category="Market Structure" data-name="BOS CHoCH EC FVG RSI" data-description="Break of Structure Change of Character Engulfing Candles Fair Value Gaps RSI divergence">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">BOS/CHoCH + EC + FVG + RSI</h3>
+                    <span class="category-badge">Market Structure</span>
+                </div>
+            </div>
+            <p class="card-description">Advanced market structure indicator combining Break of Structure, Change of Character detection, engulfing candles, Fair Value Gaps, and RSI divergence filtering for high-probability entry signals.</p>
+            <ul class="card-features">
+                <li>Automated BOS and CHoCH identification</li>
+                <li>Engulfing candle pattern detection with FVG confirmation</li>
+                <li>RSI divergence filtering for signal validation</li>
+            </ul>
+            <a href="bos-choch-ec-fvg-rsi.html" class="view-btn">View Details →</a>
+        </div>
+
+        <!-- Indicator 2 -->
+        <div class="indicator-card" data-category="Market Structure" data-name="BOS CHoCH Indicator" data-description="Break of Structure Change of Character market structure pivot points">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">BOS/CHoCH Indicator V8</h3>
+                    <span class="category-badge">Market Structure</span>
+                </div>
+            </div>
+            <p class="card-description">Core market structure detection system focusing on Break of Structure and Change of Character patterns with advanced pivot point identification and temporal processing.</p>
+            <ul class="card-features">
+                <li>Three-phase processing for anti-repainting</li>
+                <li>Internal pivot detection within BOS zones</li>
+                <li>Real-time structure validation and updates</li>
+            </ul>
+            <a href="bos-choch-indicator-v8.html" class="view-btn">View Details →</a>
+        </div>
+
+        <!-- Indicator 3 -->
+        <div class="indicator-card" data-category="Pattern Recognition" data-name="Engulfing Candles FVG Volume" data-description="Bullish Bearish engulfing pattern Fair Value Gap volume analysis">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">Engulfing Candles + FVG V8</h3>
+                    <span class="category-badge">Pattern Recognition</span>
+                </div>
+            </div>
+            <p class="card-description">Comprehensive engulfing candle detection with Fair Value Gap filtering, swing point analysis, and volume pattern recognition for precise trade entry identification.</p>
+            <ul class="card-features">
+                <li>Multi-criteria engulfing candle validation</li>
+                <li>FVG overlap detection with delayed intercept tracking</li>
+                <li>Advanced volume pattern analysis integration</li>
+            </ul>
+            <a href="bullish-bearish-engulfing-candles-w-fvg-v8.html" class="view-btn">View Details →</a>
+        </div>
+
+        <!-- Indicator 4 -->
+        <div class="indicator-card" data-category="Trend" data-name="Channel Detection" data-description="automated channel detection trend analysis parallel lines">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">Channel Detection Indicator</h3>
+                    <span class="category-badge">Trend Analysis</span>
+                </div>
+            </div>
+            <p class="card-description">Automated channel detection system using multiple trend analysis methods including EMA, linear, exponential, and Gaussian decay for accurate trend channel identification.</p>
+            <ul class="card-features">
+                <li>Four independent trend detection methodologies</li>
+                <li>Anti-repainting architecture with buffer zones</li>
+                <li>Dynamic channel validation and breakout detection</li>
+            </ul>
+            <a href="channel-detection-indicator.html" class="view-btn">View Details →</a>
+        </div>
+
+        <!-- Indicator 5 -->
+        <div class="indicator-card" data-category="Trend" data-name="Consolidation Region EDSMA" data-description="consolidation detection range bound EDSMA ATR">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">Consolidation Region V2</h3>
+                    <span class="category-badge">Trend Analysis</span>
+                </div>
+            </div>
+            <p class="card-description">Consolidation zone detection using Ehlers Dynamic Smoothed Moving Average with ATR-based bands and slope filtering for identifying range-bound market conditions.</p>
+            <ul class="card-features">
+                <li>EDSMA-based dynamic trend assessment</li>
+                <li>ATR bands for consolidation boundary detection</li>
+                <li>Slope filter for trending bar exclusion</li>
+            </ul>
+            <a href="consolidation-region-v2.html" class="view-btn">View Details →</a>
+        </div>
+
+        <!-- Indicator 6 -->
+        <div class="indicator-card" data-category="Volume" data-name="EC FVG Volume Pattern" data-description="engulfing candles Fair Value Gap volume spike pattern">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">EC + FVG + Volume V1</h3>
+                    <span class="category-badge">Volume Analysis</span>
+                </div>
+            </div>
+            <p class="card-description">Multi-factor pattern recognition system combining engulfing candles, Fair Value Gaps, and sophisticated volume analysis for identifying institutional trading activity.</p>
+            <ul class="card-features">
+                <li>Volume pattern sequence detection</li>
+                <li>FVG-validated engulfing candle signals</li>
+                <li>Highest volume tracking with follow-up analysis</li>
+            </ul>
+            <a href="ec-fvg-vol-v1.html" class="view-btn">View Details →</a>
+        </div>
+
+        <!-- Indicator 7 -->
+        <div class="indicator-card" data-category="Multi-Timeframe" data-name="Multi Timeframe FVG" data-description="Fair Value Gap multiple timeframes HTF CTF">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">Multi-Timeframe FVG V2</h3>
+                    <span class="category-badge">Multi-Timeframe</span>
+                </div>
+            </div>
+            <p class="card-description">Fair Value Gap detection across three configurable timeframes with dynamic visual filtering and automatic gap mitigation tracking for multi-timeframe analysis.</p>
+            <ul class="card-features">
+                <li>Simultaneous 3-timeframe FVG monitoring</li>
+                <li>Adaptive pip-based calculations for all asset classes</li>
+                <li>Visual proximity filtering for clarity</li>
+            </ul>
+            <a href="multi-timeframe-fvg-v2.html" class="view-btn">View Details →</a>
+        </div>
+
+        <!-- Indicator 8 -->
+        <div class="indicator-card" data-category="Trend" data-name="Pivot Trend Detection Decay" data-description="pivot points trend detection exponential Gaussian linear decay">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">Pivot & Trend Detection</h3>
+                    <span class="category-badge">Trend Analysis</span>
+                </div>
+            </div>
+            <p class="card-description">Advanced pivot point detection using weighted trend analysis with EMA, linear, exponential, and Gaussian decay methods for identifying key reversal points.</p>
+            <ul class="card-features">
+                <li>Four decay-based trend detection methods</li>
+                <li>Local high/low prescreening for efficiency</li>
+                <li>Anti-repainting buffer zone architecture</li>
+            </ul>
+            <a href="pivot-and-trend-detection-w-decay-methods.html" class="view-btn">View Details →</a>
+        </div>
+
+        <!-- Indicator 9 -->
+        <div class="indicator-card" data-category="Volume" data-name="Volume Alert" data-description="volume spike highest volume follow-up unusual volume">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">Volume Indicator V3</h3>
+                    <span class="category-badge">Volume Analysis</span>
+                </div>
+            </div>
+            <p class="card-description">Comprehensive volume alert system detecting new highest volume bars, follow-up volume, large candle sizes with high volume, and unusual volume spikes.</p>
+            <ul class="card-features">
+                <li>Four independent volume signal types</li>
+                <li>Cross-symbol volume monitoring capability</li>
+                <li>Adaptive threshold calculations for all markets</li>
+            </ul>
+            <a href="volume-indicator-v3.html" class="view-btn">View Details →</a>
+        </div>
+    </section>
+
+    <section class="contact-section">
+        <h2>Get in Touch</h2>
+        <p>Interested in custom indicator development or have questions about our systems?</p>
+        <div class="contact-buttons">
+            <a href="mailto:contact@quantechinnovation.com" class="contact-btn">✉ Contact Us</a>
+            <a href="https://portfolio.quantechinnovation.com/" class="contact-btn" target="_blank">🌐 View Portfolio</a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Quantech Innovation. All Rights Reserved.</p>
+        <p class="footer-tagline">Built for Professional Traders</p>
+    </footer>
+
+    <script>
+        // Filter functionality
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const indicatorCards = document.querySelectorAll('.indicator-card');
+        const searchBar = document.getElementById('searchBar');
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Update active button
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                const category = button.dataset.category;
+                
+                indicatorCards.forEach(card => {
+                    if (category === 'all' || card.dataset.category === category) {
+                        card.style.display = 'block';
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY';
+                        }, 10);
+                    } else {
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(20px)';
+                        setTimeout(() => {
+                            card.style.display = 'none';
+                        }, 300);
+                    }
+                });
+            });
+        });
+
+        // Search functionality
+        searchBar.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            indicatorCards.forEach(card => {
+                const name = card.dataset.name.toLowerCase();
+                const description = card.dataset.description.toLowerCase();
+                const category = card.dataset.category.toLowerCase();
+                
+                if (name.includes(searchTerm) || description.includes(searchTerm) || category.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

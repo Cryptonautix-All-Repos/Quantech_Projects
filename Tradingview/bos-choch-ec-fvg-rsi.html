@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOS/CHoCH + EC + FVG + RSI - Quantech Innovation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-dark: #0a0e27;
+            --secondary-dark: #131829;
+            --accent-cyan: #00d4ff;
+            --accent-blue: #0080ff;
+            --text-primary: #ffffff;
+            --text-secondary: #b8c5d6;
+            --card-bg: #1a1f3a;
+            --success: #00ff88;
+            --danger: #ff3366;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        header {
+            background: rgba(19, 24, 41, 0.95);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .back-btn {
+            padding: 0.6rem 1.5rem;
+            background: var(--card-bg);
+            color: var(--accent-cyan);
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid var(--accent-cyan);
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--accent-cyan);
+            color: var(--primary-dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .indicator-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .indicator-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .indicator-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+
+        .section {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .section h2 {
+            color: var(--accent-cyan);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .section h3 {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        .section p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .section ul, .section ol {
+            color: var(--text-secondary);
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .section li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        th {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 128, 255, 0.1));
+            border: 2px dashed rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1.5rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .disclaimer {
+            background: rgba(255, 51, 102, 0.1);
+            border-left: 4px solid var(--danger);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+        }
+
+        .disclaimer p {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        footer {
+            background: var(--secondary-dark);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(0, 212, 255, 0.1);
+            margin-top: 4rem;
+        }
+
+        .footer-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-btn {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: var(--primary-dark);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .footer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .indicator-title {
+                font-size: 2rem;
+            }
+            
+            .section {
+                padding: 1.5rem;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">Quantech Innovation</div>
+            <a href="index.html" class="back-btn">← Back to Portfolio</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="indicator-header">
+            <h1 class="indicator-title">BOS/CHoCH + EC + FVG + RSI</h1>
+            <p class="indicator-subtitle">Advanced Market Structure & Pattern Recognition System</p>
+        </div>
+
+        <!-- Overview Section -->
+        <section class="section">
+            <h2>Overview</h2>
+            <p>The BOS/CHoCH + EC + FVG + RSI indicator represents a comprehensive market structure analysis system that combines multiple technical analysis methodologies into a single, cohesive trading tool. This indicator identifies high-probability trading opportunities by detecting Break of Structure (BOS) and Change of Character (CHoCH) patterns, validating them with engulfing candle formations, Fair Value Gap (FVG) presence, and RSI divergence confirmation.</p>
+            
+            <p>The indicator is designed for traders who understand Smart Money Concepts (SMC) and seek confluence-based entry signals. By requiring multiple conditions to align, the system filters out low-probability setups and focuses on scenarios where institutional activity is likely occurring.</p>
+
+            <h3>Primary Use Case</h3>
+            <p>This indicator excels in identifying retest opportunities after significant market structure breaks. It's particularly effective in trending markets where institutional traders are creating liquidity voids (FVGs) and establishing new market structure.</p>
+
+            <h3>Key Innovation</h3>
+            <p>The unique aspect of this system is its multi-layered filtering approach. Unlike simple BOS or CHoCH indicators, this tool requires engulfing candles to occur within Fair Value Gaps AND validates the momentum shift through RSI divergence analysis. This creates a high-confidence signal generation system that significantly reduces false positives.</p>
+
+            <h3>Market Conditions</h3>
+            <p>Most effective during trending phases with clear structure, particularly after strong directional moves that create FVGs. Works across all timeframes but shows optimal performance on 15-minute to 4-hour charts where structure is more reliable and FVGs are more significant.</p>
+        </section>
+
+        <!-- Methodology Section -->
+        <section class="section">
+            <h2>Methodology & Logic</h2>
+            
+            <h3>Market Structure Detection</h3>
+            <p>The indicator employs a three-phase processing system that analyzes historical price data to identify pivots (swing highs and lows) using a two-candle confirmation pattern. Once pivots are established, the system monitors for breaks of these levels to detect BOS (continuation) or CHoCH (reversal) patterns.</p>
+
+            <h3>Signal Generation Components</h3>
+            <ol>
+                <li><strong>BOS/CHoCH Identification:</strong> Detects when price closes beyond established pivot levels, classifying the break as either structure continuation (BOS) or change (CHoCH)</li>
+                <li><strong>Engulfing Candle Detection:</strong> Identifies bullish or bearish engulfing patterns with configurable tolerance for micro-gaps</li>
+                <li><strong>Fair Value Gap Analysis:</strong> Monitors for price imbalances (gaps) in three-candle sequences and tracks their mitigation</li>
+                <li><strong>RSI Divergence Filter:</strong> Compares RSI values between the internal pivot within a BOS zone and the current retest candle to confirm momentum shifts</li>
+            </ol>
+
+            <h3>Visual Output</h3>
+            <p>The indicator displays labeled pivot points (H for highs, L for lows), horizontal lines showing BOS/CHoCH zones, color-coded FVG boxes (green for bullish, red for bearish), and entry signal labels (L for long, S for short) when all conditions align.</p>
+
+            <h3>Alert Conditions</h3>
+            <p>Signals are generated when price retests a BOS zone, forms an engulfing candle within an FVG, and RSI confirms the directional bias. The system specifically looks for retests of the high/low of the pivot candle that created the BOS.</p>
+        </section>
+
+        <!-- Parameters Section -->
+        <section class="section">
+            <h2>Parameters & Settings</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Default Value</th>
+                        <th>Range</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Pivot Search Window</td>
+                        <td>2</td>
+                        <td>1-10</td>
+                        <td>Number of bars to check on each side for local highs/lows</td>
+                    </tr>
+                    <tr>
+                        <td>Pattern Confirmation Window</td>
+                        <td>10</td>
+                        <td>5-50</td>
+                        <td>Bars to search for two-candle confirmation pattern</td>
+                    </tr>
+                    <tr>
+                        <td>Data Storage Size</td>
+                        <td>4000</td>
+                        <td>100-5000</td>
+                        <td>Historical bars retained in memory for analysis</td>
+                    </tr>
+                    <tr>
+                        <td>Enable RSI Filter</td>
+                        <td>True</td>
+                        <td>On/Off</td>
+                        <td>Requires RSI divergence for signal confirmation</td>
+                    </tr>
+                    <tr>
+                        <td>RSI Length</td>
+                        <td>14</td>
+                        <td>2-50</td>
+                        <td>Periods used for RSI calculation</td>
+                    </tr>
+                    <tr>
+                        <td>RSI Calculation Method</td>
+                        <td>Simple</td>
+                        <td>Simple/Wilder's</td>
+                        <td>Method for calculating RSI (SMA vs. exponential smoothing)</td>
+                    </tr>
+                    <tr>
+                        <td>Retest Proximity Threshold</td>
+                        <td>5 pips</td>
+                        <td>0+</td>
+                        <td>How close price must be to BOS zone for valid signal</td>
+                    </tr>
+                    <tr>
+                        <td>FVG Mode</td>
+                        <td>Current w Offset</td>
+                        <td>Infinite/Current</td>
+                        <td>How FVG boxes extend to the right</td>
+                    </tr>
+                    <tr>
+                        <td>FVG Right Offset</td>
+                        <td>4</td>
+                        <td>0+</td>
+                        <td>Bars to extend FVG boxes forward</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Customization Guidance</h3>
+            <p><strong>For Intraday Trading:</strong> Reduce Pivot Search Window to 1-2 and Pattern Confirmation Window to 5-8 for faster signal generation on lower timeframes.</p>
+            <p><strong>For Swing Trading:</strong> Increase Pivot Search Window to 3-4 and Pattern Confirmation Window to 15-20 to ensure only significant structure is captured.</p>
+            <p><strong>Volatile Markets:</strong> Increase Retest Proximity Threshold to 8-10 pips to account for price noise around zones.</p>
+            <p><strong>Trending Markets:</strong> Enable RSI Filter with Wilder's Smoothing for more sensitive momentum confirmation.</p>
+        </section>
+
+        <!-- Technical Specifications -->
+        <section class="section">
+            <h2>Technical Specifications</h2>
+            
+            <table>
+                <tr>
+                    <th>Specification</th>
+                    <th>Details</th>
+                </tr>
+                <tr>
+                    <td>PineScript Version</td>
+                    <td>v6</td>
+                </tr>
+                <tr>
+                    <td>Indicator Type</td>
+                    <td>Overlay (plots on price chart)</td>
+                </tr>
+                <tr>
+                    <td>Maximum Visual Objects</td>
+                    <td>500 labels, 500 lines, 500 boxes</td>
+                </tr>
+                <tr>
+                    <td>Timeframes</td>
+                    <td>All timeframes supported (1m to 1W+)</td>
+                </tr>
+                <tr>
+                    <td>Asset Classes</td>
+                    <td>Forex, Crypto, Stocks, Indices, Commodities</td>
+                </tr>
+                <tr>
+                    <td>Data Processing</td>
+                    <td>Three-phase: Collection → Historical Analysis → Real-time</td>
+                </tr>
+                <tr>
+                    <td>Anti-Repainting</td>
+                    <td>Uses confirmed bars with barstate.isconfirmed</td>
+                </tr>
+                <tr>
+                    <td>Memory Management</td>
+                    <td>Automatic cleanup of old data beyond storage limit</td>
+                </tr>
+            </table>
+
+            <h3>Pip Calculation System</h3>
+            <p>The indicator includes adaptive pip calculation that automatically adjusts for different asset classes:</p>
+            <ul>
+                <li>Forex pairs: 0.0001 (0.01 for JPY pairs)</li>
+                <li>Crypto: Adaptive based on price level (BTC uses 1.0 pip = $1)</li>
+                <li>Stocks: 0.01 (1 cent)</li>
+                <li>Indices/Commodities: Based on minimum tick size</li>
+            </ul>
+        </section>
+
+        <!-- Visual Documentation -->
+        <section class="section">
+            <h2>Visual Documentation</h2>
+            
+            <div class="image-placeholder">
+                <p>Example 1: BOS/CHoCH + EC + FVG + RSI on BTC/USD Daily Chart</p>
+            </div>
+            <p style="text-align: center; color: var(--text-secondary); font-style: italic; margin-top: -1rem;">
+                Showing bullish BOS with green FVG box, followed by engulfing candle retest and long signal generation
+            </p>
+
+            <div class="image-placeholder">
+                <p>Example 2: Signal Identification on EUR/USD 1-Hour Chart</p>
+            </div>
+            <p style="text-align: center; color: var(--text-secondary); font-style: italic; margin-top: -1rem;">
+                Demonstrating bearish CHoCH detection with red FVG overlap and short signal confirmation via RSI divergence
+            </p>
+
+            <div class="image-placeholder">
+                <p>Example 3: Multi-Signal Environment on ES Futures 15-Minute</p>
+            </div>
+            <p style="text-align: center; color: var(--text-secondary); font-style: italic; margin-top: -1rem;">
+                Multiple BOS patterns with FVG zones showing how the indicator manages complex market structure
+            </p>
+        </section>
+
+        <!-- Usage Guide -->
+        <section class="section">
+            <h2>Usage Guide</h2>
+            
+            <h3>Interpreting the Indicator</h3>
+            <p><strong>Pivot Labels:</strong> "H" labels mark swing highs (red), "L" labels mark swing lows (green). These are the reference points for structure breaks.</p>
+            <p><strong>BOS Lines:</strong> Solid horizontal lines (green for bullish, red for bearish) connect pivots when structure is broken in the trend direction.</p>
+            <p><strong>CHoCH Lines:</strong> Horizontal lines (purple for bullish, orange for bearish) indicate potential trend reversal when opposite structure is broken.</p>
+            <p><strong>FVG Boxes:</strong> Semi-transparent boxes (green for bullish, red for bearish) show price imbalances that often attract price for retest.</p>
+
+            <h3>Entry Signal Interpretation</h3>
+            <p><strong>Long Signals (L label):</strong> Appear below price when all conditions align:</p>
+            <ul>
+                <li>Previous bullish BOS has been established</li>
+                <li>Price returns to retest the BOS zone (high of the pivot candle)</li>
+                <li>A bullish engulfing candle forms within a bullish FVG</li>
+                <li>RSI shows lower reading than the internal pivot low (optional but recommended)</li>
+            </ul>
+
+            <p><strong>Short Signals (S label):</strong> Appear above price when:</p>
+            <ul>
+                <li>Previous bearish BOS has occurred</li>
+                <li>Price returns to retest the BOS zone (low of the pivot candle)</li>
+                <li>A bearish engulfing candle forms within a bearish FVG</li>
+                <li>RSI shows higher reading than the internal pivot high (optional)</li>
+            </ul>
+
+            <h3>Best Practices</h3>
+            <ol>
+                <li><strong>Confluence with Higher Timeframes:</strong> Verify that signals align with the trend on at least one higher timeframe</li>
+                <li><strong>Volume Confirmation:</strong> Look for increased volume on the engulfing candle for additional confirmation</li>
+                <li><strong>Risk Management:</strong> Place stops beyond the FVG zone (for longs, below the FVG low; for shorts, above the FVG high)</li>
+                <li><strong>Target Setting:</strong> Look for the next significant structure level (opposite pivot) as initial target</li>
+                <li><strong>Signal Quality:</strong> Signals that occur after clean, obvious structure breaks tend to be more reliable</li>
+            </ol>
+
+            <h3>Common Scenarios</h3>
+            <p><strong>Scenario 1 - Strong Trend Continuation:</strong> Multiple BOS patterns in the same direction with clean FVG retests typically indicate strong trending conditions. Take signals in the trend direction.</p>
+            <p><strong>Scenario 2 - Trend Reversal:</strong> When CHoCH appears after extended trend, wait for the first BOS in the new direction before taking signals to confirm the reversal.</p>
+            <p><strong>Scenario 3 - Choppy Market:</strong> If BOS and CHoCH alternate frequently within small range, reduce position sizing or avoid trading until clear structure emerges.</p>
+        </section>
+
+        <!-- Implementation Notes -->
+        <section class="section">
+            <h2>Implementation Notes</h2>
+            
+            <h3>Installation & Setup</h3>
+            <ol>
+                <li>Open TradingView and navigate to the chart where you want to use the indicator</li>
+                <li>Click on "Indicators" at the top of the chart</li>
+                <li>Search for "BOS_CHoCH_EC_FVG_RSI" in your private indicators (if you have the code)</li>
+                <li>Click to add the indicator to your chart</li>
+                <li>The indicator will begin its three-phase initialization automatically</li>
+            </ol>
+
+            <h3>Initial Loading</h3>
+            <p>When first added to a chart, the indicator goes through three phases:</p>
+            <ul>
+                <li><strong>Phase 1:</strong> Collects all available historical bar data into memory</li>
+                <li><strong>Phase 2:</strong> Analyzes historical data to identify all pivots and structure</li>
+                <li><strong>Phase 3:</strong> Switches to real-time processing for new bars</li>
+            </ul>
+            <p>You'll see debug labels (if enabled) indicating when each phase completes. This is normal and only happens on initial load.</p>
+
+            <h3>Optimization Tips</h3>
+            <ul>
+                <li>On slower systems, reduce Data Storage Size to 2000-3000 bars to improve performance</li>
+                <li>Disable "Show Debug Labels" for cleaner charts in production trading</li>
+                <li>If signals seem too frequent, increase the Pattern Confirmation Window to 15-20</li>
+                <li>For cleaner visual output, enable the Transparency Filter for FVGs (if available in your version)</li>
+                <li>The indicator works best with at least 1000 historical bars loaded on the chart</li>
+            </ul>
+
+            <h3>Compatibility Notes</h3>
+            <ul>
+                <li>Compatible with all TradingView account types (Free, Pro, Pro+, Premium)</li>
+                <li>Works on all TradingView supported exchanges and symbols</li>
+                <li>Can be combined with other indicators without conflicts</li>
+                <li>Does not interfere with strategy scripts</li>
+                <li>Mobile app display may show condensed visuals due to screen size limitations</li>
+            </ul>
+
+            <h3>Known Limitations</h3>
+            <ul>
+                <li>On very low timeframes (1-minute), signal frequency may be high due to increased noise</li>
+                <li>During low volatility periods, FVG boxes may be very small and difficult to see</li>
+                <li>The indicator's memory requirement increases with Data Storage Size setting</li>
+                <li>Maximum of 500 visual objects (labels/lines/boxes) are shown at once due to PineScript limitations</li>
+            </ul>
+        </section>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+            <p><strong>Risk Disclaimer:</strong> Trading involves substantial risk of loss. This indicator is a technical analysis tool and does not guarantee profitable trades. Past performance does not indicate future results. All trading decisions should be made based on your own analysis, risk tolerance, and market conditions. The indicator should be used as part of a comprehensive trading plan that includes proper risk management. Never risk more than you can afford to lose.</p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-buttons">
+            <a href="mailto:contact@quantechinnovation.com" class="footer-btn">Contact Us</a>
+            <a href="https://portfolio.quantechinnovation.com/" class="footer-btn" target="_blank">View Portfolio</a>
+            <a href="index.html" class="footer-btn">Back to Main</a>
+        </div>
+        <p style="color: var(--text-secondary);">&copy; 2024 Quantech Innovation. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>
