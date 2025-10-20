@@ -1,0 +1,599 @@
+//@version=6
+indicator("Multi_Timeframe_FVG_Cryptonautix", overlay=true, max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
+
+// table for debugging
+var table debugTable = table.new(position.bottom_right, 2, 10, bgcolor = color.new(color.white, 50), border_width=1)
+
+// === ALL USER INPUTS ===
+// INPUTS FOR ENGULFING CANDLE AND ITS SPECIFIC FILTERS 
+// Display Settings
+enableDebugTable = input.bool(title="Enable Debug Table Display", defval=true, group = "Display Settings")
+// TIMEFRAME 1 INPUTS (5 Minutes)
+var g_TF_1 = "Timeframe 1 Inputs"
+use_tf1 = input.bool(true, "Enable TF1", inline = "TF1", group = g_TF_1, 
+     tooltip = "Enable/disable Fair Value Gap detection for 5-minute timeframe")
+tf1 = input.timeframe("5", "Timeframe", inline = "TF1", group = g_TF_1, 
+     tooltip = "Timeframe for FVG detection - must be >= chart timeframe")
+tf1BullishColor = input.color(color.new(#00ff0d, 70), "Bull", inline = "TF1", group = g_TF_1, 
+     tooltip = "Color for bullish FVG boxes")
+tf1BearishColor = input.color(color.new(#ff0000, 70), "Bear", inline = "TF1", group = g_TF_1, 
+     tooltip = "Color for bearish FVG boxes")
+tf1FVGArraySize = input.int(defval = 50, title = "Max FVG Boxes (TF1)", minval = 10, maxval = 100, group = g_TF_1,
+     tooltip = "Maximum number of FVG boxes to store for this timeframe")
+tf1VisibleFVGs = input.int(defval = 5, title = "Visible FVGs per Side (TF1)", minval = 1, maxval = 10, group = g_TF_1,
+     tooltip = "Number of nearest FVGs to show above and below current price")
+
+// TIMEFRAME 2 INPUTS (30 Minutes)
+var g_TF_2 = "Timeframe 2 Inputs"
+use_tf2 = input.bool(true, "Enable TF2", inline = "TF2", group = g_TF_2,
+     tooltip = "Enable/disable Fair Value Gap detection for 30-minute timeframe")
+tf2 = input.timeframe("30", "Timeframe", inline = "TF2", group = g_TF_2,
+     tooltip = "Timeframe for FVG detection - must be >= chart timeframe")
+tf2BullishColor = input.color(color.new(#0080ff, 70), "Bull", inline = "TF2", group = g_TF_2,
+     tooltip = "Color for bullish FVG boxes")
+tf2BearishColor = input.color(color.new(#ff8000, 70), "Bear", inline = "TF2", group = g_TF_2,
+     tooltip = "Color for bearish FVG boxes")
+tf2FVGArraySize = input.int(defval = 50, title = "Max FVG Boxes (TF2)", minval = 10, maxval = 100, group = g_TF_2,
+     tooltip = "Maximum number of FVG boxes to store for this timeframe")
+tf2VisibleFVGs = input.int(defval = 4, title = "Visible FVGs per Side (TF2)", minval = 1, maxval = 10, group = g_TF_2,
+     tooltip = "Number of nearest FVGs to show above and below current price")
+
+// TIMEFRAME 3 INPUTS (1 Hour)
+var g_TF_3 = "Timeframe 3 Inputs"
+use_tf3 = input.bool(true, "Enable TF3", inline = "TF3", group = g_TF_3,
+     tooltip = "Enable/disable Fair Value Gap detection for 1-hour timeframe")
+tf3 = input.timeframe("60", "Timeframe", inline = "TF3", group = g_TF_3,
+     tooltip = "Timeframe for FVG detection - must be >= chart timeframe")
+tf3BullishColor = input.color(color.new(#8000ff, 70), "Bull", inline = "TF3", group = g_TF_3,
+     tooltip = "Color for bullish FVG boxes")
+tf3BearishColor = input.color(color.new(#ffff00, 70), "Bear", inline = "TF3", group = g_TF_3,
+     tooltip = "Color for bearish FVG boxes")
+tf3FVGArraySize = input.int(defval = 50, title = "Max FVG Boxes (TF3)", minval = 10, maxval = 100, group = g_TF_3,
+     tooltip = "Maximum number of FVG boxes to store for this timeframe")
+tf3VisibleFVGs = input.int(defval = 3, title = "Visible FVGs per Side (TF3)", minval = 1, maxval = 10, group = g_TF_3,
+     tooltip = "Number of nearest FVGs to show above and below current price")
+
+// INPUTS FOR FAIR VALUE GAP DETECTION
+g_FVG = "Fair Value Gap (FVG) Filter"
+enableFVGTransparencyFilter = input.bool(defval=false, title="Enable FVG Transparency Filter (Show only 10 nearest)", 
+     tooltip="When enabled, only the 5 nearest FVGs above and 5 nearest below current open will be visible", 
+     group=g_FVG)
+fvgbarsRightLimit = input.string(title = "Mode Selection for FVG Bars right edge", defval = "Current w Offset",
+     options = ["Infinite", "Current w Offset"], group=g_FVG)
+fvgbarsLeftOffset = input.int(defval = 0, minval=0, title="FVG Plots Left Offset", group=g_FVG)
+fvgbarsRightOffset= input.int(title = "Offset for FVG Bars right edge index", defval = 4, minval=0, group=g_FVG)
+
+// =============================================================================
+// SECURITY CALLS FOR CTF OR HTF DATA
+// =============================================================================
+type TFBarData
+    float o
+    float h  
+    float l
+    float c
+    float v
+    int timestamp   // UNIX timestamp - transferable accross charts.
+    string timeFrame     // Store which timeframe this came from
+// need to keep array to maintain the historical values for FVG detection
+var tf1History = array.new<TFBarData>()
+var tf2History = array.new<TFBarData>()
+var tf3History = array.new<TFBarData>()
+
+// Validate and extract data - only supports higher/equal timeframes
+extractDataFromSecurityCall(inputTF) =>
+    inputSeconds = timeframe.in_seconds(inputTF)
+    currentSeconds = timeframe.in_seconds(timeframe.period)
+    
+    // Validation: reject lower timeframes
+    if inputSeconds < currentSeconds
+        runtime.error("Invalid timeframe: " + inputTF + " is lower than chart timeframe " + timeframe.period + 
+                     ". Only timeframes equal to or higher than chart timeframe are supported.")
+    
+    // Extract data using request.security for higher/equal timeframes
+    // Has No Repainting:
+    // request.security(syminfo.tickerid, inputTF, TFBarData.new(open, high, low, close, volume, time, inputTF)[1], lookahead = barmerge.lookahead_on)
+    // Has Repainting:
+    request.security(syminfo.tickerid, inputTF, TFBarData.new(open, high, low, close, volume, time, inputTF))
+
+// Extract data with validation - only for enabled timeframes
+tf1Data = use_tf1 ? extractDataFromSecurityCall(tf1) : na
+tf2Data = use_tf2 ? extractDataFromSecurityCall(tf2) : na  
+tf3Data = use_tf3 ? extractDataFromSecurityCall(tf3) : na
+
+// Maintain history with proper duplicate detection
+shortOrderHistoricalDataMaintainer(array<TFBarData> tfDataHistory, TFBarData tfData) =>
+    if not na(tfData)
+        shouldAddToHistory = false
+        
+        if array.size(tfDataHistory) == 0
+            // First entry
+            shouldAddToHistory := true
+        else
+            // Check if this is actually new data (different timestamp)
+            lastEntry = array.get(tfDataHistory, -1)
+            if tfData.timestamp != lastEntry.timestamp
+                shouldAddToHistory := true
+        
+        if shouldAddToHistory
+            array.push(tfDataHistory, tfData)
+            if array.size(tfDataHistory) > 5
+                // Delete the visual box before removing from array
+                oldestFVG = array.get(tfDataHistory, 0)
+                array.shift(tfDataHistory)
+
+// Maintain history - only for enabled timeframes
+if use_tf1
+    shortOrderHistoricalDataMaintainer(tf1History, tf1Data)
+if use_tf2
+    shortOrderHistoricalDataMaintainer(tf2History, tf2Data)
+if use_tf3
+    shortOrderHistoricalDataMaintainer(tf3History, tf3Data)
+
+// =============================================================================
+// PIP CONVERSION FUNCTIONS
+// =============================================================================
+// Get pip size for current instrument
+getPipSize() =>
+    float pip_size = na
+    
+    // Determine asset type and set pip size accordingly
+    if syminfo.type == "forex"
+        // Forex pairs
+        if str.contains(syminfo.currency, "JPY") or str.contains(syminfo.basecurrency, "JPY")
+            // JPY pairs: 1 pip = 0.01
+            pip_size := 0.01
+        else
+            // Most other forex pairs: 1 pip = 0.0001
+            pip_size := 0.0001
+   
+    else if syminfo.type == "crypto"
+        // Crypto: Use adaptive approach based on price level and mintick
+        current_price = close
+        if current_price >= 10000
+            // High-value crypto (like BTC): 1 pip = 1.0
+            pip_size := 1.0
+        else if current_price >= 1000
+            // Medium-value crypto: 1 pip = 0.1
+            pip_size := 0.1
+        else if current_price >= 100
+            // Lower-value crypto: 1 pip = 0.01
+            pip_size := 0.01
+        else if current_price >= 1
+            // Very low-value crypto: 1 pip = 0.001
+            pip_size := 0.001
+        else
+            // Micro-value crypto: Use 10x mintick as pip
+            pip_size := syminfo.mintick * 10
+    
+    else if syminfo.type == "index" or syminfo.type == "cfd"
+        // Indices and CFDs: Use mintick-based approach
+        if syminfo.mintick >= 1.0
+            // Large tick indices (like Nikkei): 1 pip = mintick
+            pip_size := syminfo.mintick
+        else if syminfo.mintick >= 0.1
+            // Medium tick indices: 1 pip = mintick * 10
+            pip_size := syminfo.mintick * 10
+        else
+            // Small tick indices: 1 pip = mintick * 100
+            pip_size := syminfo.mintick * 100
+    
+    else if syminfo.type == "stock"
+        // Stocks: Usually 1 pip = 0.01 (1 cent)
+        pip_size := math.max(0.01, syminfo.mintick)
+    
+    else
+        // Commodities and others: Adaptive approach
+        if syminfo.mintick >= 1.0
+            // Large tick commodities (like crude oil): 1 pip = mintick
+            pip_size := syminfo.mintick
+        else if syminfo.mintick >= 0.1
+            // Medium tick: 1 pip = mintick * 10
+            pip_size := syminfo.mintick * 10
+        else if syminfo.mintick >= 0.01
+            // Small tick: 1 pip = mintick * 100
+            pip_size := syminfo.mintick * 100
+        else
+            // Very small tick: 1 pip = mintick * 1000
+            pip_size := syminfo.mintick * 1000
+    
+    pip_size
+
+// Convert pips to price points
+pipsToPrice(pips) =>
+    pip_size = getPipSize()
+    pips * pip_size
+
+// Convert price points to pips
+priceToPips(price_diff) =>
+    pip_size = getPipSize()
+    price_diff / pip_size
+
+// Get detailed instrument information
+getInstrumentInfo() =>
+    pip_size = getPipSize()
+    [syminfo.type, syminfo.basecurrency, syminfo.currency, syminfo.mintick, pip_size, syminfo.pointvalue]
+// call this utility information for the table
+[instrument_type, instrument_basecurrency, instrument_currency, instrument_mintick, pip_size, instrument_pointvalue] = getInstrumentInfo()
+
+// =============================================================================
+// COMMONLY USED PRECALCULATIONS AND METRICS
+// =============================================================================
+// Calculate time offset for right edge
+getTimeOffset(barsOffset) =>
+    if barsOffset <= 0
+        0
+    else
+        tfSeconds = timeframe.in_seconds(timeframe.period) 
+        barsOffset * tfSeconds * 1000  // Convert to milliseconds
+
+// Update the right limit calculation
+fvgbarsRightLimitValue = switch fvgbarsRightLimit
+    "Infinite" => na
+    "Current w Offset" => time + getTimeOffset(fvgbarsRightOffset)
+    => na  // default
+
+getTrendDirection(array<TFBarData> tfHistory) =>
+    string trend = "Down"
+    
+    if array.size(tfHistory) >= 4
+        // Compare current close to average of previous 3 closes
+        currentClose = array.get(tfHistory, -1).c
+        avgPrevious = (array.get(tfHistory, -2).c + array.get(tfHistory, -3).c + array.get(tfHistory, -4).c) / 3
+        
+        trend := currentClose > avgPrevious ? "Up" : "Down"
+    
+    trend
+
+// === FVG DETECTION AND BOX CREATION ===
+// A custom type that stores some extra information about the box object being stored 
+// so tht it can later be accessed to make decisions.
+type FVGBox
+    box boxRef             // Reference to the actual box object
+    color bgColor          // Store background color separately
+    int fvgType            // Custom property: 1 for bullish, -1 for bearish
+    int createdAtTime      // Custom property: bar index when created
+    string timeFrame        // Store timeframe string like "5", "1H", "1D"
+
+// Now we make arrays which support the custom box data type 
+var fvgBoxArrayTf1 = array.new<FVGBox>()
+var fvgBoxArrayTf2 = array.new<FVGBox>()
+var fvgBoxArrayTf3 = array.new<FVGBox>()
+
+// Helper function to create a new FVGBox
+createFVGBox(left, int right = na, top, bottom, bgCol, fvgType, createdAtTime, timeFrame) =>
+    // Create the actual box
+    boxRef = box.new(left=left, right=right, top=top, bottom=bottom, xloc = xloc.bar_time, bgcolor=bgCol, border_color=color.new(color.white, 100))
+    // Create and return the FVGBox instance
+    FVGBox.new(boxRef, bgCol, fvgType, createdAtTime, timeFrame)
+
+// Helper function to update box properties
+updateFVGBox(fvgBox, color newBgColor=na, int newfvgType=na) =>
+    if not na(newBgColor)
+        fvgBox.bgColor := newBgColor
+        box.set_bgcolor(fvgBox.boxRef, newBgColor)
+    if not na(newfvgType)
+        fvgBox.fvgType := newfvgType
+
+// Helper function to get properties from FVGBox
+getFVGBoxTop(fvgBox) => box.get_top(fvgBox.boxRef)
+getFVGBoxBottom(fvgBox) => box.get_bottom(fvgBox.boxRef)
+getFVGBoxLeft(fvgBox) => box.get_left(fvgBox.boxRef)
+getFVGBoxRight(fvgBox) => box.get_right(fvgBox.boxRef)
+
+// Setter functions for FVGBox position properties
+setFVGBoxTop(fvgBox, newTop) => box.set_top(fvgBox.boxRef, newTop)
+setFVGBoxBottom(fvgBox, newBottom) => box.set_bottom(fvgBox.boxRef, newBottom)
+setFVGBoxLeft(fvgBox, newLeft) => box.set_left(fvgBox.boxRef, newLeft)
+setFVGBoxRight(fvgBox, newRight) => box.set_right(fvgBox.boxRef, newRight)
+
+// Convenience function to set all position properties at once
+setFVGBoxPosition(fvgBox, int newLeft=na, float newTop=na, int newRight=na, float newBottom=na) =>
+    if not na(newLeft)
+        box.set_left(fvgBox.boxRef, newLeft)
+    if not na(newTop)
+        box.set_top(fvgBox.boxRef, newTop)
+    if not na(newRight)
+        box.set_right(fvgBox.boxRef, newRight)
+    if not na(newBottom)
+        box.set_bottom(fvgBox.boxRef, newBottom)
+
+// =============================================================================
+// FVG DETECTION / CREATION LOGIC.
+// =============================================================================
+// The logic for detecting and saving the FVG boxes inside the box array should come first
+// every thing runs with accordance to candle[0] or current candle. the first condition is for checking if candle[2] and 
+// candle[1] exist / check register or GPT for FVG definition.
+detectAndInstantiateFVGs(array<FVGBox> fvgArrayTf, 
+                         array<TFBarData> tfDataHistory,
+                         TFBarData tfData,
+                         color tfBullishColor,
+                         color tfBearishColor,
+                         int fvgArraySizeTf) =>
+    if array.size(tfDataHistory) >= 3
+        tfDataPrev2 = array.get(tfDataHistory, -3)
+        tfDataPrev1 = array.get(tfDataHistory, -2)
+        tfDataCurr = tfData
+        if (not na(tfDataPrev2)) and (not na(tfDataPrev1))
+            // now the script is allowed to run and we can move towards detection of FVG boxes
+            // For bullish FVG
+            if tfDataCurr.h > tfDataPrev2.h and tfDataCurr.l - tfDataPrev2.h > 0
+                // FVG = low - high[2]
+                fvgBox = createFVGBox(left=tfDataCurr.timestamp, right=na, top=tfDataCurr.l, bottom=tfDataPrev2.h,
+                     bgCol=tfBullishColor, fvgType=1, createdAtTime=tfDataCurr.timestamp, timeFrame = tfDataCurr.timeFrame)
+                array.push(fvgArrayTf, fvgBox)
+
+            // For bearish FVG
+            if tfDataCurr.l < tfDataPrev2.l and tfDataPrev2.l - tfDataCurr.h > 0
+                // FVG = low[2] - high
+                fvgBox = createFVGBox(left=tfDataCurr.timestamp, right=na, top=tfDataPrev2.l, bottom=tfDataCurr.h,
+                     bgCol=tfBearishColor, fvgType=-1, createdAtTime=tfDataCurr.timestamp, timeFrame = tfDataCurr.timeFrame)
+                array.push(fvgArrayTf, fvgBox)
+    if array.size(fvgArrayTf) > fvgArraySizeTf
+        // Get the oldest FVG before removing it
+        oldestFVG = array.get(fvgArrayTf, 0)
+        if not na(oldestFVG)
+            // Delete the visual box first
+            box.delete(oldestFVG.boxRef)
+        // Then remove from array
+        array.shift(fvgArrayTf)
+
+
+if use_tf1
+    detectAndInstantiateFVGs(fvgArrayTf=fvgBoxArrayTf1, tfDataHistory=tf1History, tfData=tf1Data,
+         tfBullishColor=tf1BullishColor, tfBearishColor=tf1BearishColor, fvgArraySizeTf=tf1FVGArraySize)
+if use_tf2
+    detectAndInstantiateFVGs(fvgArrayTf=fvgBoxArrayTf2, tfDataHistory=tf2History, tfData=tf2Data,
+         tfBullishColor=tf2BullishColor, tfBearishColor=tf2BearishColor, fvgArraySizeTf=tf2FVGArraySize)
+if use_tf3
+    detectAndInstantiateFVGs(fvgArrayTf=fvgBoxArrayTf3, tfDataHistory=tf3History, tfData=tf3Data,
+         tfBullishColor=tf3BullishColor, tfBearishColor=tf3BearishColor, fvgArraySizeTf=tf3FVGArraySize)
+
+
+// === INTERCEPTED FVG BOX DELETION LOGIC ===
+// Now a for loop over all the boxes in the boxArray for mutation / deletion
+// Process existing boxes for mitigation/deletion
+updateOrDeleteFVGs(array<FVGBox> fvgArrayTf,
+                   array<TFBarData> tfDataHistory,
+                   TFBarData tfData) =>
+    if array.size(fvgArrayTf) > 0
+        i = array.size(fvgArrayTf) - 1
+        while i >= 0  // Use while loop for better control
+            fvgBoxRef = array.get(fvgArrayTf, i)
+            shouldDecrementIndex = true  // Track if we need to decrement
+            
+            if not na(fvgBoxRef)
+                // while we're already looping over the current FVGs here, might as well update their
+                // right indexes to the current candle
+                setFVGBoxRight(fvgBoxRef, fvgbarsRightLimitValue)
+                topVal = getFVGBoxTop(fvgBoxRef)
+                bottomVal = getFVGBoxBottom(fvgBoxRef)
+                
+                if not na(topVal) and not na(bottomVal)
+                    deleteBox = false
+                    
+                    // Scenario 0 - complete fill
+                    if (tfData.h >= topVal) and (tfData.l <= bottomVal)
+                        deleteBox := true
+                        
+                    // Scenario 1 - penetration from above
+                    else if (tfData.h >= topVal) and (tfData.l < topVal) and (tfData.l > bottomVal)
+                        setFVGBoxTop(fvgBoxRef, tfData.l)
+                        
+                    // Scenario 2 - penetration from below  
+                    else if (tfData.l <= bottomVal) and (tfData.h > bottomVal) and (tfData.h < topVal)
+                        setFVGBoxBottom(fvgBoxRef, tfData.h)
+
+                    // Scenario 3 - candle inside FVG
+                    else if (tfData.h < topVal) and (tfData.l > bottomVal)
+                        trendResult = getTrendDirection(tfDataHistory)
+                        if trendResult == "Up"
+                            setFVGBoxBottom(fvgBoxRef, tfData.h)
+                        else if trendResult == "Down"
+                            setFVGBoxTop(fvgBoxRef, tfData.l)
+
+                    // Handle deletion
+                    if deleteBox
+                        box.delete(fvgBoxRef.boxRef)  // Delete original visual box
+                        array.remove(fvgArrayTf, i)
+                        shouldDecrementIndex := false  // Array size already changed
+                        
+                    // Check for invalid dimensions after editing
+                    else
+                        newTop = getFVGBoxTop(fvgBoxRef)
+                        newBottom = getFVGBoxBottom(fvgBoxRef)
+                        if not na(newTop) and not na(newBottom) and newTop <= newBottom
+                            box.delete(fvgBoxRef.boxRef)  // Delete original visual box
+                            array.remove(fvgArrayTf, i)
+                            shouldDecrementIndex := false  // Array size already changed
+            
+            // Only decrement if we didn't remove an element
+            if shouldDecrementIndex
+                i -= 1
+            else
+                // Recalculate i since array size changed
+                i := math.min(i, array.size(fvgArrayTf) - 1)
+
+if use_tf1
+    updateOrDeleteFVGs(fvgArrayTf=fvgBoxArrayTf1, tfDataHistory=tf1History, tfData=tf1Data)
+if use_tf2
+    updateOrDeleteFVGs(fvgArrayTf=fvgBoxArrayTf2, tfDataHistory=tf2History, tfData=tf2Data)
+if use_tf3
+    updateOrDeleteFVGs(fvgArrayTf=fvgBoxArrayTf3, tfDataHistory=tf3History, tfData=tf3Data)
+
+// === FVG BOX HIDING / SHOWING LOGIC ===
+// The code here is responsible for checking for the 10 nearest FVG boxes to the candle open of the last bar when its 
+// confirmed to avoid rapid rerunning of this lather processing heavy algorithm.
+// Enhanced function to find 5 FVGs above and 5 FVGs below current open price
+findNearestFVGBoxesToOpen(array<FVGBox> fvgArrayTf, TFBarData tfData, int visiblePerSide) =>
+    nearestIndices = array.new<int>()
+    // Separate tracking for above and below
+    aboveFVGs = array.new<int>()
+    aboveDistances = array.new<float>()
+    belowFVGs = array.new<int>()
+    belowDistances = array.new<float>()
+    
+    currentOpen = tfData.o
+    
+    if array.size(fvgArrayTf) == 0
+        [nearestIndices, 0, 0]
+    else
+        // STEP 1: Separate FVGs into above and below categories
+        for i = 0 to array.size(fvgArrayTf) - 1
+            fvgBox = array.get(fvgArrayTf, i)
+            
+            // Skip invalidboxes
+            if na(fvgBox)
+                continue
+                
+            boxTop = getFVGBoxTop(fvgBox)
+            boxBottom = getFVGBoxBottom(fvgBox)
+            
+            if na(boxTop) or na(boxBottom)
+                continue
+                
+            boxMidpoint = (boxTop + boxBottom) / 2
+            signedDistance = boxMidpoint - currentOpen
+            
+            if signedDistance > 0
+                // Above current open
+                array.push(aboveFVGs, i)
+                array.push(aboveDistances, signedDistance)  // Keep positive
+            else if signedDistance < 0
+                // Below current open
+                array.push(belowFVGs, i)
+                array.push(belowDistances, math.abs(signedDistance))  // Make positive for comparison
+        
+        // STEP 2: Find 5 closest above FVGs (using selection without remove/insert)
+        aboveCount = 0
+        selectedAbove = array.new<bool>()
+        
+        // Initialize selection array
+        if array.size(aboveFVGs) > 0
+            for j = 0 to array.size(aboveFVGs) - 1
+                array.push(selectedAbove, false)
+        
+        // Select up to closest above FVGs
+        for pick = 1 to visiblePerSide
+            if array.size(aboveFVGs) == 0
+                break
+                
+            minDist = 999999999.0
+            minIdx = -1
+            
+            // Find minimum unselected distance
+            for j = 0 to array.size(aboveDistances) - 1
+                if not array.get(selectedAbove, j)  // Not already selected
+                    dist = array.get(aboveDistances, j)
+                    if dist < minDist
+                        minDist := dist
+                        minIdx := j
+            
+            // Add to results if found
+            if minIdx >= 0
+                array.push(nearestIndices, array.get(aboveFVGs, minIdx))
+                array.set(selectedAbove, minIdx, true)  // Mark as selected
+                aboveCount += 1
+            else
+                break  // No more unselected FVGs
+        
+        // STEP 3: Find 5 closest below FVGs (using selection without remove/insert)
+        belowCount = 0
+        selectedBelow = array.new<bool>()
+        
+        // Initialize selection array
+        if array.size(belowFVGs) > 0
+            for j = 0 to array.size(belowFVGs) - 1
+                array.push(selectedBelow, false)
+        
+        // Select up to 5 closest below FVGs
+        for pick = 1 to visiblePerSide
+            if array.size(belowFVGs) == 0
+                break
+                
+            minDist = 999999999.0
+            minIdx = -1
+            
+            // Find minimum unselected distance
+            for j = 0 to array.size(belowDistances) - 1
+                if not array.get(selectedBelow, j)  // Not already selected
+                    dist = array.get(belowDistances, j)
+                    if dist < minDist
+                        minDist := dist
+                        minIdx := j
+            
+            // Add to results if found
+            if minIdx >= 0
+                array.push(nearestIndices, array.get(belowFVGs, minIdx))
+                array.set(selectedBelow, minIdx, true)  // Mark as selected
+                belowCount += 1
+            else
+                break  // No more unselected FVGs
+        
+        [nearestIndices, aboveCount, belowCount]
+
+// Generic function for any timeframe
+makeTimeframeFVGsTransparent(array<FVGBox> fvgArray, TFBarData tfData, color bullishColor, color bearishColor, int visibleCount) =>
+    if array.size(fvgArray) == 0
+        [0, 0]  // Return counts for debug table
+    else
+        [nearestIndices, aboveCount, belowCount] = findNearestFVGBoxesToOpen(fvgArray, tfData, visibleCount)
+        
+        // Apply transparency / color to all FVGs in this timeframe
+        for i = 0 to array.size(fvgArray) - 1
+            fvgBoxRef = array.get(fvgArray, i)
+            if not na(fvgBoxRef)
+                if array.includes(nearestIndices, i)
+                    // Keep visible with original colors
+                    originalColor = fvgBoxRef.fvgType == 1 ? bullishColor : bearishColor
+                    updateFVGBox(fvgBoxRef, newBgColor=originalColor)
+                else 
+                    // Make transparent
+                    transparentColor = fvgBoxRef.fvgType == 1 ? color.new(bullishColor, 100) : color.new(bearishColor, 100)
+                    updateFVGBox(fvgBoxRef, newBgColor=transparentColor)
+        
+        [aboveCount, belowCount]
+
+// Unified transparency system for all timeframes
+makeAllTimeframesFVGsTransparent() =>
+    if barstate.isconfirmed
+        [aboveTf1, belowTf1] = makeTimeframeFVGsTransparent(fvgBoxArrayTf1, tf1Data, tf1BullishColor, tf1BearishColor, tf1VisibleFVGs)
+        [aboveTf2, belowTf2] = makeTimeframeFVGsTransparent(fvgBoxArrayTf2, tf2Data, tf2BullishColor, tf2BearishColor, tf2VisibleFVGs)  
+        [aboveTf3, belowTf3] = makeTimeframeFVGsTransparent(fvgBoxArrayTf3, tf3Data, tf3BullishColor, tf3BearishColor, tf3VisibleFVGs)
+        
+        // Debug table updates
+        if barstate.islast
+            table.cell(debugTable, 0, 6, "TF1 Above/Below:", text_color=color.black, text_size=size.small)
+            table.cell(debugTable, 1, 6, str.tostring(aboveTf1) + "/" + str.tostring(belowTf1), text_color=color.black, text_size=size.small)
+            
+            table.cell(debugTable, 0, 7, "TF2 Above/Below:", text_color=color.black, text_size=size.small)  
+            table.cell(debugTable, 1, 7, str.tostring(aboveTf2) + "/" + str.tostring(belowTf2), text_color=color.black, text_size=size.small)
+            
+            table.cell(debugTable, 0, 8, "TF3 Above/Below:", text_color=color.black, text_size=size.small)
+            table.cell(debugTable, 1, 8, str.tostring(aboveTf3) + "/" + str.tostring(belowTf3), text_color=color.black, text_size=size.small)
+
+// Replace existing call
+if enableFVGTransparencyFilter
+    makeAllTimeframesFVGsTransparent()
+
+// Debugging table
+if barstate.islast and enableDebugTable
+    table.cell(debugTable, 0, 0, "Pip Size:", text_color=color.black, text_size=size.small)
+    table.cell(debugTable, 1, 0, str.tostring(pip_size), text_color=color.black, text_size=size.small)
+
+    table.cell(debugTable, 0, 1, "Active TF1 FVGs:", text_color=color.black, text_size=size.small)
+    table.cell(debugTable, 1, 1, str.tostring(array.size(fvgBoxArrayTf1)), text_color=color.black, text_size=size.small)
+    
+    table.cell(debugTable, 0, 2, "Active TF2 FVGs:", text_color=color.black, text_size=size.small)
+    table.cell(debugTable, 1, 2, str.tostring(array.size(fvgBoxArrayTf2)), text_color=color.black, text_size=size.small)
+    
+    table.cell(debugTable, 0, 3, "Active TF3 FVGs:", text_color=color.black, text_size=size.small)
+    table.cell(debugTable, 1, 3, str.tostring(array.size(fvgBoxArrayTf3)), text_color=color.black, text_size=size.small)
+    
+    // table.cell(debugTable, 0, 5, "Total Current Bullish FVG Taps (Cur Candle):", text_color=color.black, text_size=size.small)
+    // table.cell(debugTable, 1, 5, str.tostring(totalBullishFVGTaps), text_color=color.black, text_size=size.small)
+    
+    // table.cell(debugTable, 0, 6, "Total Current Bearish FVG Taps (Cur Candle):", text_color=color.black, text_size=size.small)
+    // table.cell(debugTable, 1, 6, str.tostring(totalBearishFVGTaps), text_color=color.black, text_size=size.small)
+    
+    // table.cell(debugTable, 0, 7, "CHART NAME Print:", text_color=color.black, text_size=size.small)
+    // table.cell(debugTable, 1, 7, chartPair, text_color=color.black, text_size=size.small)

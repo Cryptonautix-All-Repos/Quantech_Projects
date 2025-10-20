@@ -1,0 +1,1314 @@
+//@version=6
+indicator("EC_FVG_V6_Cryptonautix", overlay=true)
+
+// table for debugging
+var table debugTable = table.new(position.bottom_right, 2, 10, bgcolor = color.new(color.white, 50), border_width=1)
+
+
+// === ALL USER INPUTS ===
+// INPUTS FOR ENGULFING CANDLE AND ITS SPECIFIC FILTERS 
+// Display Settings
+enableDebugTable = input.bool(title="Enable Debug Table Display", defval=true, group = "Display Settings")
+shapeSizeInput = input.string(title = "Plot Shape Size", defval = "small", options = ["small", "normal", "auto"], tooltip = "Controls the size of all plotted shapes on the chart", group = "Display Settings")
+enableSwingHighLowPlotShapes = input.bool(title="Enable Swing High/Low Plot Shapes (Yellow Cross)", defval = false, group = "Display Settings")
+enableTradeActivationPlotShapes = input.bool(title="Enable Trade Activation Plot Shapes (Blue Diamond)", defval = false, group = "Display Settings")
+
+// Main Pattern Controls
+enableBullishEC = input.bool(title="Enable Bullish Engulfing", defval = true, group = "Main Pattern Controls")
+enableBearishEC = input.bool(title="Enable Bearish Engulfing", defval = true, group = "Main Pattern Controls")
+pointAllowance = input.int(title = "Point Allowance in Pips", defval = 1, minval = 0,
+     tooltip = "Maximum gap allowed in pips on engulfing Candles", group = "Main Pattern Controls")
+
+// Swing High / Low Filter Settings
+enableSwingHighFilter = input.bool(title="Enable Swing High Filter", defval = false, group = "Swing High / Low Filter Settings")
+enableSwingLowFilter = input.bool(title="Enable Swing Low Filter", defval = false, group = "Swing High / Low Filter Settings")
+swingDetectionMethod = input.string( title="Swing Detection Method", defval = "Highest Lookback",
+     options=["Highest Lookback", "Morning / Evening", "Symmetric"], group = "Swing High / Low Filter Settings")
+swingLookBack = input.int(title = "Lookback for Swing High/Low", defval = 10, minval=1, group = "Swing High / Low Filter Settings",
+     tooltip = "This is where you specify to the code, how many bars behind current bar do you want to account for in high and low detection")
+swingStrength = input.int(title="Swing Strength (for Symmetric)", defval = 2, minval=1, group = "Swing High / Low Filter Settings",
+     tooltip="this is how far back from the current candle you want to check for the swing center (symmetric method)")
+
+// Candle Size Filter Settings
+enableMinCandle1Size = input.bool(title="Enable the minimum candle[1] size Filter", defval = true, group = "Candle Size Filter Settings")
+minCandle1SizeInPips = input.int(title="Min Candle[1] Body Size in Pips", defval=0, minval=0, group = "Candle Size Filter Settings",
+     tooltip="If previous candle[1]'s' body is smaller than the Price Equivalent of these Pips, EC signal is ignored.")
+enableMinECCandleSize = input.bool(title="Enable the minimum EC candle size Filter", defval = true, group = "Candle Size Filter Settings")
+minECCandleSizeInPips = input.int(title="Min EC Candle Body Size", defval=0, minval=0, group = "Candle Size Filter Settings",
+     tooltip="If EC candle's' body is smaller than the Price Equivalent of these Pips, EC signal is ignored.")
+
+// Candle Position Filter Settings
+enableIsCandle1InsideCandle2 = input.bool(title="Enable Candle[1] inside Candle[2] filter", defval = false, group = "Candle Position Filter Settings")
+
+// EC Candle Analysis Settings
+enableECLowestLowHighestHighCheck = input.bool(title="Enable EC Candle Lowest Low / Highest High Check", defval = false, group = "EC Candle Analysis Settings")
+lookBackforECLowestLowHighestHighCheck = input.int(title = "Lookback for Engulfing Candle Highest High / Lowest Low", defval = 6, minval=1,
+     tooltip = "This is where you specify to the code, how many bars behind Engulfing candle do you want to check for highest high and lowest low", group = "EC Candle Analysis Settings")
+
+// Mimimum Gap Check Filter Settings
+enableECCloseAndCandle1OpenMinGapCheck = input.bool(title="Enable EC Candle close and candle[1] open Mimimum gap check filter", defval = false, group = "Mimimum Gap Check Filter Settings")
+minECCloseAndCandle1OpenGapInPips = input.int(title = "Minimum Gap in Pips required between close of EC and open of EC's candle[1]", defval = 0, minval = 0, step = 1,
+     tooltip = "In both Bullish and Bearish ECs, the gap of interest for us is the gap between the close of the EC and the open of its candle[1]. 
+     In both cases candle[1]'s open is fortuitiously right up against the EC close. This Check / Filter is for the Minmum requisite gap to clear the signal alert", group = "Mimimum Gap Check Filter Settings")
+
+// Maximum Gap Check Filter Settings
+enableECCloseAndCandle1OpenMaxGapCheck = input.bool(title="Enable EC Candle close and candle[1] open Maximum gap check filter (Master Switch for All 3 Max Gap Filters Below)", defval=true, tooltip="Turns ON the Maximum Gap Check between the EC 
+     Candle's Close and the Open of its Candle[1]. The gap must be within user-defined thresholds to pass this filter.", group="Maximum Gap Check Filter Settings")
+enableMaxGap_minpip = input.bool(title="Enable Max Gap in Pips between EC Close and Candle[1] Open", defval=false, tooltip="Enable check where the gap between the EC Candle's Close and Candle[1] Open
+     is compared to a maximum number of Pips. The signal is invalidated if the gap exceeds the given pip allowance.", group="Maximum Gap Check Filter Settings")
+maxECCloseAndCandle1OpenGapInPips = input.int(title="Max Pip Gap between EC Close and Candle[1] Open", defval=0, minval=0, step=1, tooltip="Maximum allowed gap in Pips between the EC Candle's Close and Candle[1] 
+     Open. If gap exceeds this, the EC signal is rejected.", group="Maximum Gap Check Filter Settings")
+enableMaxGap_pctHL = input.bool(title="Enable Max Gap as % of (EC High - Candle[1] Low)", defval=false, tooltip="Enable check where the gap between the EC Close and Candle[1] Open is compared as a 
+     percentage of the total range from EC High to Candle[1] Low. Useful for dynamic filters based on recent price structure.", group="Maximum Gap Check Filter Settings")
+maxECCloseAndC1OpenGapPctofECHighAndC1Low = input.float(title="Maximum Gap between EC Close and Candle[1] Open as % of (EC High - Candle[1] Low)", defval=0.0, minval=0.0, step=0.01, tooltip="In both Bullish and Bearish ECs, 
+     this filter limits the Close-to-Open gap based on the range between the Engulfing Candle's High and Candle[1] Low. Gap must be within this %age to pass.", group="Maximum Gap Check Filter Settings")
+enableMaxGap_pctCC = input.bool(title="Enable Max Gap as % of (EC Close - Candle[1] Close)", defval=false, tooltip="Enable check where the Close-to-Open gap is compared to the Close-to-Close distance between EC 
+     and Candle[1]. Adds another dynamic range option for strict filtering.", group="Maximum Gap Check Filter Settings")
+maxECCloseAndC1OpenGapPctofECCloseAndC1Close = input.float(title="Maximum Gap between EC Close and Candle[1] Open as % of (EC Close - Candle[1] Close)", defval=0.0, minval=0.0, step=0.01, tooltip="Restricts the Close-to-Open 
+     gap using the Close-to-Close distance as a reference range. Particularly useful when looking for proximity-based setups.", group="Maximum Gap Check Filter Settings")
+
+// Wick Comparison Object Selection
+enableOpenCloseBody = input.bool(defval = true, title="Enable Wick Comparison using Open-Close", group="Wick To Body Ratio Filter Settings - General")
+enableHighLowBody = input.bool(defval = false, title="Enable Wick Comparison using High-Low", group="Wick To Body Ratio Filter Settings - General")
+
+// Wick To Body Ratio Filter Settings - Bullish EC
+enableisBullishECUpperWickTooBig = input.bool(title="Enable the Bullish Engulfing Candle Upper Wick to body size ratio Filter", defval = false, group = "Wick To Body Ratio Filter Settings - Bullish EC")
+upperWicktoBodyRatioBullishEC = input.float( title="Max Upper Wick-to-Body Ratio (0 to 1) for Bullish EC", defval =  0.3, minval=0, maxval=5, step=0.01,
+     tooltip="Reject Bullish EC where upper or lower wick is more than this % of body size (0.3 = 30%)", group = "Wick To Body Ratio Filter Settings - Bullish EC")
+enableisBullishECLowerWickTooBig = input.bool(title="Enable the Bullish Engulfing Candle Lower Wick to body size ratio Filter", defval = false, group = "Wick To Body Ratio Filter Settings - Bullish EC")
+lowerWicktoBodyRatioBullishEC = input.float( title="Max Lower Wick-to-Body Ratio (0 to 1) for Bullish EC", defval =  0.3, minval=0, maxval=5, step=0.01,
+     tooltip="Reject Bullish EC where upper or lower wick is more than this % of body size (0.3 = 30%)", group = "Wick To Body Ratio Filter Settings - Bullish EC")
+enableisBullishECCandle1UpperWickTooBig = input.bool(title="Enable Bullish Engulfing Candle's Candle[1] Upper Wick to body size ratio Filter", defval = false, group = "Wick To Body Ratio Filter Settings - Bullish EC")
+upperWicktoBodyRatioBullishECCandle1 = input.float( title="Max Upper Wick-to-Body Ratio (0 to 1) for Bullish EC's Candle 1 ", defval =  0.3, minval=0, maxval=5, step=0.01,
+     tooltip="Reject Bullish EC's Candle 1 if upper wick is more than this % of body size (0.3 = 30%)", group = "Wick To Body Ratio Filter Settings - Bullish EC")
+enableisBullishECCandle1LowerWickTooBig = input.bool(title="Enable the Bullish Engulfing Candle's Candle[1] Lower Wick to body size ratio Filter", defval = false, group = "Wick To Body Ratio Filter Settings - Bullish EC")
+lowerWicktoBodyRatioBullishECCandle1 = input.float( title="Max Lower Wick-to-Body Ratio (0 to 1) for Bullish EC's Candle 1 ", defval =  0.3, minval=0, maxval=5, step=0.01,
+     tooltip="Reject Bullish EC's Candle 1 if lower wick is more than this % of body size (0.3 = 30%)", group = "Wick To Body Ratio Filter Settings - Bullish EC")
+
+// Wick To Body Ratio Filter Settings - Bearish EC
+enableisBearishECUpperWickTooBig = input.bool(title="Enable the Bearish Engulfing Candle Upper Wick to body size ratio Filter", defval = false, group = "Wick To Body Ratio Filter Settings - Bearish EC")
+upperWicktoBodyRatioBearishEC = input.float( title="Max Upper Wick-to-Body Ratio (0 to 1) for Bearish EC", defval =  0.3, minval=0, maxval=5, step=0.01,
+     tooltip="Reject Bearish EC where upper or lower wick is more than this % of body size (0.3 = 30%)", group = "Wick To Body Ratio Filter Settings - Bearish EC")
+enableisBearishECLowerWickTooBig = input.bool(title="Enable the Bearish Engulfing Candle Lower Wick to body size ratio Filter", defval = false, group = "Wick To Body Ratio Filter Settings - Bearish EC")
+lowerWicktoBodyRatioBearishEC = input.float( title="Max Lower Wick-to-Body Ratio (0 to 1) for Bearish EC", defval =  0.3, minval=0, maxval=5, step=0.01,
+     tooltip="Reject Bearish EC where upper or lower wick is more than this % of body size (0.3 = 30%)", group = "Wick To Body Ratio Filter Settings - Bearish EC")
+enableisBearishECCandle1UpperWickTooBig = input.bool(title="Enable Bearish Engulfing Candle's Candle[1] Upper Wick to body size ratio Filter", defval = false, group = "Wick To Body Ratio Filter Settings - Bearish EC")
+upperWicktoBodyRatioBearishECCandle1 = input.float( title="Max Upper Wick-to-Body Ratio (0 to 1) for Bearish EC's Candle 1 ", defval =  0.3, minval=0, maxval=5, step=0.01,
+     tooltip="Reject Bearish EC's Candle 1 if upper wick is more than this % of body size (0.3 = 30%)", group = "Wick To Body Ratio Filter Settings - Bearish EC")
+enableisBearishECCandle1LowerWickTooBig = input.bool(title="Enable the Bearish Engulfing Candle's Candle[1] Lower Wick to body size ratio Filter", defval = false, group = "Wick To Body Ratio Filter Settings - Bearish EC")
+lowerWicktoBodyRatioBearishECCandle1 = input.float( title="Max Lower Wick-to-Body Ratio (0 to 1) for Bearish EC's Candle 1 ", defval =  0.3, minval=0, maxval=5, step=0.01,
+     tooltip="Reject Bearish EC's Candle 1 if lower wick is more than this % of body size (0.3 = 30%)", group = "Wick To Body Ratio Filter Settings - Bearish EC")
+
+// INPUTS FOR FAIR VALUE GAP DETECTION
+enableFVGTransparencyFilter = input.bool(defval=true, title="Enable FVG Transparency Filter (Show only 10 nearest)", 
+     tooltip="When enabled, only the 5 nearest FVGs above and 5 nearest below current open will be visible", 
+     group="Fair Value Gap (FVG) Filter")
+maxFVGHistoricalLookback = input.int(defval = 5000, title = "Max FVG Historical Lookback", minval = 100, maxval = 8000, 
+     tooltip = "Maximum bars back to keep FVGs. Prevents historical buffer limit errors.", 
+     group="Fair Value Gap (FVG) Filter")
+// New input for configurable lookback
+lookbackCandlesForFVGCheck = input.int(title="Max Candles Behind EC for FVG Check", defval=1, minval=0, maxval=10, 
+     tooltip="Check candles from EC (0) to this many candles back for FVG interactions", group="Fair Value Gap (FVG) Filter")
+enableFvgbars2ndCandleDistanceThreshold = input.bool(defval=true, title = "Enable / Disable Check For FVG 2nd Candle to Tap Minimum Distance Threshold",
+     tooltip = "Enable Checking for Distance Violation For Both Candle 1 and EC such that both should not send alerts when they tap an FVG whose second candle is too close",
+     group="Fair Value Gap (FVG) Filter")
+fvgbars2ndCandleDistanceThreshold=input.int(title = "Minimum Distance Allowed between Candle Tapping and FVG 2nd Candle For Valid Alert",
+     defval = 0, minval=0, maxval=10, step=1, tooltip="This is the number of candles you require between a candle that taps the 
+     FVG and the 2nd candle that creates that FVG - for it to trigger a valid alert.", group="Fair Value Gap (FVG) Filter")
+fvgbarsRightLimit = input.string(title = "Mode Selection for FVG Bars right edge", defval = "Current w Offset", options = ["Infinite", "Current w Offset"], group="Fair Value Gap (FVG) Filter")
+fvgbarsLeftOffset = input.int(defval = 0, minval=0, title="FVG Plots Left Offset", group="Fair Value Gap (FVG) Filter")
+fvgbarsRightOffset= input.int(title = "Offset for FVG Bars right edge index", defval = 4, minval=0, group="Fair Value Gap (FVG) Filter")
+fvgbarsRightLimitValue = switch fvgbarsRightLimit
+    "Infinite" => na
+    "Current w Offset" => bar_index + fvgbarsRightOffset
+    => na  // default
+enableFVGFilter = input.bool(defval=true, title="Require Engulfing Candle to be inside FVG", group="Fair Value Gap (FVG) Filter")
+enableDelayedInterceptFVGFilter = input.bool(defval=true, title="Enable tracking candles behind the EC for Their intercepts in the deleted FVGs",
+     group="Fair Value Gap (FVG) Filter")
+maxEditedORDeletedFVGArraySize = input.int(1, "Max Deleted FVGs to Track", minval=1, group="Fair Value Gap (FVG) Filter")
+lookBackFVGInterceptBars = input.int(1, "Lookback Bars for Delayed FVG Detection", minval=1, maxval=20, group="Fair Value Gap (FVG) Filter")
+// enableFVGBarDeletion = input.bool(defval=true, title="To toggle FVG Bar Deletion (TESTING)", group="Fair Value Gap (FVG) Filter")
+priceSourceStr = input.string("Close", "Price Source", options = ["Close", "High", "Low", "Open"], group="Fair Value Gap (FVG) Filter")
+localTrendPriceSource = switch priceSourceStr
+    "Close" => close
+    "High" => high
+    "Low" => low
+    "Open" => open
+    => close  // default
+// EMA Settings
+enableEMA = input.bool(defval = false, title="Enable EMA Check", group="Fair Value Gap (FVG) Filter")
+emaLookBack = input.int(defval = 13, minval=1, title="EMA LookBack", group="Fair Value Gap (FVG) Filter")
+// Slope Settings
+enableSlope = input.bool(defval = false, title="Enable Slope Check", group="Fair Value Gap (FVG) Filter")
+slopeLookBack = input.int(defval = 10, minval=1, title="Slope LookBack", group="Fair Value Gap (FVG) Filter")
+// SMA Settings
+enableSMA = input.bool(defval = true, title="Enable SMA Check", group="Fair Value Gap (FVG) Filter")
+smaLookBack = input.int(defval = 20, minval=1, title="SMA LookBack", group="Fair Value Gap (FVG) Filter")
+
+// INPUTS FOR TRADE ACTIVATION DETECTION
+enableBullishTradeActivationSignal = input.bool(defval=true, title="Enable / Disable Bullish Trade Activation Signal", 
+     tooltip = "This is a switch to enable listening for activation of the bullish trade signal, i.e., if the candle[1] 
+     generated a bullish signal after clearing all its filters and the current candle's high has broken its high", group="Trade Activation Signal")
+enableBearishTradeActivationSignal = input.bool(defval=true, title="Enable / Disable Bearish Trade Activation Signal", 
+     tooltip = "This is a switch to enable listening for activation of the bearish trade signal, i.e., if the candle[1] 
+     generated a bearish signal after clearing all its filters and the current candle's low has broken its low", group="Trade Activation Signal")
+noOfPotentialTradesToShow = input.int(defval = 1, minval=1, title="No. of Recent Trades Zones To Track on Screen", group="Trade Activation Signal")
+
+
+// === PINE CONNECTOR TRADE SETTINGS ===
+// User Inputs for Trade Management
+enablePineConnectorAlerts = input.bool(defval=true, title="Enable Pine Connector Alerts", group="Pine Connector Settings")
+licenseID = input.string(defval="", title="Pine Connector License ID", 
+     tooltip="Your Pine Connector License ID (e.g., 6161199464661)", group="Pine Connector Settings")
+chartPair = input.string(defval="", title="Chart pair Name (As Expected in MT5)", tooltip="This must match the MT5 symbol exactly", group="Pine Connector Settings")
+secretKey = input.string(defval="", title="Pine Connector Secret Key", 
+     tooltip="Your Pine Connector Secret Key (e.g., PineApple)", group="Pine Connector Settings")
+riskValue = input.float(defval=1.0, minval=0.1, maxval=10.0, step=0.1, title="Risk/Volume Value", 
+     tooltip="Risk or volume parameter for position sizing", group="Pine Connector Settings")
+riskRewardRatio = input.float(defval=2.0, minval=0.1, maxval=10.0, step=0.1, title="Risk:Reward Ratio", 
+     tooltip="Take Profit will be this many times the Stop Loss distance", group="Pine Connector Settings")
+stopLossExtraMultiplier = input.float(defval=1.0, step=0.01, title="A small multiplier for fractional Increases in Stop Loss Distance", 
+     tooltip="This value will get multiplied to the stop loss calculated by the script - default is 1.0, but you can increase stop loss by 1% 
+     multiplying it by with 1.01, so the number in this input reflects such a multiplier ", group="Pine Connector Settings")
+enableTradeZoneVisuals = input.bool(defval=false, title="Enable Trade Zone Rectangles", group="Pine Connector Settings")
+zoneExtension = input.int(defval=2, minval=1, maxval=50, title="Zone Extension (bars to the right)", 
+     tooltip="How many bars to extend the trade zones to the right", group="Pine Connector Settings")
+
+// === COMMONLY USED PRECALCULATIONS AND METRICS ===
+getTrendDirection () =>
+    upScore = 0
+    downScore = 0
+
+    // --- EMA Check ---
+    if enableEMA
+        emaVal = ta.ema(localTrendPriceSource, emaLookBack)
+        upScore += localTrendPriceSource > emaVal ? 1 : 0
+        downScore += localTrendPriceSource < emaVal ? 1 : 0
+
+    // --- Slope Check ---
+    if enableSlope
+        slopeNow = ta.linreg(localTrendPriceSource, slopeLookBack, 0)
+        slopePrev = ta.linreg(localTrendPriceSource, slopeLookBack, 1)
+        slope = slopeNow - slopePrev
+        upScore += slope > 0 ? 1 : 0
+        downScore += slope < 0 ? 1 : 0
+
+    // --- SMA Check ---
+    if enableSMA
+        smaVal = ta.sma(localTrendPriceSource, smaLookBack)
+        upScore += localTrendPriceSource > smaVal ? 1 : 0
+        downScore += localTrendPriceSource < smaVal ? 1 : 0
+
+    // --- Return Trend Result ---
+    trend = upScore > downScore ? "Up" : "Down"
+    trend
+
+// the local trend result needs to be calculated for each box but will only 
+// be used in scenario 3.
+trendResult = getTrendDirection()
+
+
+// =============================================================================
+// PIP CONVERSION FUNCTIONS
+// =============================================================================
+
+// Get pip size for current instrument
+getPipSize() =>
+    float pip_size = na
+    
+    // Determine asset type and set pip size accordingly
+    if syminfo.type == "forex"
+        // Forex pairs
+        if str.contains(syminfo.currency, "JPY") or str.contains(syminfo.basecurrency, "JPY")
+            // JPY pairs: 1 pip = 0.01
+            pip_size := 0.01
+        else
+            // Most other forex pairs: 1 pip = 0.0001
+            pip_size := 0.0001
+   
+    else if syminfo.type == "crypto"
+        // Crypto: Use adaptive approach based on price level and mintick
+        current_price = close
+        if current_price >= 10000
+            // High-value crypto (like BTC): 1 pip = 1.0
+            pip_size := 1.0
+        else if current_price >= 1000
+            // Medium-value crypto: 1 pip = 0.1
+            pip_size := 0.1
+        else if current_price >= 100
+            // Lower-value crypto: 1 pip = 0.01
+            pip_size := 0.01
+        else if current_price >= 1
+            // Very low-value crypto: 1 pip = 0.001
+            pip_size := 0.001
+        else
+            // Micro-value crypto: Use 10x mintick as pip
+            pip_size := syminfo.mintick * 10
+    
+    else if syminfo.type == "index" or syminfo.type == "cfd"
+        // Indices and CFDs: Use mintick-based approach
+        if syminfo.mintick >= 1.0
+            // Large tick indices (like Nikkei): 1 pip = mintick
+            pip_size := syminfo.mintick
+        else if syminfo.mintick >= 0.1
+            // Medium tick indices: 1 pip = mintick * 10
+            pip_size := syminfo.mintick * 10
+        else
+            // Small tick indices: 1 pip = mintick * 100
+            pip_size := syminfo.mintick * 100
+    
+    else if syminfo.type == "stock"
+        // Stocks: Usually 1 pip = 0.01 (1 cent)
+        pip_size := math.max(0.01, syminfo.mintick)
+    
+    else
+        // Commodities and others: Adaptive approach
+        if syminfo.mintick >= 1.0
+            // Large tick commodities (like crude oil): 1 pip = mintick
+            pip_size := syminfo.mintick
+        else if syminfo.mintick >= 0.1
+            // Medium tick: 1 pip = mintick * 10
+            pip_size := syminfo.mintick * 10
+        else if syminfo.mintick >= 0.01
+            // Small tick: 1 pip = mintick * 100
+            pip_size := syminfo.mintick * 100
+        else
+            // Very small tick: 1 pip = mintick * 1000
+            pip_size := syminfo.mintick * 1000
+    
+    pip_size
+
+// Convert pips to price points
+pipsToPrice(pips) =>
+    pip_size = getPipSize()
+    pips * pip_size
+
+// Convert price points to pips
+priceToPips(price_diff) =>
+    pip_size = getPipSize()
+    price_diff / pip_size
+
+// Get detailed instrument information
+getInstrumentInfo() =>
+    pip_size = getPipSize()
+    [syminfo.type, syminfo.basecurrency, syminfo.currency, syminfo.mintick, pip_size, syminfo.pointvalue]
+// call this utility information for the table
+[instrument_type, instrument_basecurrency, instrument_currency, instrument_mintick, pip_size, instrument_pointvalue] = getInstrumentInfo()
+
+// === FVG DETECTION AND BOX CREATION ===
+// A custom type that stores some extra information about the box object being stored 
+// so tht it can later be accessed to make decisions.
+type FVGBox
+    box boxRef             // Reference to the actual box object
+    color bgColor          // Store background color separately
+    int fvgType            // Custom property: 1 for bullish, -1 for bearish
+    int createdAtBar       // Custom property: bar index when created
+    bool isEdited          // Track if this was deleted (for deleted array)
+    bool isDeleted         // Track if this was deleted (for deleted array)
+    int deletedAtBar       // Track when this was edited/deleted
+
+// Now we make arrays which support the custom box data type
+var fvgBoxArray = array.new<FVGBox>()
+var editedORDeletedFvgBoxArray = array.new<FVGBox>()
+// we also need an array to store sl/tp zones coming at the end
+type TradeZone
+    box profitZoneBox
+    box lossZoneBox
+
+var tradeZonesArray = array.new<TradeZone>()
+
+// Helper function to create a new FVGBox
+createFVGBox(left, int right = na, top, bottom, bgCol, fvgType) =>
+    // Create the actual box
+    boxRef = box.new(left=left, right=right, top=top, bottom=bottom, bgcolor=bgCol, border_color=color.new(color.white, 100))
+    
+    // Create and return the FVGBox instance
+    FVGBox.new(boxRef, bgCol, fvgType, bar_index, false, false, na)
+
+// Helper function to update box properties
+updateFVGBox(fvgBox, color newBgColor=na, int newfvgType=na, bool newIsEdited=false, bool newIsDeleted=false, int newDeletedAtBar=na) =>
+    if not na(newBgColor)
+        fvgBox.bgColor := newBgColor
+        box.set_bgcolor(fvgBox.boxRef, newBgColor)
+    if not na(newfvgType)
+        fvgBox.fvgType := newfvgType
+    fvgBox.isEdited := newIsEdited
+    fvgBox.isDeleted := newIsDeleted
+    if not na(newDeletedAtBar)
+        fvgBox.deletedAtBar := newDeletedAtBar
+
+// Helper function to get properties from FVGBox
+getFVGBoxTop(fvgBox) => box.get_top(fvgBox.boxRef)
+getFVGBoxBottom(fvgBox) => box.get_bottom(fvgBox.boxRef)
+getFVGBoxLeft(fvgBox) => box.get_left(fvgBox.boxRef)
+getFVGBoxRight(fvgBox) => box.get_right(fvgBox.boxRef)
+
+// Setter functions for FVGBox position properties
+setFVGBoxTop(fvgBox, newTop) => box.set_top(fvgBox.boxRef, newTop)
+setFVGBoxBottom(fvgBox, newBottom) => box.set_bottom(fvgBox.boxRef, newBottom)
+setFVGBoxLeft(fvgBox, newLeft) => box.set_left(fvgBox.boxRef, newLeft)
+setFVGBoxRight(fvgBox, newRight) => box.set_right(fvgBox.boxRef, newRight)
+
+// Convenience function to set all position properties at once
+setFVGBoxPosition(fvgBox, int newLeft=na, float newTop=na, int newRight=na, float newBottom=na) =>
+    if not na(newLeft)
+        box.set_left(fvgBox.boxRef, newLeft)
+    if not na(newTop)
+        box.set_top(fvgBox.boxRef, newTop)
+    if not na(newRight)
+        box.set_right(fvgBox.boxRef, newRight)
+    if not na(newBottom)
+        box.set_bottom(fvgBox.boxRef, newBottom)
+
+// Find index of an object in a custom array by createdAtBar:
+findFvgBoxIndexByCreatedBar(arr, int targetBar) =>
+    int idx = na
+    if array.size(arr) > 0 and not na(targetBar)  // Added na check
+        for i = 0 to array.size(arr) - 1
+            boxItem = array.get(arr, i)
+            if not na(boxItem) and boxItem.createdAtBar == targetBar  // Added na check
+                idx := i
+                break
+    idx
+
+// Function to add Edited or deleted FVG to circular buffer - call this before runnin deletion steps
+// from the main array
+
+addToEditedORDeletedArray(fvgBox) =>
+    isBehindHistoricalLookback = false
+    // Store original prices
+    oldLeft = getFVGBoxLeft(fvgBox)
+    oldRight = getFVGBoxRight(fvgBox)
+    oldTop = getFVGBoxTop(fvgBox)
+    oldBottom = getFVGBoxBottom(fvgBox)
+    oldCreatedAtBar = fvgBox.createdAtBar
+    oldFvgType = fvgBox.fvgType
+
+    // BUFFER LIMIT PROTECTION: Check if the FVG is too far back
+    barsBack = bar_index - oldCreatedAtBar
+    if barsBack > maxFVGHistoricalLookback
+        isBehindHistoricalLookback := true
+        // If too far back, just delete the FVG without creating a copy
+        if fvgBox.isDeleted
+            // Remove from main array
+            deletedIdx = findFvgBoxIndexByCreatedBar(fvgBoxArray, fvgBox.createdAtBar)
+            if not na(deletedIdx)
+                box.delete(fvgBox.boxRef)  // Delete original visual box
+                array.remove(fvgBoxArray, deletedIdx)
+        
+
+    // Check if there's already an entry for this createdAtBar
+    existingIdx = findFvgBoxIndexByCreatedBar(editedORDeletedFvgBoxArray, fvgBox.createdAtBar)
+    
+    // Handle edited FVGs
+    if fvgBox.isEdited and not isBehindHistoricalLookback
+        fvgBox.isEdited := false  // Reset for next visit
+        
+        // Create visual copy of OLD version
+        editedFvgBoxOldVersionCopy = createFVGBox(oldLeft, oldRight, oldTop, oldBottom, color.new(color.yellow, 60), oldFvgType)
+        editedFvgBoxOldVersionCopy.isEdited := true
+        editedFvgBoxOldVersionCopy.isDeleted := false
+        editedFvgBoxOldVersionCopy.deletedAtBar := na
+        
+        // Use set if exists, push if new
+        if not na(existingIdx)
+            // Delete old yellow box first
+            oldBox = array.get(editedORDeletedFvgBoxArray, existingIdx)
+            if not na(oldBox.boxRef)
+                box.delete(oldBox.boxRef)
+            array.set(editedORDeletedFvgBoxArray, existingIdx, editedFvgBoxOldVersionCopy)
+        else
+            array.push(editedORDeletedFvgBoxArray, editedFvgBoxOldVersionCopy)
+
+    // Handle deleted FVGs
+    if fvgBox.isDeleted and not isBehindHistoricalLookback
+        // Remove from main array
+        deletedIdx = findFvgBoxIndexByCreatedBar(fvgBoxArray, fvgBox.createdAtBar)
+        if not na(deletedIdx)
+            box.delete(fvgBox.boxRef)  // Delete original visual box
+            array.remove(fvgBoxArray, deletedIdx)
+        
+        // Create visual copy of deleted version
+        deletedFvgBoxOldVersionCopy = createFVGBox(oldLeft, oldRight, oldTop, oldBottom, color.new(color.yellow, 60), oldFvgType)
+        deletedFvgBoxOldVersionCopy.isEdited := false
+        deletedFvgBoxOldVersionCopy.isDeleted := true
+        deletedFvgBoxOldVersionCopy.deletedAtBar := bar_index
+        
+        // Use set if exists, push if new
+        if not na(existingIdx)
+            // Delete old yellow box first
+            oldBox = array.get(editedORDeletedFvgBoxArray, existingIdx)
+            if not na(oldBox.boxRef)
+                box.delete(oldBox.boxRef)
+            array.set(editedORDeletedFvgBoxArray, existingIdx, deletedFvgBoxOldVersionCopy)
+        else
+            array.push(editedORDeletedFvgBoxArray, deletedFvgBoxOldVersionCopy)
+
+    // Enforce size limit
+    while array.size(editedORDeletedFvgBoxArray) > maxEditedORDeletedFVGArraySize
+        oldestFVG = array.shift(editedORDeletedFvgBoxArray)
+        if not na(oldestFVG.boxRef)
+            box.delete(oldestFVG.boxRef)  // This removes the visual yellow box
+
+
+// The logic for detecting and saving the FVG boxes inside the box array should come first
+// every thing runs with accordance to candle[0] or current candle. the first condition is for checking if candle[2] and 
+// candle[1] exist / check register or GPT for FVG definition.
+if (not na(close[2])) and (not na(close[1]))
+    // now the script is allowed to run and we can move towards detection of FVG boxes
+    // For bullish FVG
+    idx = bar_index
+    if high > high[2] and low - high[2] > 0
+        // FVG = low - high[2]
+        bgColor = color.new(color.green, 70)
+        fvgBox = createFVGBox(left=idx - 2 + fvgbarsLeftOffset, right=na, top=low, bottom=high[2], bgCol=bgColor, fvgType=1)
+        array.push(fvgBoxArray, fvgBox)
+
+    // For bearish FVG
+    if low < low[2] and low[2] - high > 0
+        // FVG = low[2] - high
+        bgColor = color.new(color.red, 70)
+        fvgBox = createFVGBox(left=idx - 2 + fvgbarsLeftOffset, right=na, top=low[2], bottom=high, bgCol=bgColor, fvgType=-1)
+        array.push(fvgBoxArray, fvgBox)
+
+
+// === ENGULFING CANDLE DETECTION AND FILTERS LOGIC ===
+// precalculate these values since all values need to be calculated for all bars in this language and in chainging 
+// conditionals like and / or between function calls - such function results might not be available for all bars.
+highestHigh = ta.highest(high, swingLookBack)
+lowestLow = ta.lowest(low, swingLookBack)
+
+// Check Swing High / Low Filter
+swingHigh = false
+swingLow = false
+
+if swingDetectionMethod == "Symmetric"
+    // We can only test if the current bar is the center AFTER `swingStrength` bars have passed
+    isHigh = true
+    isLow = true
+    for i = 1 to swingStrength
+        isHigh := isHigh and high[swingStrength] > high[swingStrength + i] and high[swingStrength] > high[swingStrength - i]
+        isLow := isLow and low[swingStrength] < low[swingStrength + i] and low[swingStrength] < low[swingStrength - i]
+    // make sure the highest or lowest bar is actually bar_index[swingStrength]
+    swingHigh := isHigh
+    swingLow := isLow 
+else if swingDetectionMethod == "Morning / Evening"
+    swingHigh := high[1] > high[2] and high[1] > high[0]
+    swingLow := low[1] < low[2] and low[1] < low[0]
+else // swingDetectionMethod == "Highest Lookback"
+    swingHigh := high == highestHigh or high[1] == highestHigh
+    swingLow := low == lowestLow or low[1] == lowestLow
+
+// Recalculate allowance every bar (don't use `var`)
+// Convert user-defined point allowance into price units
+allowance = pipsToPrice(pointAllowance)
+
+// Bullish Engulfing with Micro Gap Tolerance:
+// Previous candle is bearish	close[1] < open[1]
+// Current candle is bullish	close > open
+// Current body engulfs previous body	open < close[1] and close > open[1]
+bullish_engulfing_candle =
+     close[1] < open[1] and 
+     close > open and
+     open <= (close[1] + allowance) and
+     close >= (open[1] - allowance)
+
+// Bearish Engulfing with Micro Gap Tolerance:
+// Previous candle is bullish	close[1] > open[1]
+// Current candle is bearish	close < open
+// Current body engulfs previous body	open > close[1] and close < open[1]
+bearish_engulfing_candle =
+     close[1] > open[1] and
+     close < open and
+     open >= (close[1] - allowance) and
+     close <= (open[1] + allowance)
+
+// Check if candle[1] is above the minimum size, if not,
+// ignore the signal
+minCandle1Size = pipsToPrice(minCandle1SizeInPips)
+allowableCandle1Size = math.abs(open[1] - close[1]) >= minCandle1Size
+
+// Check if EC candle is above the minimum size, if not,
+// ignore the signal
+minECCandleSize = pipsToPrice(minECCandleSizeInPips)
+allowableECCandleSize = math.abs(open - close) >= minECCandleSize
+
+// Ignore signal if previous candle [1] is fully enclosed within the body of candle [2]
+// if u dont get why its written this way, pay attention, you'll get it
+isCandle1InsideCandle2 = (math.min(high[1], low[1]) > math.min(high[2], low[2])) and
+     (math.max(high[1], low[1]) < math.max(high[2], low[2]))
+
+// in the bullish case, the low of the bullish EC should be the lowest low in the Lookback
+// in the bearish case, the high of the bearish EC should be the highest high in the lookback
+lowestLowForBullishECLookBack =  ta.lowest(low, lookBackforECLowestLowHighestHighCheck)
+highestHighForBearishECLookBack = ta.highest(high, lookBackforECLowestLowHighestHighCheck)
+
+bullishLowIsLowestLowinLookback = bullish_engulfing_candle and (low <= lowestLowForBullishECLookBack or low[1] <= lowestLowForBullishECLookBack)
+bearishHighIsHighestHighinLookback = bearish_engulfing_candle and (high >= highestHighForBearishECLookBack or high[1] >= highestHighForBearishECLookBack)
+
+// Minimum gap check filter for the gap between the close of the EC and the open of the EC's candle[1]
+isAboveMinECCloseAndCandle1OpenGap = (bullish_engulfing_candle and math.abs(close - open[1]) >= pipsToPrice(minECCloseAndCandle1OpenGapInPips)) or (bearish_engulfing_candle and math.abs(open[1] - close) >= pipsToPrice(minECCloseAndCandle1OpenGapInPips)) 
+
+// Maximum gap check filter for the gap between the close of the EC and the open of the EC's candle[1]
+gapECandC1 = math.abs(close - open[1])  // same for both bullish/bearish
+// --- Individual Conditions ---
+gapCheck_pips = not enableMaxGap_minpip or (gapECandC1 <= pipsToPrice(maxECCloseAndCandle1OpenGapInPips))
+gapCheck_pctHL   = not enableMaxGap_pctHL or (gapECandC1 <= maxECCloseAndC1OpenGapPctofECHighAndC1Low * (high - low[1]))
+gapCheck_pctCC   = not enableMaxGap_pctCC or (gapECandC1 <= maxECCloseAndC1OpenGapPctofECCloseAndC1Close * math.abs(close - close[1]))
+isBelowMaxECCloseAndCandle1OpenGap = not enableECCloseAndCandle1OpenMaxGapCheck or ((bullish_engulfing_candle or bearish_engulfing_candle)
+      and gapCheck_pips and gapCheck_pctHL and gapCheck_pctCC)
+
+// check if size of upper wick in bullish and lower wick in bearish Engulfing Candle
+// is greater than set 20-30% of the size of the candle body, if it is, ignore the signal.
+bodySizeOpenCloseEC = math.abs(close - open)
+bodySizeHighLowEC = math.abs(high - low)
+
+bodySizeOpenCloseCandle1 = math.abs(close[1] - open[1])
+bodySizeHighLowCandle1 = math.abs(high[1] - low[1])
+
+// Bullish EC Wick Filters
+isBullishECUpperWickTooBig = bullish_engulfing_candle and ((enableOpenCloseBody ? ((high - close) > upperWicktoBodyRatioBullishEC * bodySizeOpenCloseEC) : false) 
+      or (enableHighLowBody ? ((high - close) > upperWicktoBodyRatioBullishEC * bodySizeHighLowEC) : false))
+isBullishECCandle1UpperWickTooBig = bullish_engulfing_candle and ((enableOpenCloseBody ? ((close[1] > open[1] ? high[1] - close[1] : high[1] - open[1]) > (upperWicktoBodyRatioBullishECCandle1 * bodySizeOpenCloseCandle1)) : false) 
+      or (enableHighLowBody ? ((close[1] > open[1] ? high[1] - close[1] : high[1] - open[1]) > (upperWicktoBodyRatioBullishECCandle1 * bodySizeHighLowCandle1)) : false))
+isBullishECLowerWickTooBig = bullish_engulfing_candle and ((enableOpenCloseBody ? ((open - low) > lowerWicktoBodyRatioBullishEC * bodySizeOpenCloseEC) : false)
+      or (enableHighLowBody ? ((open - low) > lowerWicktoBodyRatioBullishEC * bodySizeHighLowEC) : false))
+isBullishECCandle1LowerWickTooBig = bullish_engulfing_candle and ((enableOpenCloseBody ? ((close[1] > open[1] ? open[1] - low[1] : close[1] - low[1]) > lowerWicktoBodyRatioBullishECCandle1 * bodySizeOpenCloseCandle1) : false)
+      or (enableHighLowBody ? ((close[1] > open[1] ? open[1] - low[1] : close[1] - low[1]) > lowerWicktoBodyRatioBullishECCandle1 * bodySizeHighLowCandle1) : false))
+
+// Bearish EC Wick Filters
+isBearishECUpperWickTooBig = bearish_engulfing_candle and ((enableOpenCloseBody ? ((high - open) > upperWicktoBodyRatioBearishEC * bodySizeOpenCloseEC) : false)
+      or (enableHighLowBody ? ((high - open) > upperWicktoBodyRatioBearishEC * bodySizeHighLowEC) : false))
+isBearishECCandle1UpperWickTooBig = bearish_engulfing_candle and ((enableOpenCloseBody ? ((open[1] > close[1] ? high[1] - open[1] : high[1] - close[1]) > upperWicktoBodyRatioBearishECCandle1 * bodySizeOpenCloseCandle1) : false)
+      or (enableHighLowBody ? ((open[1] > close[1] ? high[1] - open[1] : high[1] - close[1]) > upperWicktoBodyRatioBearishECCandle1 * bodySizeHighLowCandle1) : false))
+isBearishECLowerWickTooBig = bearish_engulfing_candle and ((enableOpenCloseBody ? ((close - low) > lowerWicktoBodyRatioBearishEC * bodySizeOpenCloseEC) : false)
+      or (enableHighLowBody ? ((close - low) > lowerWicktoBodyRatioBearishEC * bodySizeHighLowEC) : false))
+isBearishECCandle1LowerWickTooBig = bearish_engulfing_candle and ((enableOpenCloseBody ? ((open[1] > close[1] ? close[1] - low[1] : open[1] - low[1]) > lowerWicktoBodyRatioBearishECCandle1 * bodySizeOpenCloseCandle1) : false)
+      or (enableHighLowBody ? ((open[1] > close[1] ? close[1] - low[1] : open[1] - low[1]) > lowerWicktoBodyRatioBearishECCandle1 * bodySizeHighLowCandle1) : false))
+
+// === ENGULFING CANDLE & FVG OVERLAP PRESENCE CHECK FUNCTION ===
+// All this function will do is detect if the current candle or the candle behind the indices provided to the function
+// lies within any of the FVG boxes that yet survive the deletion phase up until this candle in the boxArray.
+// once this function detects that the EC has formed inside the FVG box, it will return true
+isCandleInBullishORBearishFVG(backwardIdx) =>
+    inside = false
+    isViolatingCloseDistanceLimit = false
+    idx = backwardIdx
+    int tappedFvgType = na
+    if array.size(fvgBoxArray) > 0
+        for i = 0 to array.size(fvgBoxArray) - 1
+            fvgBoxRef = array.get(fvgBoxArray, i)
+            // check first that the box reference is valid and that its red or green, i.e., its not been edited nor 
+            // deleted
+            if not na(fvgBoxRef) and not fvgBoxRef.isEdited and not fvgBoxRef.isDeleted
+                topVal = getFVGBoxTop(fvgBoxRef)
+                bottomVal = getFVGBoxBottom(fvgBoxRef)
+                // since this is an active / surviving FVG box, it may be used for checks against the current candle and 
+                // candle[1] as per current filter specs.
+                if not na(topVal) and not na(bottomVal) and topVal > bottomVal
+                    // Check all overlap scenarios:
+                    candleOverlaps = false
+                    // 1. Candle completely fills the FVG
+                    if high[idx] >= topVal and low[idx] <= bottomVal
+                        candleOverlaps := true
+                    // 2. Candle penetrates FVG from above
+                    else if high[idx] >= topVal and low[idx] < topVal and low[idx] > bottomVal
+                        candleOverlaps := true
+                    // 3. Candle penetrates FVG from below
+                    else if low[idx] <= bottomVal and high[idx] > bottomVal and high[idx] < topVal
+                        candleOverlaps := true
+                    // 4. Candle is completely inside FVG
+                    else if high[idx] < topVal and low[idx] > bottomVal
+                        candleOverlaps := true
+                    // only supply results on the bar's relation to the fvg box, do not mutate FVG box yet.
+                    if candleOverlaps
+                        // set the values of both results of interest here
+                        inside := true
+                        tappedFvgType := fvgBoxRef.fvgType // Custom property: 1 for bullish, -1 for bearish
+                        // take the opportunity to see if the candle has tapped into an FVG whose 2nd candle, i.e.,
+                        // the barIndex of the second candle that created the FVG was closer than the allowed limit.
+                        // Calculate bars elapsed since FVG creation point
+                        distanceFromFVG2ndCandle = math.abs(bar_index - fvgBoxRef.createdAtBar)
+                        // Check if too close: threshold+1 accounts for second candle being 1 bar after createdAtBar
+                        // Example: if threshold=3, allows FVG taps starting from bar 4 after FVG creation
+                        isViolatingCloseDistanceLimit := fvgbars2ndCandleDistanceThreshold + 1 > distanceFromFVG2ndCandle
+                        break
+    [inside, tappedFvgType, isViolatingCloseDistanceLimit]
+
+// === COMPREHENSIVE MULTI-CANDLE FVG ANALYSIS FUNCTION ===
+checkMultipleCandlesInFVG(maxLookback) =>
+    // Arrays to store results for each candle (index 0 = EC, index 1 = C1, etc.)
+    candleInsideFVG = array.new<bool>()
+    candleTappedFVGType = array.new<int>()  // 1 = bullish FVG, -1 = bearish FVG
+    candleViolatingDistance = array.new<bool>()
+    
+    // Check each candle from EC (0) to maxLookback
+    for i = 0 to maxLookback
+        [inside, tappedType, violatingDistance] = isCandleInBullishORBearishFVG(i)
+        array.push(candleInsideFVG, inside)
+        array.push(candleTappedFVGType, tappedType)
+        array.push(candleViolatingDistance, violatingDistance)
+    
+    // Return arrays containing results for all checked candles
+    [candleInsideFVG, candleTappedFVGType, candleViolatingDistance]
+
+// === EVALUATION FUNCTIONS FOR SIGNAL FILTERING ===
+// Function to check if ANY candle in lookback range tapped a bullish FVG
+evaluateBullishFVGTaps(insideArray, typeArray, violatingArray, checkDistanceViolations) =>
+    hasBullishTap = false
+    hasDistanceViolation = false
+    tapCount = 0
+    
+    if array.size(insideArray) > 0
+        for i = 0 to array.size(insideArray) - 1
+            isInside = array.get(insideArray, i)
+            tappedType = array.get(typeArray, i)
+            violating = array.get(violatingArray, i)
+            
+            // Check for bullish FVG tap (type == 1)
+            if isInside and not na(tappedType) and tappedType == 1
+                hasBullishTap := true
+                tapCount += 1
+                
+                // Check distance violations if enabled
+                if checkDistanceViolations and violating
+                    hasDistanceViolation := true
+                    // Note: We don't break here as we want to count all taps
+    
+    [hasBullishTap, hasDistanceViolation, tapCount]
+
+// Function to check if ANY candle in lookback range tapped a bearish FVG  
+evaluateBearishFVGTaps(insideArray, typeArray, violatingArray, checkDistanceViolations) =>
+    hasBearishTap = false
+    hasDistanceViolation = false
+    tapCount = 0
+    
+    if array.size(insideArray) > 0
+        for i = 0 to array.size(insideArray) - 1
+            isInside = array.get(insideArray, i)
+            tappedType = array.get(typeArray, i)
+            violating = array.get(violatingArray, i)
+            
+            // Check for bearish FVG tap (type == -1)
+            if isInside and not na(tappedType) and tappedType == -1
+                hasBearishTap := true
+                tapCount += 1
+                
+                // Check distance violations if enabled
+                if checkDistanceViolations and violating
+                    hasDistanceViolation := true
+    
+    [hasBearishTap, hasDistanceViolation, tapCount]
+
+// === MAIN EXECUTION - REPLACES CURRENT DUAL-CALL SYSTEM ===
+// Execute comprehensive multi-candle FVG analysis
+[allCandleInsideFVG, allCandleTappedFVGType, allCandleViolatingDistance] = checkMultipleCandlesInFVG(lookbackCandlesForFVGCheck)
+
+// Evaluate results for signal filtering
+[bullishFVGTapFound, bullishDistanceViolation, bullishTapCount] =
+     evaluateBullishFVGTaps(allCandleInsideFVG, allCandleTappedFVGType, allCandleViolatingDistance, enableFvgbars2ndCandleDistanceThreshold)
+[bearishFVGTapFound, bearishDistanceViolation, bearishTapCount] =
+     evaluateBearishFVGTaps(allCandleInsideFVG, allCandleTappedFVGType, allCandleViolatingDistance, enableFvgbars2ndCandleDistanceThreshold)
+
+// === OPTIONAL / MAYBE FOR FUTURE USE: ADVANCED EVALUATION FUNCTIONS ===
+// If I need more granular control, these functions provide additional analysis options
+// Get specific candle's FVG interaction (0=EC, 1=C1, etc.)
+getCandleFVGStatus(candleIndex, insideArray, typeArray, violatingArray) =>
+    if candleIndex >= 0 and candleIndex < array.size(insideArray)
+        inside = array.get(insideArray, candleIndex)
+        tappedType = array.get(typeArray, candleIndex)  
+        violating = array.get(violatingArray, candleIndex)
+        [inside, tappedType, violating]
+    else
+        [false, na, false]
+
+// Count total FVG interactions across all candles
+getTotalFVGInteractions(insideArray, typeArray) =>
+    totalBullish = 0
+    totalBearish = 0
+    
+    if array.size(insideArray) > 0
+        for i = 0 to array.size(insideArray) - 1
+            if array.get(insideArray, i) and not na(array.get(typeArray, i))
+                if array.get(typeArray, i) == 1
+                    totalBullish += 1
+                else if array.get(typeArray, i) == -1
+                    totalBearish += 1
+    
+    [totalBullish, totalBearish]
+// For Analysis by Traders in Debug Table Stats
+[totalBullishFVGTaps, totalBearishFVGTaps] = getTotalFVGInteractions(allCandleInsideFVG, allCandleTappedFVGType)
+
+// === DELAYED CANDLE FVG OVERLAP (FOR CANDLES BEHIND EC) PRESENCE CHECK FUNCTION ===
+// Function to check if a bar interacted with an FVG
+barHitEditedORDeletedFVG(fvgBoxRef, barIndex) =>
+    bool inside = false
+    int hitType = na
+    
+    // Critical bounds checking to prevent the error
+    if barIndex < 0 or barIndex > 5000
+        inside := false
+    else
+        pastBarIndex = bar_index - barIndex  // Calculate the actual past bar index
+        if not na(fvgBoxRef)
+            // Check if FVG was active at the past bar: created <= past, deleted > past (or na)
+            if fvgBoxRef.createdAtBar <= pastBarIndex and (na(fvgBoxRef.deletedAtBar) or fvgBoxRef.deletedAtBar >= pastBarIndex)
+                // make sure these are coming from the deleted array with detatched instances from their active counterparts.
+                topVal = getFVGBoxTop(fvgBoxRef)      // Use stored prices for deleted FVGs
+                bottomVal = getFVGBoxBottom(fvgBoxRef) // Use stored prices for deleted FVGs
+                
+                if not na(topVal) and not na(bottomVal) and topVal > bottomVal
+                    // Check all overlap scenarios using barIndex directly
+                    candleOverlaps = false
+                    
+                    // 1. Candle completely fills the FVG
+                    if high[barIndex] >= topVal and low[barIndex] <= bottomVal
+                        candleOverlaps := true
+                    // 2. Candle penetrates FVG from above
+                    else if high[barIndex] >= topVal and low[barIndex] < topVal and low[barIndex] > bottomVal
+                        candleOverlaps := true
+                    // 3. Candle penetrates FVG from below
+                    else if low[barIndex] <= bottomVal and high[barIndex] > bottomVal and high[barIndex] < topVal
+                        candleOverlaps := true
+                    // 4. Candle is completely inside FVG
+                    else if high[barIndex] < topVal and low[barIndex] > bottomVal
+                        candleOverlaps := true
+                    
+                    if candleOverlaps
+                        inside := true
+                        hitType := fvgBoxRef.fvgType  // Return the type if hit
+    
+    // return result
+    [inside, hitType]
+
+// Also fix the checkDelayedFVGInteractions function:
+checkDelayedFVGInteractions() =>
+    int bullishDelayedHits = 0
+    int bearishDelayedHits = 0
+    
+    // Only check if we have deleted FVGs to analyze
+    if array.size(editedORDeletedFvgBoxArray) > 0
+        
+        for lookbackIndex = 1 to lookBackFVGInterceptBars
+            // Walk backwards through deleted FVGs (from latest to earliest)
+            i = array.size(editedORDeletedFvgBoxArray) - 1
+            while i >= 0
+                editedORDeletedFvg = array.get(editedORDeletedFvgBoxArray, i)
+                // while we're already looping over the editedORDeletedFvgBoxArray FVGs here, might as well update their
+                // right indexes to the current candle
+                box.set_right(editedORDeletedFvg.boxRef, fvgbarsRightLimitValue)
+                // Check if the FVG is valid and its been edited or deleted, do not allow checks against active boxes
+                if not na(editedORDeletedFvg) and (editedORDeletedFvg.isEdited or editedORDeletedFvg.isDeleted)
+                    // Check if the bar hit the FVG
+                    [insideEditedORDeletedFvgBox, hitType] = barHitEditedORDeletedFVG(editedORDeletedFvg, lookbackIndex)
+                    if insideEditedORDeletedFvgBox
+                        if hitType == 1
+                            bullishDelayedHits += 1
+                        else if hitType == -1
+                            bearishDelayedHits += 1
+                i -= 1
+    // return
+    [bullishDelayedHits, bearishDelayedHits]
+
+[delayedBullishHitCount, delayedBearishHitCount] = checkDelayedFVGInteractions()
+
+// === FINAL SIGNALS (INCLUDE FVG FILTER) ===
+// lets just get the proper FVG filter Values first
+// It needs AND logic when one of both filters are enabled, 
+// OR logic only when both are on and only one needs to be true
+
+// Cleaner FVG filter evaluation
+// for bullish signal
+fvgFiltersPassBullish = false
+if enableFVGFilter and not enableDelayedInterceptFVGFilter
+    // Only active FVG taps matter
+    fvgFiltersPassBullish := bullishFVGTapFound
+else if enableDelayedInterceptFVGFilter and not enableFVGFilter  
+    // Only delayed FVG hits matter
+    fvgFiltersPassBullish := delayedBullishHitCount > 0
+else if enableFVGFilter and enableDelayedInterceptFVGFilter
+    // Either active OR delayed FVG interactions qualify
+    fvgFiltersPassBullish := bullishFVGTapFound or (delayedBullishHitCount > 0)
+else
+    // No FVG filtering enabled
+    fvgFiltersPassBullish := true
+
+// for bearish signal
+fvgFiltersPassBearish = false  
+if enableFVGFilter and not enableDelayedInterceptFVGFilter
+    fvgFiltersPassBearish := bearishFVGTapFound
+else if enableDelayedInterceptFVGFilter and not enableFVGFilter
+    fvgFiltersPassBearish := delayedBearishHitCount > 0
+else if enableFVGFilter and enableDelayedInterceptFVGFilter
+    fvgFiltersPassBearish := bearishFVGTapFound or (delayedBearishHitCount > 0)
+else
+    fvgFiltersPassBearish := true
+
+// Collese filters and switches here
+finalBullishSignal = enableBullishEC and bullish_engulfing_candle 
+      and (enableSwingLowFilter ? swingLow : true)
+      and (enableMinCandle1Size ? allowableCandle1Size : true)
+      and (enableMinECCandleSize ? allowableECCandleSize : true)
+      and (enableIsCandle1InsideCandle2 ? not isCandle1InsideCandle2 : true)
+      and (enableECLowestLowHighestHighCheck ? bullishLowIsLowestLowinLookback : true)
+      and (enableECCloseAndCandle1OpenMinGapCheck ? isAboveMinECCloseAndCandle1OpenGap : true)
+      and (enableECCloseAndCandle1OpenMaxGapCheck ? isBelowMaxECCloseAndCandle1OpenGap : true)
+      //  wick size filters
+      and (enableisBullishECUpperWickTooBig ? not isBullishECUpperWickTooBig : true)
+      and (enableisBullishECCandle1UpperWickTooBig ? not isBullishECCandle1UpperWickTooBig : true)
+      and (enableisBullishECLowerWickTooBig ? not isBullishECLowerWickTooBig : true)
+      and (enableisBullishECCandle1LowerWickTooBig ? not isBullishECCandle1LowerWickTooBig : true)
+      // Enhanced FVG Filter System
+      and fvgFiltersPassBullish
+      // Distance violation check - now unified
+      and (enableFvgbars2ndCandleDistanceThreshold ? not bullishDistanceViolation : true)
+
+finalBearishSignal = enableBearishEC and bearish_engulfing_candle
+      and (enableSwingHighFilter ? swingHigh : true)
+      and (enableMinCandle1Size ? allowableCandle1Size : true)
+      and (enableMinECCandleSize ? allowableECCandleSize : true)
+      and (enableIsCandle1InsideCandle2 ? not isCandle1InsideCandle2 : true)
+      and (enableECLowestLowHighestHighCheck ? bearishHighIsHighestHighinLookback : true)
+      and (enableECCloseAndCandle1OpenMinGapCheck ? isAboveMinECCloseAndCandle1OpenGap : true)
+      and (enableECCloseAndCandle1OpenMaxGapCheck ? isBelowMaxECCloseAndCandle1OpenGap : true)
+      //  wick size filters
+      and (enableisBearishECUpperWickTooBig ? not isBearishECUpperWickTooBig : true)
+      and (enableisBearishECCandle1UpperWickTooBig ? not isBearishECCandle1UpperWickTooBig : true)
+      and (enableisBearishECLowerWickTooBig ? not isBearishECLowerWickTooBig : true)
+      and (enableisBearishECCandle1LowerWickTooBig ? not isBearishECCandle1LowerWickTooBig : true)
+      // Enhanced FVG Filter System  
+      and fvgFiltersPassBearish
+      // Distance violation check - now unified
+      and (enableFvgbars2ndCandleDistanceThreshold ? not bearishDistanceViolation : true)
+
+// === EXTRA CONDITIONS NOT AFFECTING BULLISH / BEARISH SIGNALS ===
+tradeActivationBullish = enableBullishTradeActivationSignal and finalBullishSignal[1] and (high > high[1])
+tradeActivationBearish = enableBearishTradeActivationSignal and finalBearishSignal[1] and (low < low[1])
+
+// === STOP LOSS AND TAKE PROFIT CALCULATIONS ===
+// Function to calculate stop loss and take profit levels
+calculateTradeLevels(isLong, entryPrice) =>
+    stopDistanceInPrice = (isLong ? math.abs(high[1] - math.min(low[1], low[2])) : math.abs(math.max(high[1], high[2]) - low[1])) * stopLossExtraMultiplier
+    stopLoss = if isLong
+        entryPrice - stopDistanceInPrice
+    else
+        entryPrice + stopDistanceInPrice
+    
+    takeProfit = if isLong
+        entryPrice + (stopDistanceInPrice * riskRewardRatio)
+    else
+        entryPrice - (stopDistanceInPrice * riskRewardRatio)
+    
+    [stopLoss, takeProfit, stopDistanceInPrice]
+
+// === PINE CONNECTOR MESSAGE GENERATION ===
+// Function to generate Pine Connector alert message
+generatePineConnectorMessage(action, entryPrice, stopLoss, takeProfit) =>
+    // Calculate distances in price units from current price
+    slDistanceInPriceUnits = math.abs(stopLoss - entryPrice)
+    tpDistanceInPriceUnits = math.abs(takeProfit - entryPrice)
+    
+    // Convert to pips using user-defined ratio
+    slInPips = priceToPips(slDistanceInPriceUnits)
+    tpInPips = priceToPips(tpDistanceInPriceUnits)
+    // 2) Check if empty
+    chartPairStrVal = str.trim(chartPair)
+    chartPairStrVal := str.length(chartPairStrVal) > 0 ? chartPairStrVal : syminfo.ticker
+
+    // Generate message string in Pine Connector format
+    // Format: LicenseID,command,symbol,risk=value,sl=pips,tp=pips,secret=key
+    command = action == "BUY" ? "buy" : "sell"
+    
+    message = licenseID + "," + 
+              command + "," + 
+              chartPairStrVal + "," +
+              "risk=" + str.tostring(riskValue, "#.##") + "," +
+              "sl=" + str.tostring(slInPips, "#.##") + "," +
+              "tp=" + str.tostring(tpInPips, "#.##") + "," +
+              "secret=" + secretKey
+    
+    message
+
+// === PLOTS ===
+// If size set as auto
+plotshape(finalBullishSignal and shapeSizeInput == "auto" , title = "Bullish EC", style = shape.triangleup, location = location.belowbar, color = color.green, size = size.auto)
+plotshape(finalBearishSignal and shapeSizeInput == "auto", title = "Bearish EC", style = shape.triangledown, location = location.abovebar, color = color.red, size = size.auto)
+plotshape(enableSwingHighLowPlotShapes and swingHigh and finalBearishSignal and shapeSizeInput == "auto", title="Swing High (Symmetric)", style=shape.xcross, 
+     location=location.abovebar, color=color.yellow, size=size.auto, 
+     offset = -(swingDetectionMethod == "Symmetric" ? swingStrength : swingDetectionMethod == "Morning / Evening" ? 1 : 1))
+plotshape(enableSwingHighLowPlotShapes and swingLow and finalBullishSignal and shapeSizeInput == "auto", title="Swing Low Pivot", style=shape.xcross, 
+     location=location.belowbar, color=color.yellow, size=size.auto, 
+     offset = -(swingDetectionMethod == "Symmetric" ? swingStrength : swingDetectionMethod == "Morning / Evening" ? 1 : 1))
+plotshape(enableTradeActivationPlotShapes and tradeActivationBullish and shapeSizeInput == "auto", title="Trade Activation Bullish", style=shape.diamond, 
+     location=location.abovebar, color=color.blue, size=size.auto)
+plotshape(enableTradeActivationPlotShapes and tradeActivationBearish and shapeSizeInput == "auto", title="Trade Activation Bearish", style=shape.diamond, 
+     location=location.belowbar, color=color.blue, size=size.auto)
+// // If size set as small
+plotshape(finalBullishSignal and shapeSizeInput == "small" , title = "Bullish EC", style = shape.triangleup, location = location.belowbar, color = color.green, size = size.small)
+plotshape(finalBearishSignal and shapeSizeInput == "small", title = "Bearish EC", style = shape.triangledown, location = location.abovebar, color = color.red, size = size.small)
+plotshape(enableSwingHighLowPlotShapes and swingHigh and finalBearishSignal and shapeSizeInput == "small", title="Swing High (Symmetric)", style=shape.xcross, 
+     location=location.abovebar, color=color.yellow, size=size.small, 
+     offset = -(swingDetectionMethod == "Symmetric" ? swingStrength : swingDetectionMethod == "Morning / Evening" ? 1 : 1))
+plotshape(enableSwingHighLowPlotShapes and swingLow and finalBullishSignal and shapeSizeInput == "small", title="Swing Low Pivot", style=shape.xcross, 
+     location=location.belowbar, color=color.yellow, size=size.small, 
+     offset = -(swingDetectionMethod == "Symmetric" ? swingStrength : swingDetectionMethod == "Morning / Evening" ? 1 : 1))
+plotshape(enableTradeActivationPlotShapes and tradeActivationBullish and shapeSizeInput == "small", title="Trade Activation Bullish", style=shape.diamond, 
+     location=location.abovebar, color=color.blue, size=size.small)
+plotshape(enableTradeActivationPlotShapes and tradeActivationBearish and shapeSizeInput == "small", title="Trade Activation Bearish", style=shape.diamond, 
+     location=location.belowbar, color=color.blue, size=size.small)
+// If size set as normal
+plotshape(finalBullishSignal and shapeSizeInput == "normal" , title = "Bullish EC", style = shape.triangleup, location = location.belowbar, color = color.green, size = size.normal)
+plotshape(finalBearishSignal and shapeSizeInput == "normal", title = "Bearish EC", style = shape.triangledown, location = location.abovebar, color = color.red, size = size.normal)
+plotshape(enableSwingHighLowPlotShapes and swingHigh and finalBearishSignal and shapeSizeInput == "normal", title="Swing High (Symmetric)", style=shape.xcross, 
+     location=location.abovebar, color=color.yellow, size=size.normal, 
+     offset = -(swingDetectionMethod == "Symmetric" ? swingStrength : swingDetectionMethod == "Morning / Evening" ? 1 : 1))
+plotshape(enableSwingHighLowPlotShapes and swingLow and finalBullishSignal and shapeSizeInput == "normal", title="Swing Low Pivot", style=shape.xcross, 
+     location=location.belowbar, color=color.yellow, size=size.normal, 
+     offset = -(swingDetectionMethod == "Symmetric" ? swingStrength : swingDetectionMethod == "Morning / Evening" ? 1 : 1))
+plotshape(enableTradeActivationPlotShapes and tradeActivationBullish and shapeSizeInput == "normal", title="Trade Activation Bullish", style=shape.diamond, 
+     location=location.abovebar, color=color.blue, size=size.normal)
+plotshape(enableTradeActivationPlotShapes and tradeActivationBearish and shapeSizeInput == "normal", title="Trade Activation Bearish", style=shape.diamond, 
+     location=location.belowbar, color=color.blue, size=size.normal)
+
+// === TRADE ZONE VISUALIZATION ===
+// Variables to store active trade zones
+// Variables to store active trade zones
+
+// Function to create trade zone rectangles
+// Helper function to create a TradeZone object
+createTradeZone(isLong, entryPrice, stopLoss, takeProfit) =>
+    // Calculate zone boundaries  
+    rightBar = bar_index + zoneExtension
+
+    // Define custom hex colors with transparency
+    cyanColor = color.new(#00ff80, 40)
+    magentaColor = color.new(#ff0077, 40)
+
+    // Create boxes based on trade direction
+    box profitZone = na
+    box lossZone = na
+
+    if isLong
+        profitZone := box.new(bar_index, takeProfit, rightBar, entryPrice,
+             bgcolor=cyanColor, border_color=cyanColor,
+             border_width=1, border_style=line.style_dashed)
+        lossZone := box.new(bar_index, entryPrice, rightBar, stopLoss,
+             bgcolor=magentaColor, border_color=magentaColor,
+             border_width=1, border_style=line.style_dashed)
+    else
+        profitZone := box.new(bar_index, entryPrice, rightBar, takeProfit,
+             bgcolor=cyanColor, border_color=cyanColor,
+             border_width=1, border_style=line.style_dashed)
+        lossZone := box.new(bar_index, stopLoss, rightBar, entryPrice,
+             bgcolor=magentaColor, border_color=magentaColor,
+             border_width=1, border_style=line.style_dashed)
+
+    // Return the TradeZone object containing both boxes
+    TradeZone.new(profitZone, lossZone)
+
+// Function to add new trade zone and maintain array size limit
+addTradeZone(isLong, entryPrice, stopLoss, takeProfit) =>
+    // Create new trade zone
+    newZone = createTradeZone(isLong, entryPrice, stopLoss, takeProfit)
+    
+    // Add to end of array (most recent)
+    array.push(tradeZonesArray, newZone)
+    
+    // Maintain size limit: remove oldest trades when limit exceeded
+    while array.size(tradeZonesArray) > noOfPotentialTradesToShow
+        oldestZone = array.shift(tradeZonesArray)  // Remove first (oldest) element
+        // Clean up visual boxes from oldest trade
+        if not na(oldestZone.profitZoneBox)
+            box.delete(oldestZone.profitZoneBox)
+        if not na(oldestZone.lossZoneBox)
+            box.delete(oldestZone.lossZoneBox)
+
+
+// === PINECONNECTOR ALERTS ===
+var alertMessagePrint = "Hi"
+var SLPrint = 0.0
+var TPPrint = 0.0
+if enablePineConnectorAlerts
+    // Generate alerts when trades activate
+    if tradeActivationBullish
+        [sl, tp, stopDistance] = calculateTradeLevels(true, high[1])
+        alertMessage = generatePineConnectorMessage("BUY", high[1], sl, tp)
+        SLPrint := sl
+        TPPrint := tp
+        alertMessagePrint := alertMessage
+        alert(alertMessage, alert.freq_once_per_bar)
+        
+        // Create trade zone visualization
+        if enableTradeZoneVisuals
+            addTradeZone(true, high[1], sl, tp)
+
+    if tradeActivationBearish
+        [sl, tp, stopDistance] = calculateTradeLevels(false, low[1])
+        alertMessage = generatePineConnectorMessage("SELL", low[1], sl, tp)
+        alertMessagePrint := alertMessage
+        alert(alertMessage, alert.freq_once_per_bar)
+        
+        // Create trade zone visualization
+        if enableTradeZoneVisuals
+            addTradeZone(false, low[1], sl, tp)
+
+// === NORMAL ALERTCONDITIONS (outside any local scope) ===
+alertcondition(not enablePineConnectorAlerts and finalBullishSignal, title="Bullish Engulfing Candle Alert", message="A Bullish Engulfing Candle which has passed all applied filters has been detected for {{ticker}}")
+alertcondition(not enablePineConnectorAlerts and finalBearishSignal, title="Bearish Engulfing Candle Alert", message="A Bearish Engulfing Candle which has passed all applied filters has been detected for {{ticker}}")
+alertcondition(not enablePineConnectorAlerts and tradeActivationBullish, title="Bullish Engulfing Trade Activation Alert", message="candle[1] generated a bullish signal after clearing all its filters and the current candle's high has broken its high for {{ticker}}")
+alertcondition(not enablePineConnectorAlerts and tradeActivationBearish, title="Bearish Engulfing Trade Activation Alert", message="candle[1] generated a bearish signal after clearing all its filters and the current candle's low has broken its low for {{ticker}}")
+
+// === INTERCEPTED FVG BOX DELETION LOGIC ===
+// Now a for loop over all the boxes in the boxArray for mutation / deletion
+// Process existing boxes for mitigation/deletion
+// if enableFVGBarDeletion and array.size(fvgBoxArray) > 0
+if array.size(fvgBoxArray) > 0
+    i = array.size(fvgBoxArray) - 1
+    while i >= 0  // Use while loop for better control
+        fvgBoxRef = array.get(fvgBoxArray, i)
+        shouldDecrementIndex = true  // Track if we need to decrement
+        
+        if not na(fvgBoxRef) and not fvgBoxRef.isDeleted  // Prevent double processing
+            // while we're already looping over the current FVGs here, might as well update their
+            // right indexes to the current candle
+            box.set_right(fvgBoxRef.boxRef, fvgbarsRightLimitValue)
+            topVal = getFVGBoxTop(fvgBoxRef)
+            bottomVal = getFVGBoxBottom(fvgBoxRef)
+            
+            if not na(topVal) and not na(bottomVal)
+                deleteBox = false
+                
+                // Scenario 0 - complete fill
+                if (high >= topVal) and (low <= bottomVal)
+                    deleteBox := true
+                    
+                // Scenario 1 - penetration from above
+                else if (high >= topVal) and (low < topVal) and (low > bottomVal)
+                    fvgBoxRef.isEdited := true
+                    addToEditedORDeletedArray(fvgBoxRef)
+                    setFVGBoxTop(fvgBoxRef, low)
+                    
+                // Scenario 2 - penetration from below  
+                else if (low <= bottomVal) and (high > bottomVal) and (high < topVal)
+                    fvgBoxRef.isEdited := true
+                    addToEditedORDeletedArray(fvgBoxRef)
+                    setFVGBoxBottom(fvgBoxRef, high)
+
+                // Scenario 3 - candle inside FVG
+                else if (high < topVal) and (low > bottomVal)
+                    fvgBoxRef.isEdited := true
+                    addToEditedORDeletedArray(fvgBoxRef)
+                    if trendResult == "Up"
+                        setFVGBoxBottom(fvgBoxRef, high)
+                    else if trendResult == "Down"
+                        setFVGBoxTop(fvgBoxRef, low)
+
+                // Handle deletion
+                if deleteBox
+                    fvgBoxRef.isDeleted := true
+                    addToEditedORDeletedArray(fvgBoxRef)
+                    shouldDecrementIndex := false  // Array size already changed in function
+                    
+                // Check for invalid dimensions after editing
+                else
+                    newTop = getFVGBoxTop(fvgBoxRef)
+                    newBottom = getFVGBoxBottom(fvgBoxRef)
+                    if not na(newTop) and not na(newBottom) and newTop <= newBottom
+                        fvgBoxRef.isDeleted := true
+                        addToEditedORDeletedArray(fvgBoxRef)
+                        shouldDecrementIndex := false  // Array size already changed
+        
+        // Only decrement if we didn't remove an element
+        if shouldDecrementIndex
+            i -= 1
+        else
+            // Recalculate i since array size changed
+            i := math.min(i, array.size(fvgBoxArray) - 1)
+
+// === FVG BOX HIDING / SHOWING LOGIC ===
+// The code here is responsible for checking for the 10 nearest FVG boxes to the candle open of the last bar when its 
+// confirmed to avoid rapid rerunning of this lather processing heavy algorithm.
+// Enhanced function to find 5 FVGs above and 5 FVGs below current open price
+findNearestFVGBoxesToOpen() =>
+    nearestIndices = array.new<int>()
+    
+    // Separate tracking for above and below
+    aboveFVGs = array.new<int>()
+    aboveDistances = array.new<float>()
+    belowFVGs = array.new<int>()
+    belowDistances = array.new<float>()
+    
+    currentOpen = open
+    
+    if array.size(fvgBoxArray) == 0
+        [nearestIndices, 0, 0]
+    else
+        // STEP 1: Separate FVGs into above and below categories
+        for i = 0 to array.size(fvgBoxArray) - 1
+            fvgBox = array.get(fvgBoxArray, i)
+            
+            // Skip invalid, deleted, or edited boxes
+            if na(fvgBox) // or fvgBox.isDeleted or fvgBox.isEdited
+                continue
+                
+            boxTop = getFVGBoxTop(fvgBox)
+            boxBottom = getFVGBoxBottom(fvgBox)
+            
+            if na(boxTop) or na(boxBottom)
+                continue
+                
+            boxMidpoint = (boxTop + boxBottom) / 2
+            signedDistance = boxMidpoint - currentOpen
+            
+            if signedDistance > 0
+                // Above current open
+                array.push(aboveFVGs, i)
+                array.push(aboveDistances, signedDistance)  // Keep positive
+            else if signedDistance < 0
+                // Below current open
+                array.push(belowFVGs, i)
+                array.push(belowDistances, math.abs(signedDistance))  // Make positive for comparison
+        
+        // STEP 2: Find 5 closest above FVGs (using selection without remove/insert)
+        aboveCount = 0
+        selectedAbove = array.new<bool>()
+        
+        // Initialize selection array
+        if array.size(aboveFVGs) > 0
+            for j = 0 to array.size(aboveFVGs) - 1
+                array.push(selectedAbove, false)
+        
+        // Select up to 5 closest above FVGs
+        for pick = 1 to 5
+            if array.size(aboveFVGs) == 0
+                break
+                
+            minDist = 999999999.0
+            minIdx = -1
+            
+            // Find minimum unselected distance
+            for j = 0 to array.size(aboveDistances) - 1
+                if not array.get(selectedAbove, j)  // Not already selected
+                    dist = array.get(aboveDistances, j)
+                    if dist < minDist
+                        minDist := dist
+                        minIdx := j
+            
+            // Add to results if found
+            if minIdx >= 0
+                array.push(nearestIndices, array.get(aboveFVGs, minIdx))
+                array.set(selectedAbove, minIdx, true)  // Mark as selected
+                aboveCount += 1
+            else
+                break  // No more unselected FVGs
+        
+        // STEP 3: Find 5 closest below FVGs (using selection without remove/insert)
+        belowCount = 0
+        selectedBelow = array.new<bool>()
+        
+        // Initialize selection array
+        if array.size(belowFVGs) > 0
+            for j = 0 to array.size(belowFVGs) - 1
+                array.push(selectedBelow, false)
+        
+        // Select up to 5 closest below FVGs
+        for pick = 1 to 5
+            if array.size(belowFVGs) == 0
+                break
+                
+            minDist = 999999999.0
+            minIdx = -1
+            
+            // Find minimum unselected distance
+            for j = 0 to array.size(belowDistances) - 1
+                if not array.get(selectedBelow, j)  // Not already selected
+                    dist = array.get(belowDistances, j)
+                    if dist < minDist
+                        minDist := dist
+                        minIdx := j
+            
+            // Add to results if found
+            if minIdx >= 0
+                array.push(nearestIndices, array.get(belowFVGs, minIdx))
+                array.set(selectedBelow, minIdx, true)  // Mark as selected
+                belowCount += 1
+            else
+                break  // No more unselected FVGs
+        
+        [nearestIndices, aboveCount, belowCount]
+
+// Debug version that shows counts in debug table
+makeAllFVGBoxesButNearestTransparent() =>
+    if barstate.isconfirmed
+        [nearest10fvgBoxArrayIndices, aboveCount, belowCount] = findNearestFVGBoxesToOpen()
+        
+        visibleBoxes = 0
+        transparentBoxes = 0
+        
+        if array.size(fvgBoxArray) > 0
+            for i = 0 to array.size(fvgBoxArray) - 1
+                fvgBoxRef = array.get(fvgBoxArray, i)
+                
+                if na(fvgBoxRef) or fvgBoxRef.isDeleted or fvgBoxRef.isEdited
+                    continue
+                
+                if array.includes(nearest10fvgBoxArrayIndices, i)
+                    visibleBoxes += 1
+                    originalColor = fvgBoxRef.fvgType == 1 ? color.new(color.green, 70) : color.new(color.red, 70)
+                    updateFVGBox(fvgBoxRef, newBgColor=originalColor)
+                else 
+                    transparentBoxes += 1
+                    transparentColor = fvgBoxRef.fvgType == 1 ? color.new(color.green, 100) : color.new(color.red, 100)
+                    updateFVGBox(fvgBoxRef, newBgColor=transparentColor)
+        
+        // Add debug info to your existing debug table
+        if barstate.islast
+            table.cell(debugTable, 0, 8, "FVGs Above Open:", text_color=color.black, text_size=size.small)
+            table.cell(debugTable, 1, 8, str.tostring(aboveCount), text_color=color.black, text_size=size.small)
+            
+            table.cell(debugTable, 0, 9, "FVGs Below Open:", text_color=color.black, text_size=size.small)
+            table.cell(debugTable, 1, 9, str.tostring(belowCount), text_color=color.black, text_size=size.small)
+
+// Conditional call with user control
+if enableFVGTransparencyFilter
+    makeAllFVGBoxesButNearestTransparent()
+
+// Debugging table
+if barstate.islast and enableDebugTable
+    table.cell(debugTable, 0, 0, "Active FVGs:", text_color=color.black, text_size=size.small)
+    table.cell(debugTable, 1, 0, str.tostring(array.size(fvgBoxArray)), text_color=color.black, text_size=size.small)
+    
+    table.cell(debugTable, 0, 1, "Deleted FVGs:", text_color=color.black, text_size=size.small)
+    table.cell(debugTable, 1, 1, str.tostring(array.size(editedORDeletedFvgBoxArray)), text_color=color.black, text_size=size.small)
+    
+    table.cell(debugTable, 0, 2, "Max Deleted FVGs Allowed:", text_color=color.black, text_size=size.small)
+    table.cell(debugTable, 1, 2, str.tostring(maxEditedORDeletedFVGArraySize), text_color=color.black, text_size=size.small)
+    
+    // Count actual yellow boxes on chart
+    yellowBoxCount = 0
+    if array.size(editedORDeletedFvgBoxArray) > 0
+        for j = 0 to array.size(editedORDeletedFvgBoxArray) - 1
+            yellowBox = array.get(editedORDeletedFvgBoxArray, j)
+            if not na(yellowBox.boxRef)
+                yellowBoxCount += 1
+    
+    table.cell(debugTable, 0, 3, "Yellow Boxes:", text_color=color.black, text_size=size.small)
+    table.cell(debugTable, 1, 3, str.tostring(yellowBoxCount), text_color=color.black, text_size=size.small)
+    
+    table.cell(debugTable, 0, 4, "Pip Size:", text_color=color.black, text_size=size.small)
+    table.cell(debugTable, 1, 4, str.tostring(pip_size), text_color=color.black, text_size=size.small)
+
+    table.cell(debugTable, 0, 5, "Total Current Bullish FVG Taps (Cur Candle):", text_color=color.black, text_size=size.small)
+    table.cell(debugTable, 1, 5, str.tostring(totalBullishFVGTaps), text_color=color.black, text_size=size.small)
+    
+    table.cell(debugTable, 0, 6, "Total Current Bearish FVG Taps (Cur Candle):", text_color=color.black, text_size=size.small)
+    table.cell(debugTable, 1, 6, str.tostring(totalBearishFVGTaps), text_color=color.black, text_size=size.small)
+    
+    // table.cell(debugTable, 0, 5, "SL Print:", text_color=color.black, text_size=size.small)
+    // table.cell(debugTable, 1, 5, str.tostring(SLPrint), text_color=color.black, text_size=size.small)
+    
+    // table.cell(debugTable, 0, 6, "TP Print:", text_color=color.black, text_size=size.small)
+    // table.cell(debugTable, 1, 6, str.tostring(TPPrint), text_color=color.black, text_size=size.small)
+
+    // table.cell(debugTable, 0, 7, "CHART NAME Print:", text_color=color.black, text_size=size.small)
+    // table.cell(debugTable, 1, 7, chartPair, text_color=color.black, text_size=size.small)

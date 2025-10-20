@@ -1,0 +1,1200 @@
+//@version=6
+indicator(title = "Non-Repainting Channel Detector", overlay = true, max_labels_count = 500, max_lines_count = 500)
+
+// === USER INPUTS ===
+g_Prescreening = "High/Low Pivot Prescreening Controls"
+enable_local_prescreening = input.bool(defval = true, title = "Enable Local High/Low Prescreening", 
+     tooltip = "When enabled, bars must be local highs/lows before trend analysis is performed",
+     group = g_Prescreening)
+local_high_or_low_search_window_size = input.int(defval = 2, title = "Local Extreme Window Size", minval = 1, maxval = 10, step = 1,
+     tooltip = "Number of bars on each side to check for local highs/lows",
+     group = g_Prescreening)
+
+g_Trend_Methods = "High/Low Pivot Detection Method Controls"
+trendDetectionPriceSelection = input.string(defval = "typical_price", title = "Price Source for Trend Detection", 
+     options = ["typical_price", "weighted_price", "median_price", "true_price", "close"], 
+     tooltip = "Price source for trend analysis",
+     group = g_Trend_Methods)
+
+lookback_limit = input.int(defval = 10, title = "Window Size (Lookback Distance)", minval = 2, maxval = 50, step = 1,
+     tooltip = "Number of bars to analyze on each side - CRITICAL for anti-repainting buffer",
+     group = g_Trend_Methods)
+
+decay_factor = input.float(defval = 0.9, title = "Exponential Decay Factor", minval = 0.1, maxval = 0.99, step = 0.01,
+     tooltip = "Controls how quickly bar influence decreases with distance",
+     group = g_Trend_Methods)
+
+sigma = input.float(defval = 2.0, title = "Gaussian Decay Spread (Sigma)", minval = 0.5, maxval = 5.0, step = 0.1,
+     tooltip = "Controls Gaussian weight distribution spread",
+     group = g_Trend_Methods)
+
+enable_ema_method = input.bool(defval = true, title = "Enable EMA Slope Method", group = g_Trend_Methods)
+enable_linear_method = input.bool(defval = true, title = "Enable Linear Decay Method", group = g_Trend_Methods)  
+enable_exponential_method = input.bool(defval = true, title = "Enable Exponential Decay Method", group = g_Trend_Methods)
+enable_gaussian_method = input.bool(defval = true, title = "Enable Gaussian Decay Method", group = g_Trend_Methods)
+
+ema_weight = input.float(defval = 0.25, title = "EMA Method Weight", minval = 0.0, maxval = 1.0, step = 0.1, group = g_Trend_Methods)
+linear_weight = input.float(defval = 0.25, title = "Linear Method Weight", minval = 0.0, maxval = 1.0, step = 0.1, group = g_Trend_Methods)
+exponential_weight = input.float(defval = 0.25, title = "Exponential Method Weight", minval = 0.0, maxval = 1.0, step = 0.1, group = g_Trend_Methods)
+gaussian_weight = input.float(defval = 0.25, title = "Gaussian Method Weight", minval = 0.0, maxval = 1.0, step = 0.1, group = g_Trend_Methods)
+
+g_Channel_Detection = "Channel Detection Controls"
+enable_overlapping_channel_detection = input.bool(defval = true, title = "Enable Overlapping Channel Detection",
+     group = g_Channel_Detection)
+max_slope_diff = input.float(defval = 0.5, title = "Max Slope Difference", minval = 0.01, step = 0.05,
+     tooltip = "Maximum allowed absolute difference between upper and lower channel slopes (price units per bar)",
+     group = g_Channel_Detection)
+max_angle_diff_degrees = input.float(defval = 15.0, title = "Max Angle Difference (Degrees)", minval = 1.0, maxval = 45.0, step = 1.0,
+     tooltip = "Maximum allowed angle difference between channel lines in degrees",
+     group = g_Channel_Detection)
+enable_convergence_check = input.bool(defval = true, title = "Enable Convergence Check", 
+     tooltip = "Reject channels that converge too soon (wedge patterns)",
+     group = g_Channel_Detection)
+min_convergence_bars = input.int(defval = 100, title = "Minimum Convergence Distance (bars)", minval = 20, maxval = 500, step = 10,
+     tooltip = "Minimum bars before channel lines should converge. Channels converging sooner are rejected or clipped.",
+     group = g_Channel_Detection)
+breakout_tolerance_atr_multiplier = input.float(defval = 1.5, title = "Breakout Tolerance (ATR Multiple)", 
+     minval = 0.1, step = 0.1,
+     tooltip = "Violation occurs when price exceeds channel by this many ATRs (1.0=strict, 2.0+=loose)",
+     group = g_Channel_Detection)
+atr_length = input.int(defval = 14, title = "ATR Length", minval = 5, maxval = 50, step = 1,
+     tooltip = "Period for ATR calculation",
+     group = g_Channel_Detection)
+show_channels = input.bool(defval = true, title = "Show Channel Lines", group = g_Channel_Detection)
+max_channels_storage = input.int(defval = 100, title = "Max Channels to Store", minval = 10, maxval = 500, step = 10, group = g_Channel_Detection)
+
+show_pivot_labels = input.bool(defval = true, title = "Show Pivot Labels", group = "Display")
+show_trend_scores = input.bool(defval = false, title = "Show Detailed Trend Scores", group = "Display")
+show_debug_labels = input.bool(defval = true, title = "Show Phase Debug Labels", group = "Display")
+candle_data_storage_map_size = input.int(defval = 4000, title = "Data Storage Size", minval = 100, maxval = 5000, step = 100, group = "Display")
+
+// === DATA STRUCTURES ===
+type BarData
+    int   barIndex
+    float bar_open
+    float bar_high
+    float bar_low
+    float bar_close
+    float bar_volume
+    float price_source
+    bool  is_local_high
+    bool  is_local_low
+    bool  is_processed_for_pivot
+    bool  is_processed_for_micro_channel
+    float pivot_price
+    int   id_channel_respected
+    bool  is_pivot_high
+    bool  is_pivot_low
+    float ema_slope_score_left
+    float linear_decay_score_left
+    float exponential_decay_score_left
+    float gaussian_decay_score_left
+    float ema_slope_score_right
+    float linear_decay_score_right
+    float exponential_decay_score_right
+    float gaussian_decay_score_right
+    int   trend_left
+    int   trend_right
+
+type Channel
+    int channel_id
+    int formation_bar_index
+    int end_bar_index
+    int convergence_bar_index
+    BarData first_pivot_high
+    BarData second_pivot_high
+    BarData first_pivot_low
+    BarData second_pivot_low
+    float upper_slope
+    float upper_intercept
+    float lower_slope
+    float lower_intercept
+    bool is_active
+    int last_validation_bar
+    int pivot_count_respecting_channel
+    line upper_line
+    line lower_line
+    label channel_label
+
+// === STORAGE MAP ===
+var barMap = map.new<int, BarData>()
+var array<Channel> channels_drawn = array.new<Channel>()
+var pivot_highs = array.new<BarData>()
+var pivot_lows = array.new<BarData>()
+
+// === GLOBAL PHASE CONTROL VARS ===
+var bool phase_one_complete = false
+var bool phase_two_complete = false
+var int last_historical_bar_index = na
+var int phase_two_stop_index = na
+var int processing_stop_index = na
+
+// Create BarData object
+createBarData(int barIndex, float Open, float High, float Low, float Close, float Volume) =>
+    calculated_price_source = switch trendDetectionPriceSelection
+        "typical_price" => (High + Low + Close) / 3
+        "weighted_price" => (Open + High + Low + Close) / 4
+        "median_price" => (High + Low) / 2
+        "true_price" => (High + Low + Close * 2) / 4
+        "close" => Close
+        => (High + Low + Close) / 3
+    
+    BarData.new(
+         barIndex = barIndex,
+         bar_open = Open,
+         bar_high = High,
+         bar_low = Low,
+         bar_close = Close,
+         bar_volume = Volume,
+         price_source = calculated_price_source,
+         is_local_high = false,
+         is_local_low = false,
+         is_processed_for_pivot = false,
+         is_processed_for_micro_channel = false,
+         pivot_price = na,
+         id_channel_respected = na,
+         is_pivot_high = false,
+         is_pivot_low = false,
+         ema_slope_score_left = na,
+         linear_decay_score_left = na,
+         exponential_decay_score_left = na,
+         gaussian_decay_score_left = na,
+         ema_slope_score_right = na,
+         linear_decay_score_right = na,
+         exponential_decay_score_right = na,
+         gaussian_decay_score_right = na,
+         trend_left = 0,
+         trend_right = 0)
+
+// Update functions
+updateLeftSideScores(bar_data_obj_ref, float ema_score, float linear_score, float exp_score, float gauss_score, int trend_result) =>
+    bar_data_obj_ref.ema_slope_score_left := ema_score
+    bar_data_obj_ref.linear_decay_score_left := linear_score
+    bar_data_obj_ref.exponential_decay_score_left := exp_score
+    bar_data_obj_ref.gaussian_decay_score_left := gauss_score
+    bar_data_obj_ref.trend_left := trend_result
+
+updateRightSideScores(bar_data_obj_ref, float ema_score, float linear_score, float exp_score, float gauss_score, int trend_result) =>
+    bar_data_obj_ref.ema_slope_score_right := ema_score
+    bar_data_obj_ref.linear_decay_score_right := linear_score
+    bar_data_obj_ref.exponential_decay_score_right := exp_score
+    bar_data_obj_ref.gaussian_decay_score_right := gauss_score
+    bar_data_obj_ref.trend_right := trend_result
+
+markPivotsAsProcessedForMicroChannel(BarData p1, BarData p2, BarData p3, BarData p4) =>
+    p1.is_processed_for_micro_channel := true
+    p2.is_processed_for_micro_channel := true
+    p3.is_processed_for_micro_channel := true
+    p4.is_processed_for_micro_channel := true
+
+// Add bar data to map
+addBarDataToMap(int barIndex, float Open, float High, float Low, float Close, float Volume) =>
+    if not map.contains(barMap, barIndex)
+        new_BarData_obj_ref = createBarData(barIndex, Open, High, Low, Close, Volume)
+        map.put(barMap, barIndex, new_BarData_obj_ref)
+
+// Cleanup old bars to prevent memory issues
+cleanupBarMapByRange() =>
+    if not na(bar_index)
+        cutoff_bar_index = bar_index - candle_data_storage_map_size
+        map_keys = map.keys(barMap)
+        for i = 0 to array.size(map_keys) - 1
+            key = array.get(map_keys, i)
+            if key < cutoff_bar_index
+                map.remove(barMap, key)
+            else
+                break
+    true
+
+// === LOCAL HIGH/LOW PRESCREENING FUNCTIONS ===
+isLocalHigh(int target_bar_index, int window_size) =>
+    if not map.contains(barMap, target_bar_index)
+        false
+    else
+        target_bar = map.get(barMap, target_bar_index)
+        bool is_highest = true
+        
+        for offset = 1 to window_size
+            left_index = target_bar_index - offset
+            if map.contains(barMap, left_index)
+                left_bar = map.get(barMap, left_index)
+                if left_bar.bar_high >= target_bar.bar_high
+                    is_highest := false
+                    break
+            
+            right_index = target_bar_index + offset
+            if map.contains(barMap, right_index)
+                right_bar = map.get(barMap, right_index)
+                if right_bar.bar_high >= target_bar.bar_high
+                    is_highest := false
+                    break
+        
+        is_highest
+
+isLocalLow(int target_bar_index, int window_size) =>
+    if not map.contains(barMap, target_bar_index)
+        false
+    else
+        target_bar = map.get(barMap, target_bar_index)
+        bool is_lowest = true
+        
+        for offset = 1 to window_size
+            left_index = target_bar_index - offset
+            if map.contains(barMap, left_index)
+                left_bar = map.get(barMap, left_index)
+                if left_bar.bar_low <= target_bar.bar_low
+                    is_lowest := false
+                    break
+            
+            right_index = target_bar_index + offset
+            if map.contains(barMap, right_index)
+                right_bar = map.get(barMap, right_index)
+                if right_bar.bar_low <= target_bar.bar_low
+                    is_lowest := false
+                    break
+        
+        is_lowest
+
+// === TREND DETECTION METHODS ===
+getLeftTrendWithEMASlopeNormalized(int current_bar_index, int fast_length, int slow_length, int atr_length) =>
+    is_processable = true
+    
+    if not map.contains(barMap, current_bar_index)
+        is_processable := false
+        
+    required_lookback = math.max(fast_length, slow_length, atr_length)
+    available_bars = 0
+    
+    for i = 1 to required_lookback
+        past_bar_index = current_bar_index - i
+        if map.contains(barMap, past_bar_index)
+            available_bars += 1
+        else
+            break
+    
+    if available_bars < required_lookback
+        is_processable := false
+
+    if is_processable
+        price_array = array.new<float>()
+        j = available_bars
+        while j >= 0
+            bar_data = map.get(barMap, current_bar_index - j)
+            array.push(price_array, bar_data.price_source)
+            j -= 1
+
+        alpha_fast = 2.0 / (fast_length + 1.0)
+        ema_fast = array.get(price_array, 0)
+        for i = 1 to array.size(price_array) - 1
+            ema_fast := alpha_fast * array.get(price_array, i) + (1 - alpha_fast) * ema_fast
+
+        alpha_slow = 2.0 / (slow_length + 1.0)
+        ema_slow = array.get(price_array, 0)
+        for i = 1 to array.size(price_array) - 1
+            ema_slow := alpha_slow * array.get(price_array, i) + (1 - alpha_slow) * ema_slow
+
+        tr_sum = 0.0
+        tr_count = 0
+        for i = 1 to math.min(atr_length, available_bars)
+            current_bar = map.get(barMap, current_bar_index - i + 1)
+            previous_bar = map.get(barMap, current_bar_index - i)
+            tr = math.max(current_bar.bar_high - current_bar.bar_low,
+                         math.abs(current_bar.bar_high - previous_bar.bar_close),
+                         math.abs(current_bar.bar_low - previous_bar.bar_close))
+            tr_sum += tr
+            tr_count += 1
+
+        atr = tr_count > 0 ? tr_sum / tr_count : 1.0
+        slope_normalized = atr > 0 ? (ema_fast - ema_slow) / atr : 0.0
+        slope_normalized
+    else
+        0.0
+
+getRightTrendWithEMASlopeNormalized(int current_bar_index, int fast_length, int slow_length, int atr_length) =>
+    is_processable = true
+    
+    if not map.contains(barMap, current_bar_index)
+        is_processable := false
+        
+    required_lookback = math.max(fast_length, slow_length, atr_length)
+    available_bars = 0
+    
+    for i = 1 to required_lookback
+        future_bar_index = current_bar_index + i
+        if map.contains(barMap, future_bar_index)
+            available_bars += 1
+        else
+            break
+    
+    if available_bars < required_lookback
+        is_processable := false
+
+    if is_processable
+        price_array = array.new<float>()
+        for i = 0 to available_bars by 1
+            bar_data = map.get(barMap, current_bar_index + i)
+            array.push(price_array, bar_data.price_source)
+
+        alpha_fast = 2.0 / (fast_length + 1.0)
+        ema_fast = array.get(price_array, 0)
+        for i = 1 to array.size(price_array) - 1
+            ema_fast := alpha_fast * array.get(price_array, i) + (1 - alpha_fast) * ema_fast
+
+        alpha_slow = 2.0 / (slow_length + 1.0)
+        ema_slow = array.get(price_array, 0)
+        for i = 1 to array.size(price_array) - 1
+            ema_slow := alpha_slow * array.get(price_array, i) + (1 - alpha_slow) * ema_slow
+
+        tr_sum = 0.0
+        tr_count = 0
+        for i = 1 to math.min(atr_length, available_bars)
+            current_bar = map.get(barMap, current_bar_index + i)
+            previous_bar = map.get(barMap, current_bar_index + i - 1)
+            tr = math.max(current_bar.bar_high - current_bar.bar_low,
+                         math.abs(current_bar.bar_high - previous_bar.bar_close),
+                         math.abs(current_bar.bar_low - previous_bar.bar_close))
+            tr_sum += tr
+            tr_count += 1
+
+        atr = tr_count > 0 ? tr_sum / tr_count : 1.0
+        slope_normalized = atr > 0 ? (ema_fast - ema_slow) / atr : 0.0
+        slope_normalized
+    else
+        0.0
+
+getLeftTrendWithLinearDecay(int current_bar_index, int lookback_limit) =>
+    weighted_sum = 0.0
+    total_weight = 0.0
+    is_processable = true
+    
+    if not map.contains(barMap, current_bar_index)
+        is_processable := false
+        
+    available_bars = 0
+    for i = 1 to lookback_limit
+        past_bar_index = current_bar_index - i
+        if map.contains(barMap, past_bar_index)
+            available_bars += 1
+        else
+            break
+    
+    if available_bars == 0
+        is_processable := false
+    
+    if is_processable
+        current_bar_data = map.get(barMap, current_bar_index)
+        for i = 1 to available_bars
+            past_bar_index = current_bar_index - i            
+            past_bar_data = map.get(barMap, past_bar_index)
+            weight = (available_bars - i + 1) / available_bars
+            price_change = current_bar_data.price_source - past_bar_data.price_source
+            weighted_sum += price_change * weight
+            total_weight += weight
+    
+    if total_weight > 0
+        weighted_sum / total_weight
+    else
+        0.0
+
+getRightTrendWithLinearDecay(int current_bar_index, int lookback_limit) =>
+    weighted_sum = 0.0
+    total_weight = 0.0
+    is_processable = true
+    
+    if not map.contains(barMap, current_bar_index)
+        is_processable := false
+        
+    available_bars = 0
+    for i = 1 to lookback_limit
+        future_bar_index = current_bar_index + i
+        if map.contains(barMap, future_bar_index)
+            available_bars += 1
+        else
+            break
+    
+    if available_bars == 0
+        is_processable := false
+    
+    if is_processable
+        current_bar_data = map.get(barMap, current_bar_index)
+        for i = 1 to available_bars
+            future_bar_index = current_bar_index + i
+            future_bar_data = map.get(barMap, future_bar_index)
+            weight = (available_bars - i + 1) / available_bars
+            price_change = future_bar_data.price_source - current_bar_data.price_source
+            weighted_sum += price_change * weight
+            total_weight += weight
+    
+    if total_weight > 0
+        weighted_sum / total_weight
+    else
+        0.0
+
+getLeftTrendWithExponentialDecay(int current_bar_index, int lookback_limit, float decay_factor) =>
+    weighted_sum = 0.0
+    total_weight = 0.0
+    is_processable = true
+    
+    if not map.contains(barMap, current_bar_index)
+        is_processable := false
+        
+    available_bars = 0
+    for i = 1 to lookback_limit
+        past_bar_index = current_bar_index - i
+        if map.contains(barMap, past_bar_index)
+            available_bars += 1
+        else
+            break
+    
+    if available_bars == 0
+        is_processable := false
+
+    if is_processable
+        current_bar_data = map.get(barMap, current_bar_index)
+        for i = 1 to available_bars
+            past_bar_index = current_bar_index - i            
+            past_bar_data = map.get(barMap, past_bar_index)
+            weight = math.pow(decay_factor, i - 1)
+            price_change = current_bar_data.price_source - past_bar_data.price_source
+            weighted_sum += price_change * weight
+            total_weight += weight
+    
+    if total_weight > 0
+        weighted_sum / total_weight
+    else
+        0.0
+
+getRightTrendWithExponentialDecay(int current_bar_index, int lookback_limit, float decay_factor) =>
+    weighted_sum = 0.0
+    total_weight = 0.0
+    is_processable = true
+    
+    if not map.contains(barMap, current_bar_index)
+        is_processable := false
+        
+    available_bars = 0
+    for i = 1 to lookback_limit
+        future_bar_index = current_bar_index + i
+        if map.contains(barMap, future_bar_index)
+            available_bars += 1
+        else
+            break
+    
+    if available_bars == 0
+        is_processable := false
+
+    if is_processable
+        current_bar_data = map.get(barMap, current_bar_index)
+        for i = 1 to available_bars
+            future_bar_index = current_bar_index + i
+            future_bar_data = map.get(barMap, future_bar_index)
+            weight = math.pow(decay_factor, i - 1)
+            price_change = future_bar_data.price_source - current_bar_data.price_source
+            weighted_sum += price_change * weight
+            total_weight += weight
+    
+    if total_weight > 0
+        weighted_sum / total_weight
+    else
+        0.0
+
+getLeftTrendWithGaussianDecay(int current_bar_index, int lookback_limit, float sigma) =>
+    weighted_sum = 0.0
+    total_weight = 0.0
+    is_processable = true
+    
+    if not map.contains(barMap, current_bar_index)
+        is_processable := false
+        
+    available_bars = 0
+    for i = 1 to lookback_limit
+        past_bar_index = current_bar_index - i
+        if map.contains(barMap, past_bar_index)
+            available_bars += 1
+        else
+            break
+    
+    if available_bars == 0
+        is_processable := false
+    
+    if is_processable
+        current_bar_data = map.get(barMap, current_bar_index)
+        for i = 1 to available_bars
+            past_bar_index = current_bar_index - i            
+            past_bar_data = map.get(barMap, past_bar_index)
+            weight = math.exp(-0.5 * math.pow(i / sigma, 2))
+            price_change = current_bar_data.price_source - past_bar_data.price_source
+            weighted_sum += price_change * weight
+            total_weight += weight
+    
+    if total_weight > 0
+        weighted_sum / total_weight
+    else
+        0.0
+
+getRightTrendWithGaussianDecay(int current_bar_index, int lookback_limit, float sigma) =>
+    weighted_sum = 0.0
+    total_weight = 0.0
+    is_processable = true
+    
+    if not map.contains(barMap, current_bar_index)
+        is_processable := false
+        
+    available_bars = 0
+    for i = 1 to lookback_limit
+        future_bar_index = current_bar_index + i
+        if map.contains(barMap, future_bar_index)
+            available_bars += 1
+        else
+            break
+    
+    if available_bars == 0
+        is_processable := false
+    
+    if is_processable
+        current_bar_data = map.get(barMap, current_bar_index)
+        for i = 1 to available_bars
+            future_bar_index = current_bar_index + i
+            future_bar_data = map.get(barMap, future_bar_index)
+            weight = math.exp(-0.5 * math.pow(i / sigma, 2))
+            price_change = future_bar_data.price_source - current_bar_data.price_source
+            weighted_sum += price_change * weight
+            total_weight += weight
+    
+    if total_weight > 0
+        weighted_sum / total_weight
+    else
+        0.0
+
+// === COMBINED TREND ANALYSIS ===
+getLeftSideTrendAndStore(int current_bar_index, int lookback_limit) =>    
+    bar_data_obj_ref = map.get(barMap, current_bar_index)
+    
+    float ema_slope_score = 0.0
+    float linear_decay_score = 0.0
+    float exponential_decay_score = 0.0
+    float gaussian_decay_score = 0.0
+    
+    if enable_ema_method
+        ema_slope_score := getLeftTrendWithEMASlopeNormalized(current_bar_index, 5, lookback_limit, lookback_limit) 
+    
+    if enable_linear_method
+        linear_decay_score := getLeftTrendWithLinearDecay(current_bar_index, lookback_limit)
+    
+    if enable_exponential_method
+        exponential_decay_score := getLeftTrendWithExponentialDecay(current_bar_index, lookback_limit, decay_factor)
+
+    if enable_gaussian_method
+        gaussian_decay_score := getLeftTrendWithGaussianDecay(current_bar_index, lookback_limit, sigma)
+
+    total_weight = (enable_ema_method ? ema_weight : 0.0) + 
+                  (enable_linear_method ? linear_weight : 0.0) + 
+                  (enable_exponential_method ? exponential_weight : 0.0) + 
+                  (enable_gaussian_method ? gaussian_weight : 0.0)
+    
+    final_score = 0.0
+    if total_weight > 0
+        final_score := (ema_slope_score * ema_weight + 
+                       linear_decay_score * linear_weight + 
+                       exponential_decay_score * exponential_weight + 
+                       gaussian_decay_score * gaussian_weight) / total_weight
+    
+    trend_result = final_score > 0.1 ? 1 : final_score < -0.1 ? -1 : 0
+    
+    updateLeftSideScores(bar_data_obj_ref, ema_slope_score, linear_decay_score, 
+                         exponential_decay_score, gaussian_decay_score, trend_result)
+    
+    [trend_result, ema_slope_score, linear_decay_score, exponential_decay_score, gaussian_decay_score, final_score]
+
+getRightSideTrendAndStore(int current_bar_index, int lookback_limit) =>
+    bar_data_obj_ref = map.get(barMap, current_bar_index)
+    
+    float ema_slope_score = 0.0
+    float linear_decay_score = 0.0
+    float exponential_decay_score = 0.0
+    float gaussian_decay_score = 0.0
+    
+    if enable_ema_method
+        ema_slope_score := getRightTrendWithEMASlopeNormalized(current_bar_index, 5, lookback_limit, lookback_limit) 
+    
+    if enable_linear_method
+        linear_decay_score := getRightTrendWithLinearDecay(current_bar_index, lookback_limit)
+    
+    if enable_exponential_method
+        exponential_decay_score := getRightTrendWithExponentialDecay(current_bar_index, lookback_limit, decay_factor)
+
+    if enable_gaussian_method
+        gaussian_decay_score := getRightTrendWithGaussianDecay(current_bar_index, lookback_limit, sigma)
+
+    total_weight = (enable_ema_method ? ema_weight : 0.0) + 
+                  (enable_linear_method ? linear_weight : 0.0) + 
+                  (enable_exponential_method ? exponential_weight : 0.0) + 
+                  (enable_gaussian_method ? gaussian_weight : 0.0)
+    
+    final_score = 0.0
+    if total_weight > 0
+        final_score := (ema_slope_score * ema_weight + 
+                       linear_decay_score * linear_weight + 
+                       exponential_decay_score * exponential_weight + 
+                       gaussian_decay_score * gaussian_weight) / total_weight
+    
+    trend_result = final_score > 0.1 ? 1 : final_score < -0.1 ? -1 : 0
+    
+    updateRightSideScores(bar_data_obj_ref, ema_slope_score, linear_decay_score,
+                         exponential_decay_score, gaussian_decay_score, trend_result)
+    
+    [trend_result, ema_slope_score, linear_decay_score, exponential_decay_score, gaussian_decay_score, final_score]
+
+// === PIVOT DETECTION BASED ON TRENDS ===
+analyzeBarForTrendBasedPivot(int target_bar_index, int lookback_limit) =>
+    bool is_potential_high = false
+    bool is_potential_low = false
+    bool is_processed = false
+
+    if map.contains(barMap, target_bar_index)
+        bar_data_obj = map.get(barMap, target_bar_index)
+        
+        if not bar_data_obj.is_processed_for_pivot
+            bool passes_prescreening = true
+            
+            if enable_local_prescreening
+                bar_data_obj.is_local_high := isLocalHigh(target_bar_index, local_high_or_low_search_window_size)
+                bar_data_obj.is_local_low := isLocalLow(target_bar_index, local_high_or_low_search_window_size)
+                passes_prescreening := bar_data_obj.is_local_high or bar_data_obj.is_local_low
+            
+            if passes_prescreening
+                [left_trend, left_ema, left_linear, left_exp, left_gauss, left_final] = 
+                     getLeftSideTrendAndStore(target_bar_index, lookback_limit)
+                [right_trend, right_ema, right_linear, right_exp, right_gauss, right_final] = 
+                     getRightSideTrendAndStore(target_bar_index, lookback_limit)
+                
+                if left_trend == 1 and right_trend == -1
+                    if enable_local_prescreening
+                        is_potential_high := bar_data_obj.is_local_high
+                    else
+                        is_potential_high := true
+                    bar_data_obj.pivot_price := bar_data_obj.bar_high
+                    array.push(pivot_highs, bar_data_obj)
+                
+                if left_trend == -1 and right_trend == 1
+                    if enable_local_prescreening
+                        is_potential_low := bar_data_obj.is_local_low
+                    else
+                        is_potential_low := true
+                    bar_data_obj.pivot_price := bar_data_obj.bar_low
+                    array.push(pivot_lows, bar_data_obj)
+                
+                if show_pivot_labels
+                    if is_potential_high
+                        label_text = show_trend_scores ? 
+                             "PIVOT HIGH\n" +
+                             "L: ▲ R: ▼\n" +
+                             "EMA: " + str.tostring(left_ema, "#.##") + "/" + str.tostring(right_ema, "#.##") + "\n" +
+                             "LIN: " + str.tostring(left_linear, "#.##") + "/" + str.tostring(right_linear, "#.##") + "\n" +
+                             "EXP: " + str.tostring(left_exp, "#.##") + "/" + str.tostring(right_exp, "#.##") + "\n" +
+                             "GAU: " + str.tostring(left_gauss, "#.##") + "/" + str.tostring(right_gauss, "#.##") + "\n" +
+                             "FIN: " + str.tostring(left_final, "#.##") + "/" + str.tostring(right_final, "#.##")
+                             : "H"
+                        
+                        label.new(x = target_bar_index, y = bar_data_obj.bar_high, text = label_text,
+                                 style = label.style_label_down, color = color.new(color.red, 60), textcolor = color.white,
+                                 size = show_trend_scores ? size.normal : size.small)
+                    
+                    if is_potential_low
+                        label_text = show_trend_scores ?
+                             "PIVOT LOW\n" +
+                             "L: ▼ R: ▲\n" +
+                             "EMA: " + str.tostring(left_ema, "#.##") + "/" + str.tostring(right_ema, "#.##") + "\n" +
+                             "LIN: " + str.tostring(left_linear, "#.##") + "/" + str.tostring(right_linear, "#.##") + "\n" +
+                             "EXP: " + str.tostring(left_exp, "#.##") + "/" + str.tostring(right_exp, "#.##") + "\n" +
+                             "GAU: " + str.tostring(left_gauss, "#.##") + "/" + str.tostring(right_gauss, "#.##") + "\n" +
+                             "FIN: " + str.tostring(left_final, "#.##") + "/" + str.tostring(right_final, "#.##")
+                             : "L"
+                        
+                        label.new(x = target_bar_index, y = bar_data_obj.bar_low, text = label_text,
+                                 style = label.style_label_up, color = color.new(color.green, 60), textcolor = color.white,
+                                 size = show_trend_scores ? size.normal : size.small)
+            
+            bar_data_obj.is_processed_for_pivot := true
+            bar_data_obj.is_pivot_high := is_potential_high
+            bar_data_obj.is_pivot_low := is_potential_low
+            is_processed := true
+
+    [is_potential_high, is_potential_low, is_processed]
+
+// === CHANNEL DETECTION FUNCTIONS ===
+calculateATR(int target_bar_index, int atr_period) =>
+    float atr_value = 0.0
+    
+    if target_bar_index >= atr_period and map.contains(barMap, target_bar_index)
+        tr_sum = 0.0
+        valid_bars = 0
+        
+        for i = 1 to atr_period
+            curr_index = target_bar_index - i + 1
+            prev_index = target_bar_index - i
+            
+            if map.contains(barMap, curr_index) and map.contains(barMap, prev_index)
+                curr = map.get(barMap, curr_index)
+                prev = map.get(barMap, prev_index)
+                
+                tr = math.max(curr.bar_high - curr.bar_low,
+                             math.abs(curr.bar_high - prev.bar_close),
+                             math.abs(curr.bar_low - prev.bar_close))
+                tr_sum += tr
+                valid_bars += 1
+        
+        atr_value := valid_bars > 0 ? tr_sum / valid_bars : 0.0
+    
+    atr_value
+
+getAllRecentPivotsAfterLastChannel(array<BarData> pivot_array) =>
+    recent_pivots = array.new<BarData>()
+    
+    int cutoff_bar_index = na
+    if array.size(channels_drawn) > 0
+        last_channel = array.get(channels_drawn, array.size(channels_drawn) - 1)
+        cutoff_bar_index := enable_overlapping_channel_detection ?
+             last_channel.formation_bar_index : last_channel.end_bar_index
+    
+    if array.size(pivot_array) > 0
+        i = array.size(pivot_array) - 1
+        while i >= 0
+            pivot = array.get(pivot_array, i)
+            if na(cutoff_bar_index) or pivot.barIndex >= cutoff_bar_index
+                array.unshift(recent_pivots, pivot)
+            i -= 1
+    
+    recent_pivots
+
+// COMPLETED FUNCTION: Ensures HLHL or LHLH pattern compliance
+recentPivotArraysHLHLPatternCompliance(array<BarData> recent_highs, array<BarData> recent_lows) =>
+    // Guard clauses
+    if array.size(recent_highs) < 2 or array.size(recent_lows) < 2
+        [array.new<BarData>(), array.new<BarData>()]
+    else
+        // Merge pivots in chronological order
+        array<BarData> mergedPivots = array.new<BarData>()
+        i = 0
+        j = 0
+        while (i < array.size(recent_highs)) and (j < array.size(recent_lows))
+            H = array.get(recent_highs, i)
+            L = array.get(recent_lows, j)
+            if H.barIndex <= L.barIndex
+                array.push(mergedPivots, H)
+                i += 1
+            else
+                array.push(mergedPivots, L)
+                j += 1
+
+        // Append remaining elements
+        while i < array.size(recent_highs)
+            array.push(mergedPivots, array.get(recent_highs, i))
+            i += 1
+
+        while j < array.size(recent_lows)
+            array.push(mergedPivots, array.get(recent_lows, j))
+            j += 1
+        
+        // Find valid HLHL or LHLH pattern using sliding window
+        array<BarData> valid_highs = array.new<BarData>()
+        array<BarData> valid_lows = array.new<BarData>()
+        bool pattern_found = false
+        
+        // Need at least 4 pivots for a valid pattern
+        if array.size(mergedPivots) >= 4
+            // Sliding window of size 4
+            for window_start = 0 to array.size(mergedPivots) - 4
+                p1 = array.get(mergedPivots, window_start)
+                p2 = array.get(mergedPivots, window_start + 1)
+                p3 = array.get(mergedPivots, window_start + 2)
+                p4 = array.get(mergedPivots, window_start + 3)
+                
+                // Count pivot types in this window
+                high_count = 0
+                low_count = 0
+                
+                if p1.is_pivot_high
+                    high_count += 1
+                if p1.is_pivot_low
+                    low_count += 1
+                    
+                if p2.is_pivot_high
+                    high_count += 1
+                if p2.is_pivot_low
+                    low_count += 1
+                    
+                if p3.is_pivot_high
+                    high_count += 1
+                if p3.is_pivot_low
+                    low_count += 1
+                    
+                if p4.is_pivot_high
+                    high_count += 1
+                if p4.is_pivot_low
+                    low_count += 1
+                
+                // Valid pattern: exactly 2 highs and 2 lows
+                if high_count == 2 and low_count == 2 and
+                     not (p1.is_processed_for_micro_channel and p2.is_processed_for_micro_channel
+                     and p3.is_processed_for_micro_channel and p4.is_processed_for_micro_channel)
+                    // Check for HLHL pattern
+                    if p1.is_pivot_high and p2.is_pivot_low and p3.is_pivot_high and p4.is_pivot_low
+                        array.push(valid_highs, p1)
+                        array.push(valid_highs, p3)
+                        array.push(valid_lows, p2)
+                        array.push(valid_lows, p4)
+                        pattern_found := true
+                        markPivotsAsProcessedForMicroChannel(p1, p2, p3, p4)
+                        break
+                    // Check for LHLH pattern
+                    else if p1.is_pivot_low and p2.is_pivot_high and p3.is_pivot_low and p4.is_pivot_high
+                        array.push(valid_lows, p1)
+                        array.push(valid_lows, p3)
+                        array.push(valid_highs, p2)
+                        array.push(valid_highs, p4)
+                        pattern_found := true
+                        markPivotsAsProcessedForMicroChannel(p1, p2, p3, p4)
+                        break
+        
+        [valid_highs, valid_lows]
+
+calculateLineEquation(BarData p1, BarData p2) =>
+    float slope = (p2.pivot_price - p1.pivot_price) / (p2.barIndex - p1.barIndex)
+    float intercept = p1.pivot_price - slope * p1.barIndex
+    [slope, intercept]
+
+getEstimatedPriceAtBarIndex(float slope, float intercept, int bar_idx) =>
+    slope * bar_idx + intercept
+
+calculateChannelConvergence(float upper_slope, float upper_intercept, float lower_slope, float lower_intercept, int current_bar_index) =>
+    float convergence_bar = na
+    float convergence_price = na
+    bool is_valid = false
+    
+    float slope_diff = math.abs(upper_slope - lower_slope)
+    
+    if slope_diff > 0.000001
+        convergence_bar := (lower_intercept - upper_intercept) / (upper_slope - lower_slope)
+        
+        if convergence_bar > current_bar_index
+            convergence_price := upper_slope * convergence_bar + upper_intercept
+            is_valid := true
+    
+    [convergence_bar, convergence_price, is_valid]
+
+areSlopesReasonablyParallel(float slope1, float slope2, float max_slope_diff, float max_angle_diff_degrees) =>
+    bool same_direction = (slope1 >= 0 and slope2 >= 0) or (slope1 < 0 and slope2 < 0)
+    if not same_direction
+        false
+    else
+        bool slope_diff_check = math.abs(slope1 - slope2) <= max_slope_diff
+        
+        angle1 = math.abs(math.todegrees(math.atan(slope1)))
+        angle2 = math.abs(math.todegrees(math.atan(slope2)))
+        angle_diff = math.abs(angle1 - angle2)
+        bool angle_check = angle_diff <= max_angle_diff_degrees
+        
+        slope_diff_check and angle_check
+
+createChannelVisuals(Channel channel) =>
+    if show_channels
+        channel.upper_line := line.new(
+             x1 = channel.first_pivot_high.barIndex,
+             y1 = channel.first_pivot_high.pivot_price,
+             x2 = channel.second_pivot_high.barIndex,
+             y2 = channel.second_pivot_high.pivot_price,
+             color = color.blue,
+             width = 2,
+             extend = extend.none)
+        
+        channel.lower_line := line.new(
+             x1 = channel.first_pivot_low.barIndex,
+             y1 = channel.first_pivot_low.pivot_price,
+             x2 = channel.second_pivot_low.barIndex,
+             y2 = channel.second_pivot_low.pivot_price,
+             color = color.blue,
+             width = 2,
+             extend = extend.none)
+        
+        label_x = channel.second_pivot_high.barIndex
+        label_y = (channel.first_pivot_high.pivot_price + channel.second_pivot_high.pivot_price) / 2
+        
+        channel.channel_label := label.new(
+             x = label_x,
+             y = label_y,
+             text = "CH" + str.tostring(channel.channel_id),
+             style = label.style_label_left,
+             color = color.new(color.blue, 70),
+             textcolor = color.blue,
+             size = size.small)
+
+updateChannelEndpoint(Channel channel, int end_bar_index, float end_price_upper, float end_price_lower) =>
+    if not na(channel.upper_line)
+        line.set_x2(channel.upper_line, end_bar_index)
+        line.set_y2(channel.upper_line, end_price_upper)
+    
+    if not na(channel.lower_line)
+        line.set_x2(channel.lower_line, end_bar_index)
+        line.set_y2(channel.lower_line, end_price_lower)
+    
+    channel.end_bar_index := end_bar_index
+
+deleteChannelVisuals(Channel channel) =>
+    if not na(channel.upper_line)
+        line.delete(channel.upper_line)
+    if not na(channel.lower_line)
+        line.delete(channel.lower_line)
+    if not na(channel.channel_label)
+        label.delete(channel.channel_label)
+
+detectNewChannels(int current_bar_index) =>
+    recent_highs = getAllRecentPivotsAfterLastChannel(pivot_highs)
+    recent_lows = getAllRecentPivotsAfterLastChannel(pivot_lows)
+
+    [pattern_compliant_2_highs, pattern_compliant_2_lows] = recentPivotArraysHLHLPatternCompliance(recent_highs, recent_lows)
+    
+    // BUG FIX: Changed second condition to check pattern_compliant_2_lows instead of duplicate pattern_compliant_2_highs
+    if array.size(pattern_compliant_2_highs) < 2 or array.size(pattern_compliant_2_lows) < 2
+        false
+    else
+        high1 = array.get(pattern_compliant_2_highs, 0)
+        high2 = array.get(pattern_compliant_2_highs, 1)
+        low1 = array.get(pattern_compliant_2_lows, 0)
+        low2 = array.get(pattern_compliant_2_lows, 1)
+        
+        [upper_slope, upper_intercept] = calculateLineEquation(high1, high2)
+        [lower_slope, lower_intercept] = calculateLineEquation(low1, low2)
+        
+        if areSlopesReasonablyParallel(upper_slope, lower_slope, max_slope_diff, max_angle_diff_degrees)
+            
+            [conv_bar, conv_price, conv_valid] = calculateChannelConvergence(
+                     upper_slope, upper_intercept,
+                     lower_slope, lower_intercept,
+                     current_bar_index)
+            
+            bool passes_convergence_check = true
+            if enable_convergence_check and conv_valid
+                bars_until_convergence = int(conv_bar) - current_bar_index
+                passes_convergence_check := bars_until_convergence >= min_convergence_bars
+            
+            if passes_convergence_check
+                new_channel = Channel.new(
+                         channel_id = current_bar_index,
+                         formation_bar_index = current_bar_index,
+                         end_bar_index = math.max(high2.barIndex, low2.barIndex),
+                         convergence_bar_index = conv_valid ? int(conv_bar) : na,
+                         first_pivot_high = high1,
+                         second_pivot_high = high2,
+                         first_pivot_low = low1,
+                         second_pivot_low = low2,
+                         upper_slope = upper_slope,
+                         upper_intercept = upper_intercept,
+                         lower_slope = lower_slope,
+                         lower_intercept = lower_intercept,
+                         is_active = true,
+                         last_validation_bar = current_bar_index,
+                         pivot_count_respecting_channel = 4)
+                
+                high1.id_channel_respected := new_channel.channel_id
+                high2.id_channel_respected := new_channel.channel_id
+                low1.id_channel_respected := new_channel.channel_id
+                low2.id_channel_respected := new_channel.channel_id
+                
+                createChannelVisuals(new_channel)
+                array.push(channels_drawn, new_channel)
+                true
+            else
+                false
+        else
+            false
+
+validateAndUpdateLatestChannel(int target_bar_index) =>
+    int respects_existing_channel_id = na
+    BarData bar_data_obj = map.get(barMap, target_bar_index)
+
+    if array.size(channels_drawn) > 0
+        channel = array.last(channels_drawn)
+        
+        if channel.is_active and target_bar_index > channel.end_bar_index
+            float atr_value = calculateATR(target_bar_index, atr_length)
+            float tolerance = atr_value * breakout_tolerance_atr_multiplier
+            
+            if not na(channel.convergence_bar_index) and target_bar_index >= channel.convergence_bar_index
+                channel.is_active := false
+                [conv_bar, conv_price, conv_valid] = calculateChannelConvergence(
+                     channel.upper_slope, channel.upper_intercept,
+                     channel.lower_slope, channel.lower_intercept,
+                     channel.formation_bar_index)
+                if conv_valid
+                    updateChannelEndpoint(channel, channel.convergence_bar_index, conv_price, conv_price)
+            else
+                expected_upper_price = getEstimatedPriceAtBarIndex(channel.upper_slope, channel.upper_intercept, target_bar_index)
+                expected_lower_price = getEstimatedPriceAtBarIndex(channel.lower_slope, channel.lower_intercept, target_bar_index)
+                
+                if not bar_data_obj.is_pivot_high and not bar_data_obj.is_pivot_low
+                    upper_breach = bar_data_obj.bar_high - expected_upper_price
+                    lower_breach = expected_lower_price - bar_data_obj.bar_low
+                    
+                    bool upper_violated = bar_data_obj.bar_high > expected_upper_price and upper_breach > tolerance
+                    bool lower_violated = bar_data_obj.bar_low < expected_lower_price and lower_breach > tolerance
+                    
+                    if upper_violated or lower_violated
+                        channel.is_active := false
+                        updateChannelEndpoint(channel, target_bar_index, expected_upper_price, expected_lower_price)
+
+                else if bar_data_obj.is_pivot_high and not bar_data_obj.is_pivot_low
+                    upper_breach = math.abs(bar_data_obj.pivot_price - expected_upper_price)
+                    
+                    // if bar_data_obj.pivot_price > expected_upper_price and upper_breach > tolerance
+                    if upper_breach > tolerance
+                        channel.is_active := false
+                        updateChannelEndpoint(channel, target_bar_index, expected_upper_price, expected_lower_price)
+                    else
+                        respects_existing_channel_id := channel.channel_id
+                        bar_data_obj.id_channel_respected := channel.channel_id
+                        updateChannelEndpoint(channel, target_bar_index, bar_data_obj.pivot_price, expected_lower_price)
+                
+                else if bar_data_obj.is_pivot_low and not bar_data_obj.is_pivot_high
+                    lower_breach = math.abs(expected_lower_price - bar_data_obj.pivot_price)
+                    
+                    // if bar_data_obj.pivot_price < expected_lower_price and lower_breach > tolerance
+                    if lower_breach > tolerance
+                        channel.is_active := false
+                        updateChannelEndpoint(channel, target_bar_index, expected_upper_price, expected_lower_price)
+                    else
+                        respects_existing_channel_id := channel.channel_id
+                        bar_data_obj.id_channel_respected := channel.channel_id
+                        updateChannelEndpoint(channel, target_bar_index, expected_upper_price, bar_data_obj.pivot_price)
+ 
+    respects_existing_channel_id
+
+cleanupChannels() =>
+    if array.size(channels_drawn) > max_channels_storage
+        while array.size(channels_drawn) > max_channels_storage
+            if array.size(channels_drawn) > 0
+                old_channel = array.shift(channels_drawn)
+                deleteChannelVisuals(old_channel)
+
+// === PHASE 1: DATA COLLECTION ===
+if not phase_one_complete
+    addBarDataToMap(bar_index, open, high, low, close, volume)
+    cleanupBarMapByRange()
+    
+    if barstate.islast
+        phase_one_complete := true
+        last_historical_bar_index := bar_index
+        
+        if show_debug_labels
+            label.new(bar_index, high, "PHASE 1 COMPLETE\n" + str.tostring(map.size(barMap)) + " bars collected", 
+                     style=label.style_label_down, color=color.blue, textcolor=color.white, size=size.small)
+
+// === PHASE 2: HISTORICAL PROCESSING WITH BUFFER ===
+if phase_one_complete and not phase_two_complete
+    cleanupBarMapByRange()
+    
+    bar_keys = map.keys(barMap)
+    array.sort(bar_keys, order.ascending)
+    
+    processing_stop_index := last_historical_bar_index - lookback_limit
+    phase_two_stop_index := processing_stop_index
+    
+    for i = 0 to array.size(bar_keys) - 1
+        target_bar_index = array.get(bar_keys, i)
+        
+        if target_bar_index <= processing_stop_index
+            [ph, pl, processed] = analyzeBarForTrendBasedPivot(target_bar_index, lookback_limit)
+            bar_data_obj = map.get(barMap, target_bar_index)
+            respects_existing_channel_id = validateAndUpdateLatestChannel(target_bar_index)
+            bar_data_obj.id_channel_respected := respects_existing_channel_id
+            if processed and (ph or pl) and na(respects_existing_channel_id)
+                detectNewChannels(target_bar_index)
+                cleanupChannels()
+    
+    phase_two_complete := true
+    
+    if show_debug_labels
+        label.new(processing_stop_index, low, 
+                 "PHASE 2 COMPLETE\nStopped at buffer zone\nBuffer = " + str.tostring(lookback_limit) + " bars", 
+                 style=label.style_label_up, color=color.orange, textcolor=color.white, size=size.small)
+
+// === PHASE 3: REAL-TIME PROCESSING ===
+if phase_one_complete and phase_two_complete and barstate.isconfirmed
+    cleanupBarMapByRange()
+    
+    if bar_index > last_historical_bar_index
+        addBarDataToMap(bar_index, open, high, low, close, volume)
+    
+    int bars_ahead_of_phase2_stop = bar_index - processing_stop_index
+    
+    if bars_ahead_of_phase2_stop >= (2 * lookback_limit)
+        int safe_processing_end = bar_index - lookback_limit
+        
+        bar_keys = map.keys(barMap)
+        array.sort(bar_keys, order.ascending)
+        
+        for i = 0 to array.size(bar_keys) - 1
+            target_bar_index = array.get(bar_keys, i)
+            
+            if target_bar_index > processing_stop_index and target_bar_index <= safe_processing_end
+                [ph, pl, processed] = analyzeBarForTrendBasedPivot(target_bar_index, lookback_limit)
+                bar_data_obj = map.get(barMap, target_bar_index)
+                respects_existing_channel_id = validateAndUpdateLatestChannel(target_bar_index)
+                bar_data_obj.id_channel_respected := respects_existing_channel_id
+                if processed and (ph or pl) and na(respects_existing_channel_id)
+                    detectNewChannels(target_bar_index)
+                    cleanupChannels()
+        
+        processing_stop_index := safe_processing_end
+
+// === DEBUG TABLE ===
+var table debugTable = table.new(position.top_right, 2, 13, bgcolor=color.new(color.gray, 80), frame_color=color.gray, frame_width=1)
+
+if barstate.islast
+    table.cell(debugTable, 0, 0, "Status", text_color=color.white, bgcolor=color.blue)
+    table.cell(debugTable, 1, 0, "Value", text_color=color.white, bgcolor=color.blue)
+    
+    table.cell(debugTable, 0, 1, "Prescreening", text_color=color.white)
+    table.cell(debugTable, 1, 1, enable_local_prescreening ? "✓ ON (Win=" + str.tostring(local_high_or_low_search_window_size) + ")" : "✗ OFF",
+              text_color=enable_local_prescreening ? color.green : color.white)
+    
+    table.cell(debugTable, 0, 2, "Phase 1", text_color=color.white)
+    table.cell(debugTable, 1, 2, phase_one_complete ? "✓ Complete" : "In Progress", 
+              text_color=phase_one_complete ? color.green : color.orange)
+    
+    table.cell(debugTable, 0, 3, "Phase 2", text_color=color.white)
+    table.cell(debugTable, 1, 3, phase_two_complete ? "✓ Complete" : "In Progress",
+              text_color=phase_two_complete ? color.green : color.orange)
+    
+    table.cell(debugTable, 0, 4, "Bars in Map", text_color=color.white)
+    table.cell(debugTable, 1, 4, str.tostring(map.size(barMap)), text_color=color.white)
+    
+    table.cell(debugTable, 0, 5, "Current Bar", text_color=color.white)
+    table.cell(debugTable, 1, 5, str.tostring(bar_index), text_color=color.white)
+    
+    table.cell(debugTable, 0, 6, "Phase 2 Stop", text_color=color.white)
+    table.cell(debugTable, 1, 6, na(phase_two_stop_index) ? "N/A" : str.tostring(phase_two_stop_index), text_color=color.white)
+    
+    table.cell(debugTable, 0, 7, "Buffer Size", text_color=color.white)
+    table.cell(debugTable, 1, 7, str.tostring(lookback_limit) + " bars", text_color=color.white)
+    
+    table.cell(debugTable, 0, 8, "Phase 3 Ready", text_color=color.white)
+    int bars_ahead = phase_two_complete and not na(processing_stop_index) ? bar_index - processing_stop_index : 0
+    bool phase3_ready = bars_ahead >= (2 * lookback_limit)
+    table.cell(debugTable, 1, 8, phase3_ready ? "✓ YES" : "Waiting (" + str.tostring(bars_ahead) + "/" + str.tostring(2 * lookback_limit) + ")",
+              text_color=phase3_ready ? color.green : color.orange)
+    
+    table.cell(debugTable, 0, 9, "Pivot Highs", text_color=color.white)
+    table.cell(debugTable, 1, 9, str.tostring(array.size(pivot_highs)), text_color=color.white)
+    
+    table.cell(debugTable, 0, 10, "Pivot Lows", text_color=color.white)
+    table.cell(debugTable, 1, 10, str.tostring(array.size(pivot_lows)), text_color=color.white)
+    
+    table.cell(debugTable, 0, 11, "Channels (Active/Total)", text_color=color.white)
+    active_channels = 0
+    if array.size(channels_drawn) > 0
+        for i = 0 to array.size(channels_drawn) - 1
+            if array.get(channels_drawn, i).is_active
+                active_channels += 1
+    table.cell(debugTable, 1, 11, str.tostring(active_channels) + "/" + str.tostring(array.size(channels_drawn)), 
+              text_color=active_channels > 0 ? color.green : color.white)
