@@ -1,0 +1,130 @@
+graph TB
+    %% External Systems
+    MT5A[MetaTrader 5<br/>Account A<br/>📊 Source Account]
+    MT5B[MetaTrader 5<br/>Account B<br/>📈 Target Account]
+    WebDash[Web Dashboard<br/>🖥️ Real-time Interface]
+    
+    %% Core System Components
+    subgraph "AI Trade Manager Core System"
+        subgraph "Web Layer"
+            Flask[Flask Web Server<br/>🌐 REST API & UI]
+            HTMX[HTMX Integration<br/>⚡ Real-time Updates]
+        end
+        
+        subgraph "AI & Analytics Engine"
+            AICore[AI Evaluation Engine<br/>🤖 ML Models]
+            MLModels[Machine Learning<br/>📊 Scikit-learn]
+            FeatureEng[Feature Engineering<br/>🔧 Technical Indicators]
+            ModelTraining[Model Training<br/>📚 Continuous Learning]
+        end
+        
+        subgraph "Trading Engine"
+            TradeManager[Trade Manager<br/>⚙️ Execution Logic]
+            CopyEngine[Copy Engine<br/>🔄 Account Sync]
+            GrowthManager[Growth Manager<br/>📈 Position Amplification]
+            OrderExecution[Order Execution<br/>⚡ MT5 API Calls]
+        end
+        
+        subgraph "Risk Management"
+            RiskEngine[Risk Assessment<br/>🛡️ Multi-layer Controls]
+            PositionSizing[Position Sizing<br/>📏 Dynamic Calculations]
+            ExposureControl[Exposure Control<br/>⚖️ Limits & Correlations]
+            VolatilityFilter[Volatility Filter<br/>📊 Market Conditions]
+        end
+        
+        subgraph "Monitoring & Control"
+            SystemMonitor[System Monitor<br/>👁️ Health Checks]
+            ConnectionMgr[Connection Manager<br/>🔗 MT5 Connectivity]
+            AlertSystem[Alert System<br/>🚨 Notifications]
+            PerformanceTracker[Performance Tracker<br/>📈 Metrics Collection]
+        end
+        
+        subgraph "Data Management"
+            DataProcessor[Data Processor<br/>🔄 Real-time Processing]
+            StateManager[State Manager<br/>💾 Position Tracking]
+            ConfigManager[Config Manager<br/>⚙️ Settings & Rules]
+        end
+        
+        subgraph "Storage Layer"
+            CSV[CSV Files<br/>📄 Trade Logs]
+            JSON[JSON Storage<br/>📦 Configuration]
+            LogFiles[Log Files<br/>📝 System Events]
+            TempState[Temporary State<br/>⚡ Runtime Data]
+        end
+    end
+    
+    %% Data Flow Connections
+    MT5A --> |Position Data<br/>Order Updates| DataProcessor
+    DataProcessor --> |Trade Signals| AICore
+    
+    AICore --> |Evaluation Results<br/>Confidence Scores| RiskEngine
+    AICore --> |ML Predictions| TradeManager
+    
+    RiskEngine --> |Risk Assessment<br/>Position Limits| TradeManager
+    TradeManager --> |Trade Commands| CopyEngine
+    CopyEngine --> |Execute Orders| OrderExecution
+    OrderExecution --> |API Calls| MT5B
+    
+    MT5B --> |Position Feedback<br/>Execution Status| SystemMonitor
+    SystemMonitor --> |Status Updates| Flask
+    Flask --> |Real-time Data| WebDash
+    
+    %% Growth Management Flow
+    SystemMonitor --> |Position Monitoring| GrowthManager
+    GrowthManager --> |Growth Decisions| TradeManager
+    GrowthManager --> |Amplification Rules| PositionSizing
+    
+    %% AI Training Flow
+    DataProcessor --> |Historical Data<br/>Market Features| FeatureEng
+    FeatureEng --> |Processed Features| ModelTraining
+    ModelTraining --> |Updated Models| MLModels
+    MLModels --> |Predictions| AICore
+    
+    %% Risk Management Flow
+    DataProcessor --> |Market Data| VolatilityFilter
+    VolatilityFilter --> |Volatility Metrics| RiskEngine
+    PositionSizing --> |Size Calculations| ExposureControl
+    ExposureControl --> |Exposure Data| RiskEngine
+    
+    %% Monitoring & Alerts
+    SystemMonitor --> |Health Status| AlertSystem
+    PerformanceTracker --> |Performance Data| AlertSystem
+    ConnectionMgr --> |Connection Status| SystemMonitor
+    AlertSystem --> |Alerts & Notifications| Flask
+    
+    %% Configuration & State
+    ConfigManager --> |Risk Parameters| RiskEngine
+    ConfigManager --> |AI Settings| AICore
+    ConfigManager --> |Growth Config| GrowthManager
+    StateManager --> |Position State| TradeManager
+    StateManager --> |Account State| SystemMonitor
+    
+    %% Data Persistence
+    DataProcessor --> |Trade Data| CSV
+    ConfigManager --> |Configuration| JSON
+    SystemMonitor --> |System Events| LogFiles
+    StateManager --> |Runtime State| TempState
+    
+    %% Bi-directional Connections
+    Flask <--> |Configuration<br/>Management| ConfigManager
+    Flask <--> |State Queries<br/>Updates| StateManager
+    HTMX <--> |Real-time Updates<br/>User Interactions| Flask
+    
+    %% Styling
+    classDef external fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#fff
+    classDef aiComponent fill:#065f46,stroke:#10b981,stroke-width:2px,color:#fff
+    classDef tradingComponent fill:#7c2d12,stroke:#ea580c,stroke-width:2px,color:#fff
+    classDef riskComponent fill:#7c1d6f,stroke:#d946ef,stroke-width:2px,color:#fff
+    classDef monitorComponent fill:#1e40af,stroke:#3b82f6,stroke-width:2px,color:#fff
+    classDef dataComponent fill:#374151,stroke:#6b7280,stroke-width:2px,color:#fff
+    classDef storageComponent fill:#451a03,stroke:#a16207,stroke-width:2px,color:#fff
+    classDef webComponent fill:#134e4a,stroke:#14b8a6,stroke-width:2px,color:#fff
+    
+    class MT5A,MT5B,WebDash external
+    class AICore,MLModels,FeatureEng,ModelTraining aiComponent
+    class TradeManager,CopyEngine,GrowthManager,OrderExecution tradingComponent
+    class RiskEngine,PositionSizing,ExposureControl,VolatilityFilter riskComponent
+    class SystemMonitor,ConnectionMgr,AlertSystem,PerformanceTracker monitorComponent
+    class DataProcessor,StateManager,ConfigManager dataComponent
+    class CSV,JSON,LogFiles,TempState storageComponent
+    class Flask,HTMX webComponent
