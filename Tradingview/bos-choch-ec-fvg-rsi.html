@@ -21,15 +21,20 @@
             --card-bg: #1a1f3a;
             --success: #00ff88;
             --danger: #ff3366;
+            --border-color: rgba(0, 212, 255, 0.1);
+            --gradient-primary: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+            --gradient-accent: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            background: var(--gradient-primary);
             color: var(--text-primary);
             line-height: 1.6;
+            min-height: 100vh;
         }
 
+        /* Header */
         header {
             background: rgba(19, 24, 41, 0.95);
             padding: 1.5rem 2rem;
@@ -37,7 +42,7 @@
             top: 0;
             z-index: 1000;
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .header-content {
@@ -51,7 +56,10 @@
         .logo {
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--accent-cyan);
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .back-btn {
@@ -62,43 +70,104 @@
             border-radius: 8px;
             border: 1px solid var(--accent-cyan);
             transition: all 0.3s ease;
+            font-weight: 500;
         }
 
         .back-btn:hover {
             background: var(--accent-cyan);
             color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
         }
 
+        /* Navigation */
+        .nav-pills {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem 0;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-pill {
+            padding: 0.5rem 1rem;
+            background: rgba(26, 31, 58, 0.6);
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .nav-pill:hover {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent-cyan);
+            border-color: var(--border-color);
+        }
+
+        /* Main Container */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 3rem 2rem;
         }
 
+        /* Indicator Header */
         .indicator-header {
             text-align: center;
             margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .indicator-title {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
+            font-weight: 700;
             margin-bottom: 1rem;
             background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .indicator-subtitle {
             color: var(--text-secondary);
-            font-size: 1.2rem;
+            font-size: 1.3rem;
+            font-weight: 300;
+            margin-bottom: 1.5rem;
         }
 
+        .indicator-tags {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 0.4rem 1rem;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--accent-cyan);
+        }
+
+        /* Section Styling */
         .section {
             background: var(--card-bg);
             padding: 2.5rem;
-            border-radius: 15px;
+            border-radius: 20px;
             margin-bottom: 2rem;
-            border: 1px solid rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-2px);
         }
 
         .section h2 {
@@ -107,127 +176,204 @@
             margin-bottom: 1.5rem;
             padding-bottom: 0.5rem;
             border-bottom: 2px solid rgba(0, 212, 255, 0.2);
+            position: relative;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: var(--gradient-accent);
         }
 
         .section h3 {
             color: var(--text-primary);
             font-size: 1.3rem;
             margin: 1.5rem 0 1rem;
+            font-weight: 600;
         }
 
         .section p {
             color: var(--text-secondary);
             margin-bottom: 1rem;
             line-height: 1.8;
+            font-size: 1.05rem;
         }
 
         .section ul, .section ol {
             color: var(--text-secondary);
-            margin-left: 2rem;
+            margin-left: 1.5rem;
             margin-bottom: 1rem;
         }
 
         .section li {
-            margin-bottom: 0.5rem;
-            line-height: 1.6;
+            margin-bottom: 0.6rem;
+            line-height: 1.7;
+        }
+
+        /* Table Styling */
+        .table-container {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 1.5rem 0;
         }
 
         th, td {
             padding: 1rem;
             text-align: left;
-            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+            border-bottom: 1px solid var(--border-color);
         }
 
         th {
             background: rgba(0, 212, 255, 0.1);
             color: var(--accent-cyan);
             font-weight: 600;
+            font-size: 0.95rem;
         }
 
         td {
             color: var(--text-secondary);
+            font-size: 0.9rem;
         }
 
+        /* Image Placeholders */
         .image-placeholder {
             width: 100%;
             height: 400px;
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 128, 255, 0.1));
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), rgba(0, 128, 255, 0.05));
             border: 2px dashed rgba(0, 212, 255, 0.3);
-            border-radius: 10px;
+            border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 1.5rem 0;
+            margin: 2rem 0;
             color: var(--text-secondary);
             font-style: italic;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
+        .image-placeholder::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .image-placeholder p {
+            position: relative;
+            z-index: 1;
+            font-size: 1.1rem;
+            padding: 2rem;
+        }
+
+        .image-caption {
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 0.9rem;
+            margin-top: -1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Disclaimer Box */
         .disclaimer {
             background: rgba(255, 51, 102, 0.1);
             border-left: 4px solid var(--danger);
             padding: 1.5rem;
             margin: 2rem 0;
             border-radius: 8px;
+            position: relative;
+        }
+
+        .disclaimer::before {
+            content: '⚠️';
+            position: absolute;
+            top: 1rem;
+            left: -2px;
+            font-size: 1.2rem;
         }
 
         .disclaimer p {
             color: var(--text-secondary);
             margin: 0;
+            padding-left: 1.5rem;
+            line-height: 1.6;
         }
 
+        /* Footer */
         footer {
             background: var(--secondary-dark);
-            padding: 2rem;
+            padding: 3rem 2rem 2rem;
             text-align: center;
-            border-top: 1px solid rgba(0, 212, 255, 0.1);
+            border-top: 1px solid var(--border-color);
             margin-top: 4rem;
         }
 
         .footer-buttons {
             display: flex;
-            gap: 1rem;
+            gap: 1.5rem;
             justify-content: center;
-            margin-bottom: 1rem;
+            margin-bottom: 2rem;
             flex-wrap: wrap;
         }
 
         .footer-btn {
             padding: 0.8rem 2rem;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            background: var(--gradient-accent);
             color: var(--primary-dark);
             text-decoration: none;
             border-radius: 8px;
             font-weight: 600;
             transition: all 0.3s ease;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
         }
 
         .footer-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
         }
 
+        footer p {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .indicator-title {
-                font-size: 2rem;
-            }
-            
-            .section {
-                padding: 1.5rem;
-            }
+            .container { padding: 2rem 1rem; }
+            .indicator-title { font-size: 2.2rem; }
+            .section { padding: 1.5rem; }
+            .section h2 { font-size: 1.5rem; }
+            .nav-pills { padding: 1rem; }
+            .footer-buttons { flex-direction: column; align-items: center; }
+            .image-placeholder { height: 300px; }
+            th, td { padding: 0.7rem 0.5rem; font-size: 0.85rem; }
+        }
 
-            table {
-                font-size: 0.9rem;
-            }
-
-            th, td {
-                padding: 0.7rem;
-            }
+        @media (max-width: 480px) {
+            .header-content { flex-direction: column; gap: 1rem; }
+            .indicator-title { font-size: 1.8rem; }
+            .section { padding: 1rem; }
         }
     </style>
 </head>
@@ -237,16 +383,31 @@
             <div class="logo">Quantech Innovation</div>
             <a href="index.html" class="back-btn">← Back to Portfolio</a>
         </div>
+        <nav class="nav-pills">
+            <a href="#overview" class="nav-pill">Overview</a>
+            <a href="#methodology" class="nav-pill">Methodology</a>
+            <a href="#parameters" class="nav-pill">Parameters</a>
+            <a href="#specs" class="nav-pill">Specifications</a>
+            <a href="#visuals" class="nav-pill">Examples</a>
+            <a href="#usage" class="nav-pill">Usage Guide</a>
+            <a href="#implementation" class="nav-pill">Implementation</a>
+        </nav>
     </header>
 
     <div class="container">
         <div class="indicator-header">
             <h1 class="indicator-title">BOS/CHoCH + EC + FVG + RSI</h1>
             <p class="indicator-subtitle">Advanced Market Structure & Pattern Recognition System</p>
+            <div class="indicator-tags">
+                <span class="tag">Smart Money Concepts</span>
+                <span class="tag">Multi-Confirmation</span>
+                <span class="tag">High Probability</span>
+                <span class="tag">All Timeframes</span>
+            </div>
         </div>
 
         <!-- Overview Section -->
-        <section class="section">
+        <section id="overview" class="section">
             <h2>Overview</h2>
             <p>The BOS/CHoCH + EC + FVG + RSI indicator represents a comprehensive market structure analysis system that combines multiple technical analysis methodologies into a single, cohesive trading tool. This indicator identifies high-probability trading opportunities by detecting Break of Structure (BOS) and Change of Character (CHoCH) patterns, validating them with engulfing candle formations, Fair Value Gap (FVG) presence, and RSI divergence confirmation.</p>
             
@@ -263,7 +424,7 @@
         </section>
 
         <!-- Methodology Section -->
-        <section class="section">
+        <section id="methodology" class="section">
             <h2>Methodology & Logic</h2>
             
             <h3>Market Structure Detection</h3>
@@ -285,74 +446,76 @@
         </section>
 
         <!-- Parameters Section -->
-        <section class="section">
+        <section id="parameters" class="section">
             <h2>Parameters & Settings</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Parameter</th>
-                        <th>Default Value</th>
-                        <th>Range</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Pivot Search Window</td>
-                        <td>2</td>
-                        <td>1-10</td>
-                        <td>Number of bars to check on each side for local highs/lows</td>
-                    </tr>
-                    <tr>
-                        <td>Pattern Confirmation Window</td>
-                        <td>10</td>
-                        <td>5-50</td>
-                        <td>Bars to search for two-candle confirmation pattern</td>
-                    </tr>
-                    <tr>
-                        <td>Data Storage Size</td>
-                        <td>4000</td>
-                        <td>100-5000</td>
-                        <td>Historical bars retained in memory for analysis</td>
-                    </tr>
-                    <tr>
-                        <td>Enable RSI Filter</td>
-                        <td>True</td>
-                        <td>On/Off</td>
-                        <td>Requires RSI divergence for signal confirmation</td>
-                    </tr>
-                    <tr>
-                        <td>RSI Length</td>
-                        <td>14</td>
-                        <td>2-50</td>
-                        <td>Periods used for RSI calculation</td>
-                    </tr>
-                    <tr>
-                        <td>RSI Calculation Method</td>
-                        <td>Simple</td>
-                        <td>Simple/Wilder's</td>
-                        <td>Method for calculating RSI (SMA vs. exponential smoothing)</td>
-                    </tr>
-                    <tr>
-                        <td>Retest Proximity Threshold</td>
-                        <td>5 pips</td>
-                        <td>0+</td>
-                        <td>How close price must be to BOS zone for valid signal</td>
-                    </tr>
-                    <tr>
-                        <td>FVG Mode</td>
-                        <td>Current w Offset</td>
-                        <td>Infinite/Current</td>
-                        <td>How FVG boxes extend to the right</td>
-                    </tr>
-                    <tr>
-                        <td>FVG Right Offset</td>
-                        <td>4</td>
-                        <td>0+</td>
-                        <td>Bars to extend FVG boxes forward</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Default Value</th>
+                            <th>Range</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Pivot Search Window</td>
+                            <td>2</td>
+                            <td>1-10</td>
+                            <td>Number of bars to check on each side for local highs/lows</td>
+                        </tr>
+                        <tr>
+                            <td>Pattern Confirmation Window</td>
+                            <td>10</td>
+                            <td>5-50</td>
+                            <td>Bars to search for two-candle confirmation pattern</td>
+                        </tr>
+                        <tr>
+                            <td>Data Storage Size</td>
+                            <td>4000</td>
+                            <td>100-5000</td>
+                            <td>Historical bars retained in memory for analysis</td>
+                        </tr>
+                        <tr>
+                            <td>Enable RSI Filter</td>
+                            <td>True</td>
+                            <td>On/Off</td>
+                            <td>Requires RSI divergence for signal confirmation</td>
+                        </tr>
+                        <tr>
+                            <td>RSI Length</td>
+                            <td>14</td>
+                            <td>2-50</td>
+                            <td>Periods used for RSI calculation</td>
+                        </tr>
+                        <tr>
+                            <td>RSI Calculation Method</td>
+                            <td>Simple</td>
+                            <td>Simple/Wilder's</td>
+                            <td>Method for calculating RSI (SMA vs. exponential smoothing)</td>
+                        </tr>
+                        <tr>
+                            <td>Retest Proximity Threshold</td>
+                            <td>5 pips</td>
+                            <td>0+</td>
+                            <td>How close price must be to BOS zone for valid signal</td>
+                        </tr>
+                        <tr>
+                            <td>FVG Mode</td>
+                            <td>Current w Offset</td>
+                            <td>Infinite/Current</td>
+                            <td>How FVG boxes extend to the right</td>
+                        </tr>
+                        <tr>
+                            <td>FVG Right Offset</td>
+                            <td>4</td>
+                            <td>0+</td>
+                            <td>Bars to extend FVG boxes forward</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
             <h3>Customization Guidance</h3>
             <p><strong>For Intraday Trading:</strong> Reduce Pivot Search Window to 1-2 and Pattern Confirmation Window to 5-8 for faster signal generation on lower timeframes.</p>
@@ -362,47 +525,49 @@
         </section>
 
         <!-- Technical Specifications -->
-        <section class="section">
+        <section id="specs" class="section">
             <h2>Technical Specifications</h2>
             
-            <table>
-                <tr>
-                    <th>Specification</th>
-                    <th>Details</th>
-                </tr>
-                <tr>
-                    <td>PineScript Version</td>
-                    <td>v6</td>
-                </tr>
-                <tr>
-                    <td>Indicator Type</td>
-                    <td>Overlay (plots on price chart)</td>
-                </tr>
-                <tr>
-                    <td>Maximum Visual Objects</td>
-                    <td>500 labels, 500 lines, 500 boxes</td>
-                </tr>
-                <tr>
-                    <td>Timeframes</td>
-                    <td>All timeframes supported (1m to 1W+)</td>
-                </tr>
-                <tr>
-                    <td>Asset Classes</td>
-                    <td>Forex, Crypto, Stocks, Indices, Commodities</td>
-                </tr>
-                <tr>
-                    <td>Data Processing</td>
-                    <td>Three-phase: Collection → Historical Analysis → Real-time</td>
-                </tr>
-                <tr>
-                    <td>Anti-Repainting</td>
-                    <td>Uses confirmed bars with barstate.isconfirmed</td>
-                </tr>
-                <tr>
-                    <td>Memory Management</td>
-                    <td>Automatic cleanup of old data beyond storage limit</td>
-                </tr>
-            </table>
+            <div class="table-container">
+                <table>
+                    <tr>
+                        <th>Specification</th>
+                        <th>Details</th>
+                    </tr>
+                    <tr>
+                        <td>PineScript Version</td>
+                        <td>v6</td>
+                    </tr>
+                    <tr>
+                        <td>Indicator Type</td>
+                        <td>Overlay (plots on price chart)</td>
+                    </tr>
+                    <tr>
+                        <td>Maximum Visual Objects</td>
+                        <td>500 labels, 500 lines, 500 boxes</td>
+                    </tr>
+                    <tr>
+                        <td>Timeframes</td>
+                        <td>All timeframes supported (1m to 1W+)</td>
+                    </tr>
+                    <tr>
+                        <td>Asset Classes</td>
+                        <td>Forex, Crypto, Stocks, Indices, Commodities</td>
+                    </tr>
+                    <tr>
+                        <td>Data Processing</td>
+                        <td>Three-phase: Collection → Historical Analysis → Real-time</td>
+                    </tr>
+                    <tr>
+                        <td>Anti-Repainting</td>
+                        <td>Uses confirmed bars with barstate.isconfirmed</td>
+                    </tr>
+                    <tr>
+                        <td>Memory Management</td>
+                        <td>Automatic cleanup of old data beyond storage limit</td>
+                    </tr>
+                </table>
+            </div>
 
             <h3>Pip Calculation System</h3>
             <p>The indicator includes adaptive pip calculation that automatically adjusts for different asset classes:</p>
@@ -415,33 +580,33 @@
         </section>
 
         <!-- Visual Documentation -->
-        <section class="section">
+        <section id="visuals" class="section">
             <h2>Visual Documentation</h2>
             
             <div class="image-placeholder">
                 <p>Example 1: BOS/CHoCH + EC + FVG + RSI on BTC/USD Daily Chart</p>
             </div>
-            <p style="text-align: center; color: var(--text-secondary); font-style: italic; margin-top: -1rem;">
+            <p class="image-caption">
                 Showing bullish BOS with green FVG box, followed by engulfing candle retest and long signal generation
             </p>
 
             <div class="image-placeholder">
                 <p>Example 2: Signal Identification on EUR/USD 1-Hour Chart</p>
             </div>
-            <p style="text-align: center; color: var(--text-secondary); font-style: italic; margin-top: -1rem;">
+            <p class="image-caption">
                 Demonstrating bearish CHoCH detection with red FVG overlap and short signal confirmation via RSI divergence
             </p>
 
             <div class="image-placeholder">
                 <p>Example 3: Multi-Signal Environment on ES Futures 15-Minute</p>
             </div>
-            <p style="text-align: center; color: var(--text-secondary); font-style: italic; margin-top: -1rem;">
+            <p class="image-caption">
                 Multiple BOS patterns with FVG zones showing how the indicator manages complex market structure
             </p>
         </section>
 
         <!-- Usage Guide -->
-        <section class="section">
+        <section id="usage" class="section">
             <h2>Usage Guide</h2>
             
             <h3>Interpreting the Indicator</h3>
@@ -483,7 +648,7 @@
         </section>
 
         <!-- Implementation Notes -->
-        <section class="section">
+        <section id="implementation" class="section">
             <h2>Implementation Notes</h2>
             
             <h3>Installation & Setup</h3>
@@ -543,7 +708,47 @@
             <a href="https://portfolio.quantechinnovation.com/" class="footer-btn" target="_blank">View Portfolio</a>
             <a href="index.html" class="footer-btn">Back to Main</a>
         </div>
-        <p style="color: var(--text-secondary);">&copy; 2024 Quantech Innovation. All Rights Reserved.</p>
+        <p>&copy; 2024 Quantech Innovation. All Rights Reserved.</p>
     </footer>
+
+    <script>
+        // Smooth scroll for navigation
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.nav-pill').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    if(targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Add scroll effect to nav pills
+            window.addEventListener('scroll', () => {
+                const sections = document.querySelectorAll('.section');
+                const navPills = document.querySelectorAll('.nav-pill');
+                
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 60) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navPills.forEach(pill => {
+                    pill.style.background = pill.getAttribute('href').substring(1) === current ? 
+                        'rgba(0, 212, 255, 0.2)' : 'rgba(26, 31, 58, 0.6)';
+                    pill.style.color = pill.getAttribute('href').substring(1) === current ? 
+                        'var(--accent-cyan)' : 'var(--text-secondary)';
+                });
+            });
+        });
+    </script>
 </body>
 </html>

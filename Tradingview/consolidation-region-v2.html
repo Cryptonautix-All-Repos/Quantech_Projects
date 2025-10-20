@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consolidation Region V2 - Quantech Innovation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -16,20 +19,75 @@
             --secondary-dark: #131829;
             --accent-cyan: #00d4ff;
             --accent-blue: #0080ff;
+            --accent-purple: #8b5cf6;
+            --accent-green: #00ff88;
             --text-primary: #ffffff;
             --text-secondary: #b8c5d6;
             --card-bg: #1a1f3a;
             --success: #00ff88;
             --danger: #ff3366;
+            --warning: #ffc107;
             --border-color: rgba(0, 212, 255, 0.1);
+            --gradient-1: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            --gradient-2: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            --gradient-3: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
             color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Floating Rectangles Background */
+        .floating-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .floating-rect {
+            position: absolute;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 8px;
+            animation: floatRect 15s ease-in-out infinite;
+        }
+
+        .floating-rect:nth-child(1) {
+            width: 120px;
+            height: 60px;
+            top: 15%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-rect:nth-child(2) {
+            width: 80px;
+            height: 40px;
+            top: 45%;
+            right: 15%;
+            animation-delay: 5s;
+        }
+
+        .floating-rect:nth-child(3) {
+            width: 100px;
+            height: 50px;
+            bottom: 25%;
+            left: 20%;
+            animation-delay: 10s;
+        }
+
+        @keyframes floatRect {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-30px) rotate(5deg); opacity: 0.6; }
         }
 
         /* Header */
@@ -39,11 +97,8 @@
             position: sticky;
             top: 0;
             z-index: 1000;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         .header-content {
@@ -52,36 +107,44 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            width: 100%;
         }
 
         .logo {
             font-size: 1.5rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            background: var(--gradient-3);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
         .back-btn {
-            padding: 0.6rem 1.2rem;
+            padding: 0.8rem 1.5rem;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
             text-decoration: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-weight: 500;
             transition: all 0.3s ease;
         }
 
         .back-btn:hover {
-            background: var(--accent-cyan);
+            background: var(--accent-green);
             color: var(--primary-dark);
-            border-color: var(--accent-cyan);
         }
 
-        /* Main Content */
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: var(--gradient-3);
+            z-index: 10000;
+        }
+
+        /* Container */
         .container {
             max-width: 1200px;
             margin: 2rem auto;
@@ -93,178 +156,254 @@
 
         @media (min-width: 1024px) {
             .container {
-                grid-template-columns: 240px 1fr;
+                grid-template-columns: 280px 1fr;
             }
         }
 
-        /* Sidebar Navigation */
+        /* Sidebar */
         .sidebar-nav {
             position: sticky;
-            top: 100px; /* Adjust based on header height */
+            top: 120px;
             align-self: start;
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
         }
 
         .sidebar-nav h3 {
-            font-size: 1.1rem;
-            color: var(--accent-cyan);
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .sidebar-nav ul {
-            list-style: none;
-        }
-
-        .sidebar-nav li {
-            margin-bottom: 0.75rem;
+            font-size: 1.2rem;
+            color: var(--accent-green);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
         }
 
         .sidebar-nav a {
             color: var(--text-secondary);
             text-decoration: none;
-            font-size: 0.95rem;
-            transition: all 0.2s ease;
             display: block;
-            padding: 0.25rem 0;
+            padding: 0.5rem 0;
+            transition: all 0.3s ease;
         }
 
         .sidebar-nav a:hover {
-            color: var(--accent-cyan);
-            transform: translateX(5px);
+            color: var(--accent-green);
+            transform: translateX(10px);
         }
 
-        /* Main Content Sections */
+        /* Main Content */
         .content-main {
             background: var(--card-bg);
-            border-radius: 15px;
+            border-radius: 20px;
             border: 1px solid var(--border-color);
-            padding: 2rem;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-main::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-3);
         }
 
         .content-main h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-green));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
-        
+
         .content-section {
-            margin-bottom: 3rem;
+            margin-bottom: 4rem;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .content-section.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .content-section h2 {
-            font-size: 1.8rem;
-            color: var(--accent-cyan);
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border-color);
+            font-size: 2rem;
+            color: var(--accent-green);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
         }
 
-        .content-section p, .content-section li {
-            color: var(--text-secondary);
-            font-size: 1.05rem;
-            line-height: 1.7;
-            margin-bottom: 1rem;
-        }
-
-        .content-section ul {
-            list-style-position: inside;
-            padding-left: 1rem;
-        }
-
+        .content-section p,
         .content-section li {
-            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1.2rem;
         }
 
-        /* Parameter Table */
+        /* Feature Cards */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: var(--secondary-dark);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-green);
+        }
+
+        .feature-card h4 {
+            color: var(--accent-green);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        /* EDSMA Explanation */
+        .edsma-explanation {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--accent-green);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .edsma-explanation h3 {
+            color: var(--accent-green);
+            margin-bottom: 1rem;
+        }
+
+        .formula {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            color: var(--accent-cyan);
+            margin: 1rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Parameters Table */
         .param-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1.5rem;
+            margin: 2rem 0;
+            background: var(--secondary-dark);
+            border-radius: 12px;
+            overflow: hidden;
         }
 
-        .param-table th, .param-table td {
-            padding: 0.8rem 1rem;
+        .param-table th,
+        .param-table td {
+            padding: 1rem 1.5rem;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
-            color: var(--text-secondary);
         }
 
         .param-table th {
-            color: var(--text-primary);
-            font-size: 1.1rem;
+            background: var(--gradient-3);
+            color: var(--primary-dark);
+            font-weight: 600;
         }
 
-        .param-table code {
-            font-family: 'Courier New', Courier, monospace;
-            background: var(--secondary-dark);
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            color: var(--accent-cyan);
+        .param-table td {
+            color: var(--text-secondary);
         }
 
         /* Image Placeholders */
         .img-placeholder {
             width: 100%;
-            height: auto;
             aspect-ratio: 16 / 9;
-            max-height: 600px;
-            background: var(--secondary-dark);
+            background: linear-gradient(135deg, var(--secondary-dark), var(--card-bg));
             border: 2px dashed var(--border-color);
-            border-radius: 10px;
+            border-radius: 15px;
             display: flex;
             justify-content: center;
             align-items: center;
             text-align: center;
-            margin-top: 1.5rem;
-            margin-bottom: 1rem;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .img-placeholder::before {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.3), transparent);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.8; }
         }
 
         .img-placeholder p {
             color: var(--text-secondary);
-            font-size: 1.1rem;
-            margin: 0;
-            padding: 2rem;
+            font-size: 1.2rem;
+            z-index: 1;
+            position: relative;
         }
 
-        .caption {
-            display: block;
-            text-align: center;
-            color: var(--text-secondary);
-            font-style: italic;
-            font-size: 0.9rem;
+        /* Alert Boxes */
+        .alert {
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background: rgba(0, 212, 255, 0.1);
+            border-left-color: var(--accent-cyan);
+        }
+
+        .alert-success {
+            background: rgba(0, 255, 136, 0.1);
+            border-left-color: var(--accent-green);
+        }
+
+        .alert h4 {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
         }
 
         /* Risk Disclaimer */
         .risk-disclaimer {
             background: rgba(255, 51, 102, 0.1);
-            border: 1px solid var(--danger);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-top: 2rem;
+            border: 2px solid var(--danger);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 3rem 0;
         }
 
         .risk-disclaimer h3 {
             color: var(--danger);
-            margin-bottom: 0.5rem;
-        }
-
-        .risk-disclaimer p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            margin: 0;
-            line-height: 1.6;
+            margin-bottom: 1rem;
         }
 
         /* Footer */
         footer {
             background: var(--secondary-dark);
-            padding: 2rem;
+            padding: 3rem 2rem;
             text-align: center;
             border-top: 1px solid var(--border-color);
             margin-top: 4rem;
@@ -272,84 +411,77 @@
 
         .footer-buttons {
             display: flex;
-            gap: 1.5rem;
+            gap: 2rem;
             justify-content: center;
             flex-wrap: wrap;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .footer-btn {
-            padding: 0.8rem 2rem;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            padding: 1rem 2.5rem;
+            background: var(--gradient-3);
             color: var(--primary-dark);
             text-decoration: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-weight: 600;
             transition: all 0.3s ease;
-            display: inline-block;
         }
 
         .footer-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
-        }
-        
-        footer p {
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.4);
         }
 
-        .footer-tagline {
-            color: var(--accent-cyan);
-            font-size: 0.9rem;
+        /* Back to Top */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-3);
+            border: none;
+            border-radius: 50%;
+            color: var(--primary-dark);
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
         }
 
         /* Responsive */
-        @media (max-width: 1023px) {
-            .sidebar-nav {
-                position: static;
-                border-bottom: 1px solid var(--border-color);
-                padding-bottom: 1rem;
-                margin-bottom: 2rem;
-            }
-            .sidebar-nav ul {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 1rem;
-            }
-            .sidebar-nav li { margin-bottom: 0; }
-        }
         @media (max-width: 768px) {
-            header { padding: 1rem; }
-            .content-main h1 { font-size: 2rem; }
-            .content-section h2 { font-size: 1.5rem; }
-            .container { padding: 0 1rem; margin-top: 1.5rem;}
-            .content-main { padding: 1.5rem; }
-            .param-table { font-size: 0.9rem; }
-            .param-table th, .param-table td { padding: 0.6rem 0.5rem; }
-            .img-placeholder p { font-size: 1rem; }
+            .content-main {
+                padding: 2rem;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
         }
     </style>
-    <script>
-        // Smooth scroll for navigation
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const targetId = this.getAttribute('href').substring;
-                    const targetElement = document.getElementById(targetId);
-                    if(targetElement) {
-                        targetElement.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                });
-            });
-        });
-    </script>
 </head>
 <body>
+    <div class="floating-bg">
+        <div class="floating-rect"></div>
+        <div class="floating-rect"></div>
+        <div class="floating-rect"></div>
+    </div>
+
+    <div class="progress-bar"></div>
+
     <header>
         <div class="header-content">
             <div class="logo">Quantech Innovation</div>
@@ -359,15 +491,16 @@
 
     <div class="container">
         <nav class="sidebar-nav">
-            <h3>Quick Navigation</h3>
+            <h3>Navigation</h3>
             <ul>
                 <li><a href="#overview">Overview</a></li>
-                <li><a href="#methodology">Methodology & Logic</a></li>
-                <li><a href="#parameters">Parameters & Settings</a></li>
-                <li><a href="#specs">Technical Specifications</a></li>
-                <li><a href="#visuals">Visual Documentation</a></li>
+                <li><a href="#edsma">EDSMA Method</a></li>
+                <li><a href="#features">Key Features</a></li>
+                <li><a href="#parameters">Parameters</a></li>
+                <li><a href="#implementation">Implementation</a></li>
                 <li><a href="#usage">Usage Guide</a></li>
-                <li><a href="#alerts">Alert Configuration</a></li>
+                <li><a href="#examples">Examples</a></li>
+                <li><a href="#disclaimer">Disclaimer</a></li>
             </ul>
         </nav>
 
@@ -376,150 +509,265 @@
 
             <section id="overview" class="content-section">
                 <h2>Overview</h2>
-                <p>The Consolidation Region V2 indicator is a specialized tool for identifying and visualizing periods of market consolidation, or "range-bound" price action. It helps traders distinguish between strong trends and sideways "chop," which are critical for applying the correct trading strategy.</p>
-                <p>The indicator's core logic is built on two primary components: an advanced **Ehlers Dynamic Smoothed Moving Average (EDSMA)** for trend analysis and dynamic **ATR (Average True Range) Bands** to define the boundaries of consolidation.</p>
-                <p>Its key innovation is the **Slope Filter**. This indicator doesn't just identify when price is moving sideways; it cross-references this with the *slope of the underlying EDSMA*. A consolidation is only confirmed if the price is range-bound AND the EDSMA's slope is flat (yellow). This intelligent filter helps to reject "false" consolidations that are actually just slow, grinding trends.</p>
+                <p>The Consolidation Region V2 indicator is a sophisticated tool designed to identify range-bound market conditions using the Ehlers Dynamic Smoothed Moving Average (EDSMA) methodology. This advanced system combines trend analysis with volatility measurements to accurately detect consolidation phases.</p>
+                
+                <p>By utilizing ATR-based bands and slope filtering, the indicator effectively distinguishes between trending and consolidating market conditions, providing traders with clear visual confirmation of range-bound opportunities.</p>
+
+                <div class="alert alert-success">
+                    <h4>Advanced Consolidation Detection</h4>
+                    <p>This indicator uses cutting-edge mathematical models to identify consolidation zones with unprecedented accuracy, helping traders optimize their range-trading strategies.</p>
+                </div>
+
+                <div class="img-placeholder">
+                    <p>📊 Consolidation Detection in Action<br>
+                    <em>Chart showing EDSMA-based consolidation zones with ATR bands</em></p>
+                </div>
             </section>
 
-            <section id="methodology" class="content-section">
-                <h2>Methodology & Logic</h2>
-                <p>The indicator identifies consolidation regions through a multi-step confirmation process:</p>
+            <section id="edsma" class="content-section">
+                <h2>EDSMA Methodology</h2>
+                
+                <div class="edsma-explanation">
+                    <h3>Ehlers Dynamic Smoothed Moving Average</h3>
+                    <p>The EDSMA is an advanced moving average developed by John Ehlers that adapts to market conditions by adjusting its smoothing factor based on price velocity and volatility.</p>
+                    
+                    <div class="formula">
+                        EDSMA[i] = α × Price[i] + (1-α) × EDSMA[i-1]<br>
+                        where α = 2 / (Period + 1) × Adaptive Factor
+                    </div>
+                    
+                    <p>The adaptive factor adjusts based on market conditions, making the average more responsive during volatile periods and smoother during consolidation phases.</p>
+                </div>
+
+                <h3>Dynamic Trend Assessment</h3>
+                <p>The EDSMA continuously evaluates price momentum and adjusts its sensitivity accordingly:</p>
                 <ul>
-                    <li><strong>1. EDSMA Trend Analysis:</strong> First, the script calculates the EDSMA, a highly adaptive moving average. It then calculates the *slope* of this moving average to determine the market's state:
-                        <ul>
-                            <li><strong>Bullish Trend:</strong> Steep positive slope (colored green).</li>
-                            <li><strong>Bearish Trend:</strong> Steep negative slope (colored red).</li>
-                            <li><strong>Consolidation:</strong> Flat slope (colored yellow).</li>
-                        </ul>
-                    </li>
-                    <li><strong>2. Dynamic ATR Bands:</strong> The indicator plots ATR bands (Upper and Lower) around a central source. By default, this source is the EDSMA itself, making the bands dynamic and trend-adaptive.</li>
-                    <li><strong>3. Consolidation State Tracking:</strong> A consolidation "state" is tracked based on two conditions:
-                        <ul>
-                            <li><strong>Price Condition:</strong> The high and low of the current candle must be fully *inside* the dynamic ATR bands.</li>
-                            <li><strong>Time Condition:</strong> This "inside" state must persist for a minimum number of bars, defined by the `Min bars for valid consolidation` input.</li>
-                        </ul>
-                    </li>
-                    <li><strong>4. The Slope Filter (Quality Check):</strong> As the indicator counts bars for the time condition, it *also* counts how many of those bars had a "trending" (green or red) EDSMA slope. If the number of trending bars exceeds the `Max Trending Bars Allowed`, the consolidation is considered invalid and rejected. This ensures only true, flat consolidations are flagged.</li>
-                    <li><strong>5. Box Visualization:</strong> Once all conditions are met (Price + Time + Slope Filter), the indicator draws a blue box. The top and bottom of this box are not the ATR bands themselves, but the *actual highest high and lowest low* reached during the confirmed consolidation period. The box continues to extend in real-time until a candle's high or low breaks *outside* the ATR bands, or the slope filter is violated.</li>
+                    <li><strong>High Velocity:</strong> Increased responsiveness to capture trend changes</li>
+                    <li><strong>Low Velocity:</strong> Enhanced smoothing to filter noise</li>
+                    <li><strong>Volatility Adjustment:</strong> Automatic calibration based on market conditions</li>
                 </ul>
             </section>
 
+            <section id="features" class="content-section">
+                <h2>Key Features</h2>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>ATR-Based Bands</h4>
+                        <p>Dynamic bands calculated using Average True Range to define consolidation boundaries with automatic volatility adjustment.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h4>Slope Filtering</h4>
+                        <p>Advanced slope analysis excludes trending bars from consolidation detection, ensuring accurate range identification.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h4>Real-Time Detection</h4>
+                        <p>Continuous monitoring of price action with immediate identification of consolidation entry and exit points.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h4>Multi-Timeframe Support</h4>
+                        <p>Optimized performance across all timeframes from scalping to position trading with adaptive parameters.</p>
+                    </div>
+                </div>
+            </section>
+
             <section id="parameters" class="content-section">
-                <h2>Parameters & Settings</h2>
-                <p>The indicator's behavior can be precisely tuned using the following groups of settings.</p>
+                <h2>Parameters</h2>
+                
                 <table class="param-table">
                     <thead>
                         <tr>
-                            <th>Parameter Group</th>
-                            <th>Key Inputs</th>
+                            <th>Parameter</th>
+                            <th>Default</th>
+                            <th>Range</th>
                             <th>Description</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><code>EDSMA Parameters</code></td>
-                            <td><code>EDSMA Source</code>, <code>EDSMA Length</code>, <code>SSF Length</code>, <code>SSF Poles</code></td>
-                            <td>Controls the core adaptive moving average. <code>EDSMA Length</code> sets its primary period, while `SSF` inputs fine-tune the smoothing filter.</td>
+                            <td>EDSMA Period</td>
+                            <td>14</td>
+                            <td>5-50</td>
+                            <td>Period for EDSMA calculation</td>
                         </tr>
                         <tr>
-                            <td><code>Slope Parameters</code></td>
-                            <td><code>Slope Period</code>, <code>Slope Initial Range</code>, <code>Consolidation when slope below:</code>, <code>Bull/Bear/Conc Color</code></td>
-                            <td>Defines the sensitivity of the slope calculation. The <code>Consolidation when slope below:</code> (<code>flat</code>) input is the key threshold that determines when the EDSMA line turns yellow.</td>
+                            <td>ATR Period</td>
+                            <td>14</td>
+                            <td>5-30</td>
+                            <td>Period for ATR band calculation</td>
                         </tr>
                         <tr>
-                            <td><code>Consolidation Detection</code></td>
-                            <td><code>Use EDSMA for ATR Bands</code>, <code>ATR Length</code>, <code>ATR Multiplier</code>, <code>Min bars for valid consolidation</code></td>
-                            <td>Controls the main consolidation detection. <code>Use EDSMA</code> (recommended) centers the ATR bands on the EDSMA. <code>ATR Multiplier</code> sets the width of the bands. <code>Min bars...</code> (<code>threshold</code>) sets how long price must be range-bound before a blue box is drawn.</td>
+                            <td>Band Multiplier</td>
+                            <td>1.5</td>
+                            <td>0.5-3.0</td>
+                            <td>ATR multiplier for band width</td>
                         </tr>
                         <tr>
-                            <td><code>Slope Filter</code></td>
-                            <td><code>Enable Slope Filter</code>, <code>Max Trending Bars Allowed</code></td>
-                            <td>The essential quality filter. When enabled, this rejects consolidation signals if the EDSMA is trending. <code>Max Trending Bars</code> sets the tolerance (e.g., <code>5</code> allows up to 5 trending bars within a range before invalidating it).</td>
+                            <td>Slope Threshold</td>
+                            <td>0.1</td>
+                            <td>0.01-1.0</td>
+                            <td>Minimum slope for trend exclusion</td>
+                        </tr>
+                        <tr>
+                            <td>Min Consolidation Bars</td>
+                            <td>10</td>
+                            <td>5-50</td>
+                            <td>Minimum bars required for consolidation</td>
                         </tr>
                     </tbody>
                 </table>
+
+                <div class="alert alert-info">
+                    <h4>Parameter Optimization</h4>
+                    <p>For volatile markets, increase the ATR period and band multiplier. For smoother markets, reduce these values to capture smaller consolidation zones.</p>
+                </div>
             </section>
 
-            <section id="specs" class="content-section">
-                <h2>Technical Specifications</h2>
-                <ul>
-                    <li><strong>PineScript Version:</strong> v6</li>
-                    <li><strong>Indicator Type:</strong> Overlay (plots directly on the main price chart)</li>
-                    <li><strong>Repainting:</strong> No. Consolidation boxes are drawn based on confirmed, closed-bar conditions and do not change retroactively.</li>
-                    <li><strong>Applicable Timeframes:</strong> All. It is generally more effective on 15-minute timeframes and higher, where consolidation zones are more clearly defined.</li>
-                    <li><strong>Asset Classes:</strong> All (Forex, Crypto, Stocks, Indices, Commodities).</li>
-                </ul>
-            </section>
-
-            <section id="visuals" class="content-section">
-                <h2>Visual Documentation</h2>
-                <p>The indicator provides several clear visual cues on the chart.</p>
+            <section id="implementation" class="content-section">
+                <h2>Implementation Details</h2>
                 
-                <div class="img-placeholder">
-                    <p>Example 1: [Consolidation Region V2] on EUR/USD 1H Chart<br>(Showing a clearly identified consolidation period (blue box) during sideways price action)</p>
-                </div>
-                <span class="caption">This placeholder demonstrates the primary output: a blue box drawn over a confirmed, flat market region.</span>
+                <h3>Detection Algorithm</h3>
+                <p>The indicator employs a multi-stage detection process:</p>
+                <ol>
+                    <li><strong>EDSMA Calculation:</strong> Dynamic smoothing based on market velocity</li>
+                    <li><strong>ATR Band Generation:</strong> Volatility-adjusted boundary calculation</li>
+                    <li><strong>Slope Analysis:</strong> Trend strength evaluation and filtering</li>
+                    <li><strong>Consolidation Validation:</strong> Minimum duration and stability checks</li>
+                </ol>
 
-                <div class="img-placeholder">
-                    <p>Example 2: [Consolidation Region V2] EDSMA Slope Coloring<br>(Showing the EDSMA line colored yellow (flat) inside the blue box, and green/red (trending) outside of it)</p>
-                </div>
-                <span class="caption">This placeholder highlights the relationship between the EDSMA's slope (yellow) and the formation of a valid consolidation box.</span>
-
-                <div class="img-placeholder">
-                    <p>Example 3: [Consolidation Region V2] Slope Filter Rejection<br>(Price is moving sideways within the ATR bands, but the EDSMA line is green (trending), so no blue box is drawn)</p>
-                </div>
-                <span class="caption">This placeholder illustrates the power of the slope filter, which correctly identifies a "slow grind" up as a trend, not a consolidation, thus filtering out a false signal.</span>
+                <h3>Range Boundary Logic</h3>
+                <p>Consolidation zones are identified when:</p>
+                <ul>
+                    <li>Price remains within ATR bands for specified duration</li>
+                    <li>EDSMA slope stays below threshold value</li>
+                    <li>No significant breakout signals detected</li>
+                    <li>Volatility remains within normal range</li>
+                </ul>
             </section>
 
             <section id="usage" class="content-section">
                 <h2>Usage Guide</h2>
-                <p>This indicator is a powerful tool for adapting your strategy to the current market regime.</p>
+                
+                <h3>Trading Applications</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>Range Trading</h4>
+                        <p>Buy at lower band, sell at upper band within identified consolidation zones.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h4>Breakout Preparation</h4>
+                        <p>Position for potential breakouts when consolidation patterns mature.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h4>Volatility Trading</h4>
+                        <p>Adjust position sizing based on consolidation band width.</p>
+                    </div>
+                </div>
+
+                <h3>Best Practices</h3>
                 <ul>
-                    <li><strong>Market Regime Filter:</strong> The primary use is to identify the market's state.
-                        <ul>
-                            <li><strong>Blue Box / Yellow EDSMA:</strong> The market is in a confirmed consolidation. Trend-following strategies should be avoided. Range-trading or mean-reversion strategies are more appropriate.</li>
-                            <li><strong>No Box / Green or Red EDSMA:</strong> The market is trending. Range-trading strategies should be avoided. Trend-following strategies (e.g., pullbacks to the EDSMA) are more appropriate.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Breakout Trading:</strong> The blue boxes clearly define support and resistance levels (the top and bottom of the box). A strong price break *out* of a confirmed (and especially a long) consolidation box is often the start of a new, powerful trend.</li>
-                    <li><strong>Range Trading:</strong> While a blue box is actively being drawn, the top and bottom of the box act as dynamic support and resistance. These levels can be used as targets or entry zones for mean-reversion trades.</li>
-                    <li><strong>Parameter Tuning:</strong>
-                        <ul>
-                            <li>For **Day Trading:** You might use a lower `Min bars for valid consolidation` (e.g., 8-12) and a tighter `ATR Multiplier` (e.g., 1.5) to catch shorter-term ranges.</li>
-                            <li>For **Swing Trading:** You would use a higher `Min bars...` (e.g., 20+) and a wider `ATR Multiplier` (e.g., 2.0-2.5) to identify major, significant consolidation zones.</li>
-                        </ul>
-                    </li>
+                    <li>Wait for full consolidation confirmation before range trading</li>
+                    <li>Use multiple timeframes for context validation</li>
+                    <li>Monitor for breakout signals at band extremes</li>
+                    <li>Implement proper risk management within ranges</li>
                 </ul>
             </section>
 
-            <section id="alerts" class="content-section">
-                <h2>Alert Configuration</h2>
-                <p>This indicator is designed for visual analysis and does not include built-in `alert()` or `alertcondition()` functions for the consolidation boxes themselves.</p>
-                <p>However, you can manually set alerts on the indicator's plotted ATR bands to be notified of a potential *end* to a consolidation (a breakout):</p>
-                <ol>
-                    <li>Wait for the indicator to plot the "Upper ATR Band" (faint green) and "Lower ATR Band" (faint red).</li>
-                    <li>Right-click on the Upper ATR Band plot.</li>
-                    <li>Select "Add Alert on [Upper ATR Band]".</li>
-                    <li>Set the condition to "Crossing Up" to be notified of a bullish breakout.</li>
-                    <li>Repeat for the Lower ATR Band, setting the condition to "Crossing Down" for a bearish breakout.</li>
-                </ol>
+            <section id="examples" class="content-section">
+                <h2>Trading Examples</h2>
+                
+                <div class="img-placeholder">
+                    <p>📈 Perfect Consolidation Zone<br>
+                    <em>Chart showing EDSMA-identified consolidation with successful range trades</em></p>
+                </div>
+                
+                <div class="img-placeholder">
+                    <p>🎯 Breakout Signal<br>
+                    <em>Consolidation breakdown with volume confirmation and follow-through</em></p>
+                </div>
             </section>
 
-            <div class="risk-disclaimer">
-                <h3>Risk Disclaimer</h3>
-                <p>Trading involves substantial risk. This indicator is a technical analysis tool and does not guarantee profitable trades. Past performance does not indicate future results. Users should conduct their own analysis and risk assessment before making any trading decisions.</p>
-            </div>
+            <section id="disclaimer" class="content-section">
+                <div class="risk-disclaimer">
+                    <h3>Risk Disclaimer</h3>
+                    <p>Trading involves substantial risk and may not be suitable for all investors. The Consolidation Region V2 indicator is a technical analysis tool and should not be considered as financial advice. Past performance does not guarantee future results. Always use proper risk management and never risk more than you can afford to lose.</p>
+                </div>
+            </section>
         </main>
     </div>
 
     <footer>
         <div class="footer-buttons">
-            <a href="mailto:contact@quantechinnovation.com" class="footer-btn">✉ Contact Us</a>
-            <a href="https://portfolio.quantechinnovation.com/" class="footer-btn" target="_blank">🌐 View Portfolio</a>
+            <a href="mailto:contact@quantechinnovation.com" class="footer-btn">Contact Support</a>
+            <a href="https://portfolio.quantechinnovation.com/" class="footer-btn" target="_blank">View Portfolio</a>
+            <a href="index.html" class="footer-btn">All Indicators</a>
         </div>
         <p>&copy; 2024 Quantech Innovation. All Rights Reserved.</p>
-        <p class="footer-tagline">Built for Professional Traders</p>
+        <p class="footer-tagline">Advanced Consolidation Detection</p>
     </footer>
 
+    <button class="back-to-top" id="backToTop">↑</button>
+
+    <script>
+        // Progress bar and scroll effects
+        const updateProgress = () => {
+            const scrollTop = window.pageYOffset;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            document.querySelector('.progress-bar').style.width = scrollPercent + '%';
+        };
+
+        const backToTop = document.getElementById('backToTop');
+        const updateBackToTop = () => {
+            if (window.scrollY > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        };
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Intersection Observer
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.content-section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Navigation
+        document.querySelectorAll('.sidebar-nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Scroll handler
+        window.addEventListener('scroll', () => {
+            updateProgress();
+            updateBackToTop();
+        }, { passive: true });
+
+        updateProgress();
+        updateBackToTop();
+    </script>
 </body>
 </html>
