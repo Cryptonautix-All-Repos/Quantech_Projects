@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantech Innovation - Trading Portfolios</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0a0e1a;
+            --secondary-color: #1a1f2e;
+            --accent-color: #00d4ff;
+            --accent-gold: #ffd700;
+            --text-primary: #ffffff;
+            --text-secondary: #b8bcc5;
+            --border-color: #2c3e50;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-accent: linear-gradient(135deg, #00d4ff 0%, #091e3a 100%);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 14, 26, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gradient-primary);
+            position: relative;
+            text-align: center;
+            padding: 0 2rem;
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--accent-color), var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-content p {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            max-width: 800px;
+            margin: 0 auto 3rem;
+        }
+
+        .cta-button {
+            background: var(--gradient-accent);
+            color: var(--primary-color);
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Sections */
+        .section {
+            padding: 5rem 0;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Portfolio Cards */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .portfolio-card {
+            background: var(--secondary-color);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+        }
+
+        .portfolio-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .portfolio-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        .portfolio-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .project-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .project-link {
+            color: var(--accent-gold);
+            text-decoration: none;
+            padding: 0.5rem;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+            display: block;
+        }
+
+        .project-link:hover {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        /* Contact Section */
+        .contact-section {
+            background: var(--secondary-color);
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            margin: 3rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .contact-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        .contact-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-btn {
+            background: var(--gradient-accent);
+            color: var(--primary-color);
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--primary-color);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .portfolio-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .contact-btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">Quantech Innovation</div>
+            <ul class="nav-links">
+                <li><a href="#automation">Automation</a></li>
+                <li><a href="#tradingview">TradingView</a></li>
+                <li><a href="#metatrader">MetaTrader</a></li>
+                <li><a href="#ninjatrader">NinjaTrader</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Quantech Innovation</h1>
+            <p>Leading the future of algorithmic trading with cutting-edge solutions across multiple platforms. Explore our comprehensive portfolio of advanced trading systems, indicators, and automation tools designed for professional traders.</p>
+            <a href="#automation" class="cta-button">Discover Our Portfolios</a>
+        </div>
+    </section>
+
+    <!-- Automation Section -->
+    <section id="automation" class="section">
+        <div class="section-header">
+            <h2 class="section-title">Automation Portfolio</h2>
+            <p class="section-subtitle">AI-powered trading systems and multi-account management solutions</p>
+        </div>
+        <div class="portfolio-grid">
+            <div class="portfolio-card">
+                <h3>AI Trade Manager</h3>
+                <p>Advanced multi-account trading system with AI-powered decision making, real-time monitoring, and dynamic position amplification. Built on Python/Flask with MetaTrader 5 integration for institutional-grade automation.</p>
+                <div class="project-links">
+                    <a href="Automation/ai_trading_system_portfolio/ai_trading_system_portfolio.html" class="project-link">View AI Trade Manager Portfolio</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TradingView Section -->
+    <section id="tradingview" class="section">
+        <div class="section-header">
+            <h2 class="section-title">TradingView Portfolio</h2>
+            <p class="section-subtitle">Professional-grade Pine Script indicators for advanced technical analysis, market structure, volume profiling, and pattern recognition</p>
+        </div>
+        <div class="portfolio-grid">
+            <div class="portfolio-card">
+                <h3>TradingView Indicators Collection</h3>
+                <p>Comprehensive suite of 9 professional indicators covering market structure analysis (BOS/CHOCH, FVG), pattern recognition (engulfing candles), volume analysis, trend detection, and multi-timeframe confluence. Each indicator features advanced filtering, real-time alerts, and customizable parameters for institutional-grade trading.</p>
+                <div class="project-links">
+                    <a href="Tradingview/index.html" class="project-link">Explore TradingView Portfolio</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MetaTrader Section -->
+    <section id="metatrader" class="section">
+        <div class="section-header">
+            <h2 class="section-title">MetaTrader Portfolio</h2>
+            <p class="section-subtitle">Expert Advisors and trading systems for MT5 platform with advanced algorithmic strategies</p>
+        </div>
+        <div class="portfolio-grid">
+            <div class="portfolio-card">
+                <h3>MetaTrader Trading Systems</h3>
+                <p>Professional collection of 4 advanced Expert Advisors including Gold SMA Crossover Strategy, MT5 Reverse Copier, Phantom Bar EA, and Range 1R Bot. Each system features real-time execution, sophisticated risk management, and market-specific optimization for forex, gold, and multi-asset trading.</p>
+                <div class="project-links">
+                    <a href="MetaTrader/MetaTrader.html" class="project-link">Explore MetaTrader Portfolio</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NinjaTrader Section -->
+    <section id="ninjatrader" class="section">
+        <div class="section-header">
+            <h2 class="section-title">NinjaTrader Portfolio</h2>
+            <p class="section-subtitle">Professional strategies and indicators for NinjaTrader platform</p>
+        </div>
+        <div class="portfolio-grid">
+            <div class="portfolio-card">
+                <h3>SmoothTrend Range Strategy</h3>
+                <p>Advanced dual moving average system with intelligent pullback detection, 11 configurable entry conditions, and professional risk management for futures trading on range bars.</p>
+                <div class="project-links">
+                    <a href="NinjaTrader/SmoothTrend_Range_Strategy/index.html" class="project-link">View SmoothTrend Range Strategy</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="contact-section">
+            <h2>Get In Touch</h2>
+            <p>Ready to explore our trading solutions or discuss custom development? Contact Quantech Innovation for professional algorithmic trading systems and advanced market analysis tools.</p>
+            <div class="contact-buttons">
+                <a href="mailto:contact@quantechinnovation.com" class="contact-btn">
+                    📧 Contact Us
+                </a>
+                <a href="https://portfolio.quantechinnovation.com/" target="_blank" class="contact-btn">
+                    🌐 Full Portfolio
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 Quantech Innovation. All rights reserved. | Professional Trading Systems & Algorithmic Solutions</p>
+    </footer>
+
+    <script>
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.style.background = 'rgba(10, 14, 26, 0.98)';
+            } else {
+                navbar.style.background = 'rgba(10, 14, 26, 0.95)';
+            }
+        });
+    </script>
+</body>
+</html>
