@@ -278,6 +278,14 @@
             line-height: 1.2;
         }
 
+        .main-image {
+            width: 100%;
+            height: auto;
+            margin: 2rem 0;
+            border-radius: 15px;
+            box-shadow: var(--shadow-lg);
+        }
+
         .content-section {
             margin-bottom: 4rem;
             opacity: 0;
@@ -517,66 +525,7 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Image Placeholders */
-        .img-placeholder {
-            width: 100%;
-            height: auto;
-            aspect-ratio: 16 / 9;
-            max-height: 600px;
-            background: linear-gradient(135deg, var(--secondary-dark), var(--card-bg));
-            border: 2px dashed var(--border-color);
-            border-radius: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            margin: 2rem 0;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
 
-        .img-placeholder::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
-            background: radial-gradient(circle, rgba(0, 212, 255, 0.2), transparent);
-            border-radius: 50%;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
-            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
-        }
-
-        .img-placeholder:hover {
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
-        }
-
-        .img-placeholder p {
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            margin: 0;
-            padding: 2rem;
-            font-weight: 500;
-            z-index: 1;
-            position: relative;
-        }
-
-        .caption {
-            display: block;
-            text-align: center;
-            color: var(--text-secondary);
-            font-style: italic;
-            font-size: 0.95rem;
-            margin-top: 0.5rem;
-        }
 
         /* Alert Boxes */
         .alert {
@@ -922,14 +871,15 @@
                 <li><a href="#fvg-analysis">FVG Analysis</a></li>
                 <li><a href="#volume-integration">Volume Integration</a></li>
                 <li><a href="#usage">Usage Guide</a></li>
-                <li><a href="#examples">Trading Examples</a></li>
                 <li><a href="#optimization">Optimization</a></li>
                 <li><a href="#disclaimer">Risk Disclaimer</a></li>
             </ul>
         </nav>
 
         <main class="content-main">
-            <h1>Engulfing Candles + FVG V8</h1>
+        <h1>Engulfing Candles + FVG V8</h1>
+
+        <img src="Bullish_Bearish_Engulfing_Candles_w_FVG_v8.png" alt="Engulfing Candles + FVG Pattern Display" class="main-image">
 
             <section id="overview" class="content-section">
                 <h2>Overview</h2>
@@ -938,15 +888,9 @@
                 <p>By combining traditional technical analysis with institutional trading concepts, this indicator helps traders identify moments when retail sentiment conflicts with smart money positioning, creating optimal entry conditions for informed traders.</p>
 
                 <div class="alert alert-info">
-                    <h4>Pattern Recognition Excellence</h4>
-                    <p>This indicator uses multi-criteria validation to ensure that only the highest quality engulfing patterns are identified, significantly reducing false signals and improving trade success rates.</p>
+                <h4>Pattern Recognition Excellence</h4>
+                <p>This indicator uses multi-criteria validation to ensure that only the highest quality engulfing patterns are identified, significantly reducing false signals and improving trade success rates.</p>
                 </div>
-
-                <div class="img-placeholder">
-                    <p>📊 Engulfing Candles + FVG Pattern Display<br>
-                    <em>Chart showing engulfing patterns with FVG confirmation and volume analysis</em></p>
-                </div>
-                <span class="caption">Figure 1: Engulfing candle patterns with Fair Value Gap validation</span>
             </section>
 
             <section id="features" class="content-section">
@@ -1020,15 +964,9 @@
                 <p>Fair Value Gaps represent imbalances in the market where institutional orders create price inefficiencies. The indicator identifies these gaps and tracks their interaction with engulfing patterns to create high-probability trading scenarios.</p>
 
                 <div class="alert alert-success">
-                    <h4>Key Innovation</h4>
-                    <p>The unique aspect of this system is the real-time tracking of FVG overlap with engulfing patterns, creating a powerful confluence that significantly increases the probability of successful trades.</p>
+                <h4>Key Innovation</h4>
+                <p>The unique aspect of this system is the real-time tracking of FVG overlap with engulfing patterns, creating a powerful confluence that significantly increases the probability of successful trades.</p>
                 </div>
-
-                <div class="img-placeholder">
-                    <p>🔄 Pattern Detection Workflow<br>
-                    <em>Flowchart showing the complete detection and validation process</em></p>
-                </div>
-                <span class="caption">Figure 2: Complete pattern detection and validation workflow</span>
             </section>
 
             <section id="parameters" class="content-section">
@@ -1117,26 +1055,14 @@
 
                 <h3>Bearish Engulfing Criteria</h3>
                 <ul>
-                    <li>Current candle opens above or at the previous candle's high</li>
-                    <li>Current candle closes below the previous candle's low</li>
-                    <li>Current candle body is significantly larger than previous candle body</li>
-                    <li>Previous candle must be bullish (green/up candle)</li>
-                    <li>Current candle must be bearish (red/down candle)</li>
-                    <li>Volume should show increase (configurable)</li>
-                    <li>Pattern occurs at or near swing high (if swing detection enabled)</li>
+                <li>Current candle opens above or at the previous candle's high</li>
+                <li>Current candle closes below the previous candle's low</li>
+                <li>Current candle body is significantly larger than previous candle body</li>
+                <li>Previous candle must be bullish (green/up candle)</li>
+                <li>Current candle must be bearish (red/down candle)</li>
+                <li>Volume should show increase (configurable)</li>
+                <li>Pattern occurs at or near swing high (if swing detection enabled)</li>
                 </ul>
-
-                <div class="img-placeholder">
-                    <p>📈 Bullish Engulfing Pattern Example<br>
-                    <em>Detailed breakdown of a perfect bullish engulfing pattern with measurements</em></p>
-                </div>
-                <span class="caption">Figure 3: Anatomy of a bullish engulfing pattern</span>
-
-                <div class="img-placeholder">
-                    <p>📉 Bearish Engulfing Pattern Example<br>
-                    <em>Detailed breakdown of a perfect bearish engulfing pattern with measurements</em></p>
-                </div>
-                <span class="caption">Figure 4: Anatomy of a bearish engulfing pattern</span>
             </section>
 
             <section id="fvg-analysis" class="content-section">
@@ -1167,15 +1093,9 @@
                 </ul>
 
                 <div class="alert alert-info">
-                    <h4>Confluence Trading</h4>
-                    <p>When an engulfing pattern forms within or near a Fair Value Gap, it creates a high-probability trading scenario. The gap provides the "why" (institutional imbalance) while the engulfing pattern provides the "when" (momentum shift).</p>
+                <h4>Confluence Trading</h4>
+                <p>When an engulfing pattern forms within or near a Fair Value Gap, it creates a high-probability trading scenario. The gap provides the "why" (institutional imbalance) while the engulfing pattern provides the "when" (momentum shift).</p>
                 </div>
-
-                <div class="img-placeholder">
-                    <p>🎯 FVG-Engulfing Confluence Example<br>
-                    <em>Chart showing perfect confluence between engulfing pattern and Fair Value Gap</em></p>
-                </div>
-                <span class="caption">Figure 5: High-probability confluence zone with FVG and engulfing pattern</span>
             </section>
 
             <section id="volume-integration" class="content-section">
@@ -1264,57 +1184,7 @@
                 </div>
             </section>
 
-            <section id="examples" class="content-section">
-                <h2>Trading Examples</h2>
-                
-                <h3>Example 1: Bullish Engulfing with FVG Confluence</h3>
-                <div class="img-placeholder">
-                    <p>📈 Perfect Bullish Setup<br>
-                    <em>Chart showing bullish engulfing pattern forming within a Fair Value Gap with volume confirmation</em></p>
-                </div>
-                <span class="caption">Figure 6: Bullish engulfing pattern with FVG confluence and volume spike</span>
-                
-                <p><strong>Setup Analysis:</strong></p>
-                <ul>
-                    <li>Strong bearish FVG identified from previous session</li>
-                    <li>Price returns to FVG area during London session</li>
-                    <li>Bullish engulfing pattern forms within FVG boundaries</li>
-                    <li>Significant volume increase confirms institutional participation</li>
-                    <li>Follow-through confirms pattern validity</li>
-                </ul>
-
-                <h3>Example 2: Bearish Engulfing at Resistance</h3>
-                <div class="img-placeholder">
-                    <p>📉 High-Probability Reversal<br>
-                    <em>Chart showing bearish engulfing pattern at key resistance with FVG formation</em></p>
-                </div>
-                <span class="caption">Figure 7: Bearish engulfing pattern creating new FVG at resistance level</span>
-                
-                <p><strong>Setup Analysis:</strong></p>
-                <ul>
-                    <li>Price approaches major resistance level</li>
-                    <li>Multiple failed attempts to break resistance</li>
-                    <li>Large bearish engulfing pattern forms at resistance</li>
-                    <li>Pattern creates new bearish FVG indicating strong selling pressure</li>
-                    <li>Volume spike confirms institutional selling</li>
-                </ul>
-
-                <h3>Example 3: Failed Pattern - Learning Opportunity</h3>
-                <div class="img-placeholder">
-                    <p>⚠️ Pattern Failure Analysis<br>
-                    <em>Chart showing why some engulfing patterns fail and how to identify weak setups</em></p>
-                </div>
-                <span class="caption">Figure 8: Failed engulfing pattern analysis and lessons learned</span>
-                
-                <p><strong>Failure Analysis:</strong></p>
-                <ul>
-                    <li>Engulfing pattern formed but lacked volume confirmation</li>
-                    <li>No significant market structure level nearby</li>
-                    <li>Counter-trend setup without higher timeframe confirmation</li>
-                    <li>FVG was too small and quickly filled</li>
-                    <li>Overall market sentiment remained unchanged</li>
-                </ul>
-            </section>
+            
 
             <section id="optimization" class="content-section">
                 <h2>Optimization Guidelines</h2>

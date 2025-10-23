@@ -353,45 +353,12 @@
             background: rgba(0, 212, 255, 0.05);
         }
 
-        /* Image Placeholders */
-        .img-placeholder {
+        .main-image {
             width: 100%;
-            aspect-ratio: 16 / 9;
-            max-height: 600px;
-            background: linear-gradient(135deg, var(--secondary-dark), var(--card-bg));
-            border: 2px dashed var(--border-color);
-            border-radius: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+            height: auto;
             margin: 2rem 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .img-placeholder::before {
-            content: '';
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            background: radial-gradient(circle, rgba(255, 133, 0, 0.2), transparent);
-            border-radius: 50%;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.2); opacity: 0.8; }
-        }
-
-        .img-placeholder p {
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            margin: 0;
-            padding: 2rem;
-            z-index: 1;
-            position: relative;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         /* Alert Boxes */
@@ -531,7 +498,7 @@
                 <li><a href="#parameters">Parameters</a></li>
                 <li><a href="#implementation">Implementation</a></li>
                 <li><a href="#usage">Usage Guide</a></li>
-                <li><a href="#examples">Examples</a></li>
+
                 <li><a href="#disclaimer">Disclaimer</a></li>
             </ul>
         </nav>
@@ -550,10 +517,7 @@
                     <p>The indicator's strength lies in its use of four independent detection methods that cross-validate each other, significantly improving accuracy and reducing false signals.</p>
                 </div>
 
-                <div class="img-placeholder">
-                    <p>📈 Channel Detection in Action<br>
-                    <em>Live chart showing automated channel detection with multiple validation methods</em></p>
-                </div>
+                <img src="Channel_Detection_Indicator.png" alt="Channel Detection in Action" class="main-image">
             </section>
 
             <section id="methods" class="content-section">
@@ -653,19 +617,7 @@
                 </ul>
             </section>
 
-            <section id="examples" class="content-section">
-                <h2>Examples</h2>
-                
-                <div class="img-placeholder">
-                    <p>📊 Uptrend Channel Example<br>
-                    <em>Clear uptrend channel with multiple touch points and breakout signal</em></p>
-                </div>
-                
-                <div class="img-placeholder">
-                    <p>📉 Downtrend Channel Example<br>
-                    <em>Downtrend channel identification with support/resistance levels</em></p>
-                </div>
-            </section>
+
 
             <section id="disclaimer" class="content-section">
                 <div class="risk-disclaimer">

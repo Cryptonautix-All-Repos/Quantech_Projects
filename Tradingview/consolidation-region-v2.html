@@ -326,41 +326,13 @@
             color: var(--text-secondary);
         }
 
-        /* Image Placeholders */
-        .img-placeholder {
+        /* Main Image */
+        .main-image {
             width: 100%;
-            aspect-ratio: 16 / 9;
-            background: linear-gradient(135deg, var(--secondary-dark), var(--card-bg));
-            border: 2px dashed var(--border-color);
-            border-radius: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+            height: auto;
             margin: 2rem 0;
-            position: relative;
-        }
-
-        .img-placeholder::before {
-            content: '';
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            background: radial-gradient(circle, rgba(0, 255, 136, 0.3), transparent);
-            border-radius: 50%;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.2); opacity: 0.8; }
-        }
-
-        .img-placeholder p {
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            z-index: 1;
-            position: relative;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         /* Alert Boxes */
@@ -499,7 +471,6 @@
                 <li><a href="#parameters">Parameters</a></li>
                 <li><a href="#implementation">Implementation</a></li>
                 <li><a href="#usage">Usage Guide</a></li>
-                <li><a href="#examples">Examples</a></li>
                 <li><a href="#disclaimer">Disclaimer</a></li>
             </ul>
         </nav>
@@ -518,10 +489,7 @@
                     <p>This indicator uses cutting-edge mathematical models to identify consolidation zones with unprecedented accuracy, helping traders optimize their range-trading strategies.</p>
                 </div>
 
-                <div class="img-placeholder">
-                    <p>📊 Consolidation Detection in Action<br>
-                    <em>Chart showing EDSMA-based consolidation zones with ATR bands</em></p>
-                </div>
+                <img src="Consolidation_Region_v2.png" alt="Consolidation Detection in Action" class="main-image">
             </section>
 
             <section id="edsma" class="content-section">
@@ -678,19 +646,7 @@
                 </ul>
             </section>
 
-            <section id="examples" class="content-section">
-                <h2>Trading Examples</h2>
-                
-                <div class="img-placeholder">
-                    <p>📈 Perfect Consolidation Zone<br>
-                    <em>Chart showing EDSMA-identified consolidation with successful range trades</em></p>
-                </div>
-                
-                <div class="img-placeholder">
-                    <p>🎯 Breakout Signal<br>
-                    <em>Consolidation breakdown with volume confirmation and follow-through</em></p>
-                </div>
-            </section>
+
 
             <section id="disclaimer" class="content-section">
                 <div class="risk-disclaimer">

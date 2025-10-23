@@ -344,42 +344,16 @@
             color: var(--text-secondary);
         }
 
-        /* Image Placeholders */
-        .img-placeholder {
+        /* Main Image */
+        .main-image {
             width: 100%;
-            aspect-ratio: 16 / 9;
-            background: linear-gradient(135deg, var(--secondary-dark), var(--card-bg));
-            border: 2px dashed var(--border-color);
-            border-radius: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+            height: auto;
             margin: 2rem 0;
-            position: relative;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
-        .img-placeholder::before {
-            content: '';
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            background: radial-gradient(circle, rgba(255, 215, 0, 0.3), transparent);
-            border-radius: 50%;
-            animation: pulse 2s ease-in-out infinite;
-        }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.2); opacity: 0.8; }
-        }
-
-        .img-placeholder p {
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            z-index: 1;
-            position: relative;
-        }
 
         /* Alert Boxes */
         .alert {
@@ -521,7 +495,6 @@
                 <li><a href="#parameters">Parameters</a></li>
                 <li><a href="#implementation">Implementation</a></li>
                 <li><a href="#usage">Usage Guide</a></li>
-                <li><a href="#examples">Examples</a></li>
                 <li><a href="#disclaimer">Disclaimer</a></li>
             </ul>
         </nav>
@@ -540,10 +513,7 @@
                     <p>This indicator excels at identifying moments when institutional traders are active, using volume patterns and price inefficiencies to spot smart money movements.</p>
                 </div>
 
-                <div class="img-placeholder">
-                    <p>📊 Multi-Factor Confluence Analysis<br>
-                    <em>Chart showing EC, FVG, and Volume confluence creating high-probability signals</em></p>
-                </div>
+                <img src="EC_FVG_VOL_V1.png" alt="Multi-Factor Confluence Analysis Chart showing EC, FVG, and Volume confluence creating high-probability signals" class="main-image">
             </section>
 
             <section id="components" class="content-section">
@@ -730,24 +700,7 @@
                 </ul>
             </section>
 
-            <section id="examples" class="content-section">
-                <h2>Trading Examples</h2>
-                
-                <div class="img-placeholder">
-                    <p>🎯 Perfect Confluence Setup<br>
-                    <em>Chart showing all three components aligning for a high-probability trade setup</em></p>
-                </div>
-                
-                <div class="img-placeholder">
-                    <p>📊 Volume Pattern Analysis<br>
-                    <em>Detailed breakdown of volume patterns supporting the engulfing candle formation</em></p>
-                </div>
-                
-                <div class="img-placeholder">
-                    <p>🔄 FVG Interaction Example<br>
-                    <em>Fair Value Gap interaction with engulfing pattern creating institutional signal</em></p>
-                </div>
-            </section>
+            
 
             <section id="disclaimer" class="content-section">
                 <div class="risk-disclaimer">

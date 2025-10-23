@@ -360,42 +360,15 @@
             color: var(--text-secondary);
         }
 
-        /* Image Placeholders */
-        .img-placeholder {
+        .main-image {
             width: 100%;
-            aspect-ratio: 16 / 9;
-            background: linear-gradient(135deg, var(--secondary-dark), var(--card-bg));
-            border: 2px dashed var(--border-color);
-            border-radius: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+            height: auto;
             margin: 2rem 0;
-            position: relative;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
-        .img-placeholder::before {
-            content: '';
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            background: radial-gradient(circle, rgba(255, 105, 180, 0.3), transparent);
-            border-radius: 50%;
-            animation: pulse 2s ease-in-out infinite;
-        }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.2); opacity: 0.8; }
-        }
-
-        .img-placeholder p {
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            z-index: 1;
-            position: relative;
-        }
 
         /* Alert Boxes */
         .alert {
@@ -534,7 +507,6 @@
                 <li><a href="#parameters">Parameters</a></li>
                 <li><a href="#implementation">Implementation</a></li>
                 <li><a href="#usage">Usage Guide</a></li>
-                <li><a href="#examples">Examples</a></li>
                 <li><a href="#disclaimer">Disclaimer</a></li>
             </ul>
         </nav>
@@ -553,10 +525,7 @@
                     <p>This indicator revolutionizes FVG analysis by providing simultaneous multi-timeframe monitoring with dynamic visual filtering and automatic gap mitigation tracking.</p>
                 </div>
 
-                <div class="img-placeholder">
-                    <p>🕰️ Multi-Timeframe FVG Dashboard<br>
-                    <em>Comprehensive view showing FVGs across three timeframes with proximity filtering</em></p>
-                </div>
+<img src="Multi_Timeframe_FVG_v2.png" alt="Multi-Timeframe FVG Dashboard" class="main-image">
             </section>
 
             <section id="timeframes" class="content-section">
@@ -757,24 +726,7 @@
                 </ul>
             </section>
 
-            <section id="examples" class="content-section">
-                <h2>Trading Examples</h2>
-                
-                <div class="img-placeholder">
-                    <p>🎆 Perfect Multi-TF Confluence<br>
-                    <em>Chart showing alignment of HTF, CTF, and LTF gaps creating powerful trading zone</em></p>
-                </div>
-                
-                <div class="img-placeholder">
-                    <p>🔄 Gap Mitigation Sequence<br>
-                    <em>Time-lapse showing systematic gap filling across multiple timeframes</em></p>
-                </div>
-                
-                <div class="img-placeholder">
-                    <p>🎯 Precision Entry Example<br>
-                    <em>LTF gap providing exact entry point within HTF gap context</em></p>
-                </div>
-            </section>
+
 
             <section id="disclaimer" class="content-section">
                 <div class="risk-disclaimer">
