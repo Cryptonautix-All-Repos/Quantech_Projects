@@ -374,41 +374,13 @@
             color: var(--text-secondary);
         }
 
-        /* Image Placeholders */
-        .img-placeholder {
+        /* Main Image */
+        .main-image {
             width: 100%;
-            aspect-ratio: 16 / 9;
-            background: linear-gradient(135deg, var(--secondary-dark), var(--card-bg));
-            border: 2px dashed var(--border-color);
-            border-radius: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+            height: auto;
             margin: 2rem 0;
-            position: relative;
-        }
-
-        .img-placeholder::before {
-            content: '';
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            background: radial-gradient(circle, rgba(46, 213, 115, 0.3), transparent);
-            border-radius: 50%;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.2); opacity: 0.8; }
-        }
-
-        .img-placeholder p {
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            z-index: 1;
-            position: relative;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         /* Alert Boxes */
@@ -551,7 +523,7 @@
                 <li><a href="#parameters">Parameters</a></li>
                 <li><a href="#implementation">Implementation</a></li>
                 <li><a href="#usage">Usage Guide</a></li>
-                <li><a href="#examples">Examples</a></li>
+                
                 <li><a href="#disclaimer">Disclaimer</a></li>
             </ul>
         </nav>
@@ -570,10 +542,7 @@
                     <p>This indicator pioneers the use of multiple decay functions in pivot detection, providing more nuanced and accurate identification of significant market turning points.</p>
                 </div>
 
-                <div class="img-placeholder">
-                    <p>📈 Advanced Pivot Detection System<br>
-                    <em>Chart showing multi-decay pivot detection with trend analysis and buffer zones</em></p>
-                </div>
+                <img src="Pivot_and_Trend_Detection_w_Decay_Methods.png" alt="Advanced Pivot Detection System Chart showing multi-decay pivot detection with trend analysis and buffer zones" class="main-image">
             </section>
 
             <section id="decay-methods" class="content-section">
@@ -792,24 +761,7 @@
                 </ul>
             </section>
 
-            <section id="examples" class="content-section">
-                <h2>Trading Examples</h2>
-                
-                <div class="img-placeholder">
-                    <p>🎯 Perfect Pivot Reversal<br>
-                    <em>Chart showing high-confidence pivot with all decay methods confirming reversal</em></p>
-                </div>
-                
-                <div class="img-placeholder">
-                    <p>🔄 Trend Continuation Signal<br>
-                    <em>Low-confidence pivot indicating trend continuation with proper entry timing</em></p>
-                </div>
-                
-                <div class="img-placeholder">
-                    <p>⚙️ Method Comparison Analysis<br>
-                    <em>Side-by-side comparison showing how different decay methods identify pivot points</em></p>
-                </div>
-            </section>
+            
 
             <section id="disclaimer" class="content-section">
                 <div class="risk-disclaimer">
