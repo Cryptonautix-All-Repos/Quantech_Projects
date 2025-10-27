@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="The RSI Engine v2.1 - Advanced Multi-Signal RSI Expert Advisor for MetaTrader 5">
-    <title>The RSI Engine v2.1 - Expert Advisor - Quantech Innovation</title>
+    <meta name="description" content="RSI Confluence Pro v2.1 - Advanced Multi-Signal RSI Expert Advisor for MetaTrader 5">
+    <title>RSI Confluence Pro v2.1 - Expert Advisor - Quantech Innovation</title>
     
     <style>
         :root {
@@ -72,7 +72,7 @@
         .nav-menu {
             display: flex;
             list-style: none;
-            gap: 30px;
+            gap: 15px;
         }
 
         .nav-menu a {
@@ -103,6 +103,50 @@
         .btn-back:hover {
             background: rgba(0, 212, 255, 0.1);
             transform: translateY(-2px);
+        }
+
+        /* Responsive navbar */
+        @media (max-width: 1024px) {
+            .nav-container {
+                padding: 0 20px;
+            }
+            .nav-menu {
+                gap: 10px;
+            }
+            .nav-menu a {
+                font-size: 0.85rem;
+                padding: 6px 8px;
+            }
+            .btn-back {
+                font-size: 0.85rem;
+                padding: 8px 14px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+                width: 100%;
+            }
+            .nav-menu a {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+            .btn-back {
+                align-self: center;
+                font-size: 0.85rem;
+                padding: 8px 16px;
+            }
+            .nav-logo {
+                text-align: center;
+            }
         }
 
         .hero {
@@ -138,6 +182,7 @@
             display: flex;
             justify-content: center;
             gap: 15px;
+            margin-top: 20px;
             margin-bottom: 30px;
             flex-wrap: wrap;
         }
@@ -1406,7 +1451,9 @@
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <span class="logo-text">Quantech Innovation</span>
+                <a href="https://portfolio.quantechinnovation.com/" class="logo-link" target="_blank" rel="noopener">
+                    <span class="logo-text">Quantech Innovation</span>
+                </a>
             </div>
             <ul class="nav-menu">
                 <li><a href="#overview">Overview</a></li>
@@ -1419,7 +1466,7 @@
                 <li><a href="#technical">Technical</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
-            <a href="index.html" class="btn-back">← Back to Portfolio</a>
+            <a href="../MetaTrader.html" class="btn-back">← Back to Portfolio</a>
         </div>
     </nav>
 
@@ -1433,7 +1480,7 @@
                 <span class="badge badge-version">v2.1</span>
             </div>
             <h1 class="hero-title">
-                <span class="gradient-text">The RSI Engine</span>
+                <span class="gradient-text">RSI Confluence Pro</span>
             </h1>
             <p class="hero-subtitle">
                 Advanced multi-signal RSI-based Expert Advisor with intelligent divergence detection and sophisticated risk management
@@ -1470,10 +1517,10 @@
                 <div class="overview-main">
                     <h3>What It Does</h3>
                     <p>
-                        The RSI Engine v2.1 is a sophisticated Expert Advisor that combines multiple RSI-based trading signals to identify high-probability entry points in the financial markets. This EA goes beyond simple RSI crossovers by incorporating advanced divergence detection, overbought/oversold reversal patterns, and intelligent confirmation mechanisms.
+                        RSI Confluence Pro v2.1 is a sophisticated Expert Advisor that combines multiple RSI-based trading signals to identify high-probability entry points in the financial markets. This EA goes beyond simple RSI crossovers by incorporating advanced divergence detection, overbought/oversold reversal patterns, and intelligent confirmation mechanisms.
                     </p>
                     <p>
-                        The core philosophy behind The RSI Engine is based on the concept that RSI divergences often precede significant price movements. By combining classical RSI signals with modern divergence analysis, the EA seeks to capture both trending moves and reversal opportunities across various market conditions.
+                        The core philosophy behind RSI Confluence Pro is based on the concept that RSI divergences often precede significant price movements. By combining classical RSI signals with modern divergence analysis, the EA seeks to capture both trending moves and reversal opportunities across various market conditions.
                     </p>
                     <p>
                         This Expert Advisor is particularly effective in ranging markets where RSI oscillates between overbought and oversold levels, as well as during trend continuations when momentum shifts are detected through divergence patterns. The multi-timeframe approach ensures that entries are aligned with the broader market structure.
@@ -2548,7 +2595,7 @@ flowchart TD
                                 <li>Open a chart for your desired symbol</li>
                                 <li>Set the appropriate timeframe (recommended: M15 or H1)</li>
                                 <li>Drag the EA from Navigator onto the chart</li>
-                                <li>Alternatively: Right-click chart → Expert Advisors → The RSI Engine</li>
+                                <li>Alternatively: Right-click chart → Expert Advisors → RSI Confluence Pro</li>
                             </ol>
                             
                             <h4>Enable Algo Trading</h4>
@@ -2629,7 +2676,7 @@ flowchart TD
                             <h4>Strategy Tester</h4>
                             <ol>
                                 <li>Open Strategy Tester (View → Strategy Tester or Ctrl+R)</li>
-                                <li>Select "The RSI Engine v2.1" from the dropdown</li>
+                                <li>Select "RSI Confluence Pro v2.1" from the dropdown</li>
                                 <li>Choose symbol and timeframe</li>
                                 <li>Set date range (at least 1 year recommended)</li>
                                 <li>Select "Every tick" or "1 minute OHLC" mode</li>
@@ -2946,17 +2993,7 @@ flowchart TD
                     </p>
                 </div>
                 
-                <!-- Quick Links -->
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <ul class="footer-links">
-                        <li><a href="index.html">All Strategies</a></li>
-                        <li><a href="#overview">Overview</a></li>
-                        <li><a href="#parameters">Parameters</a></li>
-                        <li><a href="#performance">Performance</a></li>
-                        <li><a href="#usage">Usage Guide</a></li>
-                    </ul>
-                </div>
+
                 
                 <!-- Contact -->
                 <div class="footer-section">
@@ -2965,7 +3002,7 @@ flowchart TD
                         Have questions or need custom development? We're here to help.
                     </p>
                     <div class="footer-buttons">
-                        <a href="/cdn-cgi/l/email-protection#97f4f8f9e3f6f4e3d7e6e2f6f9e3f2f4fffef9f9f8e1f6e3fef8f9b9f4f8fa" class="footer-btn footer-btn-email">
+                        <a href="mailto:contact@quantechinnovation.com" class="footer-btn footer-btn-email">
                             <span class="btn-icon">✉</span>
                             <span>Send Email</span>
                         </a>
@@ -2981,11 +3018,9 @@ flowchart TD
             <div class="footer-bottom">
                 <div class="footer-divider"></div>
                 <p class="footer-copyright">
-                    &copy; 2024 Quantech Innovation. All rights reserved.
+                    &copy; 2025 Quantech Innovation. All rights reserved.
                 </p>
-                <p class="footer-disclaimer-link">
-                    Trading involves risk. See <a href="#disclaimer">risk disclosure</a> for details.
-                </p>
+
             </div>
         </div>
     </footer>

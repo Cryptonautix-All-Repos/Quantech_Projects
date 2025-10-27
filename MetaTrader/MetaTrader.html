@@ -64,6 +64,21 @@
             </div>
             
             <div class="strategy-grid">
+            <!-- RSI Confluence Pro Card -->
+                <div class="strategy-card" data-strategy="rsi-confluence">
+                    <div class="card-icon">📊</div>
+                    <h3>RSI Confluence Pro</h3>
+                    <p class="card-description">Advanced multi-signal RSI-based Expert Advisor with intelligent divergence detection and sophisticated risk management.</p>
+                    <ul class="key-features">
+                        <li>Multi-signal RSI analysis</li>
+                        <li>Divergence detection</li>
+                        <li>Dynamic risk management</li>
+                        <li>Multiple timeframe support</li>
+                        <li>Real-time notifications</li>
+                    </ul>
+                    <a href="The_RSI_Engine_v2_1/the-rsi-engine-v2-1.html" class="cta-button">Learn More</a>
+                </div>
+
                 <!-- Gold SMA Strategy Card -->
                 <div class="strategy-card" data-strategy="gold-sma">
                     <div class="card-icon">🥇</div>
@@ -138,14 +153,68 @@
         <div class="container">
             <div class="strategy-tabs">
                 <div class="tab-nav">
-                    <button class="tab-btn active" data-tab="gold-sma-details">Gold SMA Strategy</button>
+                <button class="tab-btn active" data-tab="rsi-confluence-details">RSI Confluence Pro</button>
+                    <button class="tab-btn" data-tab="gold-sma-details">Gold SMA Strategy</button>
                     <button class="tab-btn" data-tab="reverse-copier-details">Reverse Copier</button>
                     <button class="tab-btn" data-tab="phantom-bar-details">Phantom Bar EA</button>
                     <button class="tab-btn" data-tab="range-1r-details">Range 1R Bot</button>
                 </div>
 
+                <!-- RSI Confluence Pro Details -->
+                <div class="tab-content active" id="rsi-confluence-details">
+                    <div class="strategy-detail-content">
+                        <h3>RSI Confluence Pro v2.1</h3>
+                        <div class="detail-grid">
+                            <div class="methodology">
+                                <h4>Advanced RSI Analysis</h4>
+                                <p>This sophisticated Expert Advisor combines multiple RSI-based signals with intelligent divergence detection for high-probability trading opportunities. The system analyzes RSI patterns across multiple timeframes to identify confluence zones where various signals align for optimal entry timing.</p>
+
+                                <div class="key-features-detailed">
+                                    <h5>Core Capabilities</h5>
+                                    <ul>
+                                        <li><strong>Multi-Signal RSI:</strong> Combines overbought/oversold levels with momentum analysis</li>
+                                        <li><strong>Divergence Detection:</strong> Identifies bullish/bearish divergences for reversal signals</li>
+                                        <li><strong>Risk Management:</strong> Dynamic stop-loss, take-profit, and trailing stop mechanisms</li>
+                                        <li><strong>Alert System:</strong> Real-time notifications for trade signals and account status</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="technical-specs">
+                                <h4>Technical Specifications</h4>
+                                <div class="specs-grid">
+                                    <div class="spec-item">
+                                        <span class="spec-label">Platform</span>
+                                        <span class="spec-value">MetaTrader 5</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Timeframes</span>
+                                        <span class="spec-value">M1, M5, M15, M30, H1</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Assets</span>
+                                        <span class="spec-value">All Major Pairs</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Min Deposit</span>
+                                        <span class="spec-value">$1,000</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Risk Management</span>
+                                        <span class="spec-value">Dynamic</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Execution</span>
+                                        <span class="spec-value">OnTick</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Gold SMA Strategy Details -->
-                <div class="tab-content active" id="gold-sma-details">
+                <div class="tab-content" id="gold-sma-details">
                     <div class="strategy-detail-content">
                         <h3>Gold SMA Crossover Strategy</h3>
                         <div class="detail-grid">
