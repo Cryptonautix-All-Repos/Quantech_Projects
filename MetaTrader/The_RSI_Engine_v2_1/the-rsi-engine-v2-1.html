@@ -1,0 +1,3088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The RSI Engine v2.1 - Advanced Multi-Signal RSI Expert Advisor for MetaTrader 5">
+    <title>The RSI Engine v2.1 - Expert Advisor - Quantech Innovation</title>
+    
+    <style>
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #151932;
+            --accent-cyan: #00d4ff;
+            --accent-purple: #7b2cbf;
+            --success: #00ff88;
+            --danger: #ff0055;
+            --warning: #ffaa00;
+            --text-primary: #ffffff;
+            --text-secondary: #a8b3cf;
+            --text-tertiary: #7b7b8f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+            padding: 15px 0;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.hidden {
+            transform: translateY(-100%);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo .logo-text {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-menu a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .nav-menu a:hover {
+            color: var(--accent-cyan);
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .btn-back {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            background: rgba(0, 212, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding: 120px 0 80px;
+        }
+
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(123, 44, 191, 0.1) 0%, transparent 50%);
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .badge-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-platform {
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .badge-type {
+            background: rgba(123, 44, 191, 0.2);
+            border: 1px solid var(--accent-purple);
+            color: var(--accent-purple);
+        }
+
+        .badge-version {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple), var(--success));
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientAnimation 4s ease-in-out infinite;
+        }
+
+        @keyframes gradientAnimation {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: 50px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin: 50px 0;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 16px;
+            padding: 25px 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-cta {
+            margin-top: 40px;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 35px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 12px;
+            color: #000;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .section {
+            padding: 80px 0;
+        }
+
+        .section-overview {
+            background: var(--bg-primary);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+
+        .overview-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 60px;
+            margin-top: 50px;
+        }
+
+        .overview-main h3 {
+            color: var(--accent-cyan);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .overview-main p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .overview-main ul {
+            color: var(--text-secondary);
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .overview-highlights h3 {
+            color: var(--accent-cyan);
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+        }
+
+        .highlight-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .highlight-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .highlight-card:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-3px);
+        }
+
+        .highlight-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .highlight-card h4 {
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .highlight-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .section-methodology {
+            background: var(--bg-secondary);
+        }
+
+        .methodology-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .methodology-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .methodology-card:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            background: rgba(0, 212, 255, 0.1);
+            padding: 20px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .card-header .icon {
+            font-size: 1.5rem;
+        }
+
+        .card-header h3 {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .card-content {
+            padding: 25px;
+        }
+
+        .card-content h4 {
+            color: var(--accent-cyan);
+            margin-bottom: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .card-content p {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .card-content ul {
+            color: var(--text-secondary);
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .card-content ul li {
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+
+        .section-diagrams {
+            background: var(--bg-primary);
+            padding: 80px 0;
+        }
+
+        .diagram-container {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 60px;
+        }
+
+        .diagram-container:last-child {
+            margin-bottom: 0;
+        }
+
+        .diagram-title {
+            color: var(--accent-cyan);
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .diagram-description {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .mermaid {
+            background: rgba(10, 14, 39, 0.5);
+            border-radius: 12px;
+            padding: 30px;
+            overflow-x: auto;
+        }
+
+        .section-features {
+            background: var(--bg-secondary);
+            padding: 80px 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .icon-emoji {
+            font-size: 2.5rem;
+        }
+
+        .feature-title {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.7;
+            text-align: center;
+        }
+
+        .feature-specs {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-specs li {
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+            font-size: 0.9rem;
+        }
+
+        .feature-specs li::before {
+            content: "▸";
+            color: var(--accent-cyan);
+            position: absolute;
+            left: 0;
+        }
+
+        .section-parameters {
+            background: var(--bg-primary);
+            padding: 80px 0;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 40px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .parameter-controls {
+            margin-bottom: 40px;
+        }
+
+        .param-search {
+            width: 100%;
+            max-width: 500px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .param-search:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .param-search::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .param-filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-color: transparent;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .parameters-table-container {
+            overflow-x: auto;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .parameters-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        .parameters-table thead {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .parameters-table th {
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: #ffffff;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .parameters-table tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background 0.3s ease;
+        }
+
+        .parameters-table tbody tr:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .parameters-table td {
+            padding: 15px 20px;
+            color: var(--text-secondary);
+        }
+
+        .param-name code {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent-cyan);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .param-type {
+            color: var(--accent-purple);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+        }
+
+        .param-default {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .param-range {
+            color: var(--warning);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+            margin-left: 5px;
+        }
+
+        .copy-btn:hover {
+            opacity: 1;
+        }
+
+        .param-category .badge {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-trading {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--accent-cyan);
+        }
+
+        .badge-risk {
+            background: rgba(255, 170, 0, 0.2);
+            color: var(--warning);
+        }
+
+        .badge-indicator {
+            background: rgba(123, 44, 191, 0.2);
+            color: var(--accent-purple);
+        }
+
+        .badge-advanced {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--success);
+        }
+
+        .param-categories-info {
+            margin-top: 40px;
+        }
+
+        .param-categories-info h3 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .category-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .category-card .badge {
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .category-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .performance-section {
+            background: var(--bg-secondary);
+            padding: 80px 0;
+        }
+
+        .performance-placeholder {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px dashed rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .placeholder-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .placeholder-content h3 {
+            color: var(--accent-cyan);
+            margin-bottom: 10px;
+        }
+
+        .placeholder-content p {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .suggested-metrics {
+            text-align: left;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 212, 255, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-cyan);
+        }
+
+        .suggested-metrics h4 {
+            color: var(--accent-cyan);
+            margin-bottom: 15px;
+        }
+
+        .suggested-metrics ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .suggested-metrics li {
+            padding: 8px 0;
+            color: var(--text-secondary);
+        }
+
+        .suggested-metrics strong {
+            color: var(--text-primary);
+        }
+
+        .performance-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .performance-table thead {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+        }
+
+        .performance-table th {
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: #ffffff;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .performance-table tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background 0.3s ease;
+        }
+
+        .performance-table tbody tr:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .performance-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .performance-table td {
+            padding: 15px 20px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .performance-table td:first-child {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .performance-table td:last-child {
+            text-align: right;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        .value-positive {
+            color: var(--success) !important;
+        }
+
+        .value-negative {
+            color: var(--danger) !important;
+        }
+
+        .value-neutral {
+            color: var(--accent-cyan) !important;
+        }
+
+        .section-usage {
+            background: var(--bg-primary);
+            padding: 80px 0;
+        }
+
+        .usage-timeline {
+            position: relative;
+            margin-top: 50px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .timeline-marker {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #000;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .timeline-item:not(:last-child) .timeline-marker::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 50px;
+            background: linear-gradient(to bottom, var(--accent-cyan), var(--accent-purple));
+        }
+
+        .timeline-content {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: 12px;
+            padding: 30px;
+        }
+
+        .timeline-content h3 {
+            color: var(--accent-cyan);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .step-details h4 {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            margin: 20px 0 10px;
+        }
+
+        .step-details p {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .step-details ol, .step-details ul {
+            color: var(--text-secondary);
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .step-details li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-cyan);
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .settings-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .settings-table th, .settings-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .settings-table th {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .settings-table td {
+            color: var(--text-secondary);
+        }
+
+        .checklist {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .checklist label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+
+        .checklist input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-cyan);
+        }
+
+        .warning-box {
+            background: rgba(255, 170, 0, 0.1);
+            border: 1px solid var(--warning);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .warning-box h4 {
+            color: var(--warning);
+            margin-bottom: 15px;
+        }
+
+        .warning-box ul {
+            color: var(--text-secondary);
+            margin-left: 20px;
+        }
+
+        .warning-box li {
+            margin-bottom: 8px;
+        }
+
+        .section-technical {
+            background: var(--bg-secondary);
+            padding: 80px 0;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .spec-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .spec-card:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-3px);
+        }
+
+        .spec-card h3 {
+            color: var(--accent-cyan);
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .spec-card-wide {
+            grid-column: 1 / -1;
+        }
+
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .spec-table tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .spec-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .spec-table td {
+            padding: 12px 0;
+        }
+
+        .spec-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+            width: 40%;
+        }
+
+        .spec-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .features-checklist {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .checklist-column {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .features-checklist label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .features-checklist input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent-cyan);
+        }
+
+        .compatibility-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .compat-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .compat-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .compat-item h4 {
+            color: var(--text-primary);
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .compat-item p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .section-disclaimer {
+            background: linear-gradient(135deg, rgba(255, 0, 85, 0.1), rgba(255, 170, 0, 0.1));
+            padding: 80px 0;
+        }
+
+        .disclaimer-card {
+            background: rgba(10, 14, 39, 0.9);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 0, 85, 0.5);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(255, 0, 85, 0.2);
+        }
+
+        .disclaimer-header {
+            background: linear-gradient(135deg, var(--danger), var(--warning));
+            padding: 30px;
+            text-align: center;
+        }
+
+        .disclaimer-icon {
+            font-size: 4rem;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .disclaimer-header h2 {
+            color: #ffffff;
+            font-size: 2rem;
+            margin: 0;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .disclaimer-content {
+            padding: 40px;
+        }
+
+        .disclaimer-lead {
+            font-size: 1.3rem;
+            color: var(--warning);
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .disclaimer-text p {
+            color: #e0e0e0;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .disclaimer-text h4 {
+            color: var(--danger);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .disclaimer-text ul {
+            color: #a8b3cf;
+            line-height: 1.8;
+            margin-left: 20px;
+        }
+
+        .disclaimer-text ul li {
+            margin-bottom: 10px;
+        }
+
+        .disclaimer-footer {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 0, 85, 0.3);
+            font-style: italic;
+            color: #a8b3cf;
+        }
+
+        .footer {
+            background: linear-gradient(180deg, #0a0e27 0%, #050812 100%);
+            padding: 80px 0 30px;
+            border-top: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1.5fr;
+            gap: 60px;
+            margin-bottom: 50px;
+        }
+
+        .footer-section h4 {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .footer-contact-text {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .footer-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .footer-btn-email {
+            background: linear-gradient(135deg, var(--accent-cyan), #0099cc);
+            color: #000;
+        }
+
+        .footer-btn-email:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
+        }
+
+        .footer-btn-portfolio {
+            background: linear-gradient(135deg, var(--accent-purple), #9d4edd);
+            color: #fff;
+        }
+
+        .footer-btn-portfolio:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(123, 44, 191, 0.4);
+        }
+
+        .btn-icon {
+            font-size: 1.2rem;
+        }
+
+        .footer-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.3), transparent);
+            margin-bottom: 30px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+        }
+
+        .footer-copyright {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .footer-disclaimer-link {
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
+        }
+
+        .footer-disclaimer-link a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+        }
+
+        .footer-disclaimer-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .overview-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .methodology-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .timeline-item {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .specs-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">Quantech Innovation</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#methodology">Methodology</a></li>
+                <li><a href="#logic-flow">Logic Flow</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#parameters">Parameters</a></li>
+                <li><a href="#performance">Performance</a></li>
+                <li><a href="#usage">Usage</a></li>
+                <li><a href="#technical">Technical</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <a href="index.html" class="btn-back">← Back to Portfolio</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-background"></div>
+        <div class="hero-content">
+            <div class="badge-container">
+                <span class="badge badge-platform">MetaTrader 5</span>
+                <span class="badge badge-type">Expert Advisor</span>
+                <span class="badge badge-version">v2.1</span>
+            </div>
+            <h1 class="hero-title">
+                <span class="gradient-text">The RSI Engine</span>
+            </h1>
+            <p class="hero-subtitle">
+                Advanced multi-signal RSI-based Expert Advisor with intelligent divergence detection and sophisticated risk management
+            </p>
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <span class="stat-value">RSI Trading</span>
+                    <span class="stat-label">Strategy Type</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">M1-H1</span>
+                    <span class="stat-label">Timeframes</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">Moderate</span>
+                    <span class="stat-label">Risk Level</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">Multi-Market</span>
+                    <span class="stat-label">Markets</span>
+                </div>
+            </div>
+            <div class="hero-cta">
+                <a href="#overview" class="btn-primary">Explore Details ↓</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Overview Section -->
+    <section id="overview" class="section section-overview">
+        <div class="container">
+            <h2 class="section-title">Overview</h2>
+            <div class="overview-content">
+                <div class="overview-main">
+                    <h3>What It Does</h3>
+                    <p>
+                        The RSI Engine v2.1 is a sophisticated Expert Advisor that combines multiple RSI-based trading signals to identify high-probability entry points in the financial markets. This EA goes beyond simple RSI crossovers by incorporating advanced divergence detection, overbought/oversold reversal patterns, and intelligent confirmation mechanisms.
+                    </p>
+                    <p>
+                        The core philosophy behind The RSI Engine is based on the concept that RSI divergences often precede significant price movements. By combining classical RSI signals with modern divergence analysis, the EA seeks to capture both trending moves and reversal opportunities across various market conditions.
+                    </p>
+                    <p>
+                        This Expert Advisor is particularly effective in ranging markets where RSI oscillates between overbought and oversold levels, as well as during trend continuations when momentum shifts are detected through divergence patterns. The multi-timeframe approach ensures that entries are aligned with the broader market structure.
+                    </p>
+                    <ul>
+                        <li>Combines multiple RSI-based signals for enhanced accuracy</li>
+                        <li>Advanced bullish and bearish divergence detection</li>
+                        <li>Intelligent risk management with dynamic position sizing</li>
+                        <li>Adaptable to various market conditions and timeframes</li>
+                    </ul>
+                </div>
+                <div class="overview-highlights">
+                    <h3>Key Highlights</h3>
+                    <div class="highlight-grid">
+                        <div class="highlight-card">
+                            <span class="highlight-icon">🎯</span>
+                            <h4>Precision</h4>
+                            <p>Multi-signal confirmation system reduces false signals and improves entry accuracy through sophisticated filtering mechanisms.</p>
+                        </div>
+                        <div class="highlight-card">
+                            <span class="highlight-icon">⚡</span>
+                            <h4>Speed</h4>
+                            <p>Optimized code execution ensures rapid signal detection and order placement, crucial for capturing time-sensitive opportunities.</p>
+                        </div>
+                        <div class="highlight-card">
+                            <span class="highlight-icon">🛡️</span>
+                            <h4>Protection</h4>
+                            <p>Comprehensive risk management includes daily limits, position sizing, trailing stops, and emergency exit mechanisms.</p>
+                        </div>
+                        <div class="highlight-card">
+                            <span class="highlight-icon">📊</span>
+                            <h4>Analysis</h4>
+                            <p>Real-time market analysis with RSI divergence detection, overbought/oversold monitoring, and centerline confirmations.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Methodology Section -->
+    <section id="methodology" class="section section-methodology">
+        <div class="container">
+            <h2 class="section-title">Methodology & Core Logic</h2>
+            
+            <div class="methodology-grid">
+                <!-- Entry Logic -->
+                <div class="methodology-card">
+                    <div class="card-header">
+                        <span class="icon">🟢</span>
+                        <h3>Entry Strategy</h3>
+                    </div>
+                    <div class="card-content">
+                        <h4>Signal Generation</h4>
+                        <p>The EA employs a sophisticated multi-signal approach combining RSI divergence detection with overbought/oversold reversal patterns. Entry signals are generated when RSI shows bullish or bearish divergence, confirmed by price action patterns.</p>
+                        
+                        <h4>Confirmation Methods</h4>
+                        <ul>
+                            <li>RSI centerline crossover confirmation (50 level)</li>
+                            <li>Multi-timeframe trend alignment</li>
+                            <li>Volume and volatility filters</li>
+                            <li>Market session validation</li>
+                        </ul>
+                        
+                        <h4>Filtering Mechanism</h4>
+                        <p>All signals pass through multiple validation layers including daily limits, trading hours filters, news event restrictions, and margin availability checks before execution.</p>
+                    </div>
+                </div>
+                
+                <!-- Exit Logic -->
+                <div class="methodology-card">
+                    <div class="card-header">
+                        <span class="icon">🔴</span>
+                        <h3>Exit Strategy</h3>
+                    </div>
+                    <div class="card-content">
+                        <h4>Profit Taking</h4>
+                        <p>Fixed take profit targets based on calculated risk-reward ratios. The EA automatically closes positions when predetermined profit levels are reached, ensuring systematic profit capture.</p>
+                        
+                        <h4>Loss Limitation</h4>
+                        <p>Strict stop loss management with ATR-based or fixed-point stop losses. Positions are automatically closed when adverse price movements exceed acceptable risk parameters.</p>
+                        
+                        <h4>Trailing Mechanism</h4>
+                        <p>Intelligent trailing stop system that activates only after positions reach specified profit thresholds. The trailing distance adapts to market volatility to prevent premature exits while protecting gains.</p>
+                    </div>
+                </div>
+                
+                <!-- Risk Management -->
+                <div class="methodology-card">
+                    <div class="card-header">
+                        <span class="icon">🛡️</span>
+                        <h3>Risk Management</h3>
+                    </div>
+                    <div class="card-content">
+                        <h4>Position Sizing</h4>
+                        <p>Dynamic lot size calculation based on account equity and specified risk percentage. When risk management is enabled, position sizes automatically adjust to maintain consistent risk exposure per trade.</p>
+                        
+                        <h4>Risk Per Trade</h4>
+                        <p>Configurable risk percentage (default 1-2%) ensures that no single trade can significantly impact account balance. Advanced position sizing algorithms calculate optimal lot sizes based on stop loss distance.</p>
+                        
+                        <h4>Account Protection</h4>
+                        <p>Daily profit and loss limits prevent excessive risk-taking. The EA automatically stops trading when daily targets are reached, protecting accumulated gains and limiting daily losses.</p>
+                    </div>
+                </div>
+                
+                <!-- Additional Logic -->
+                <div class="methodology-card">
+                    <div class="card-header">
+                        <span class="icon">⚙️</span>
+                        <h3>Advanced Features</h3>
+                    </div>
+                    <div class="card-content">
+                        <h4>Multi-Timeframe Analysis</h4>
+                        <p>While primarily operating on the chart timeframe, the EA can be configured to consider higher timeframe trends for enhanced signal quality and reduced false signals.</p>
+                        
+                        <h4>Market Condition Filters</h4>
+                        <p>Built-in filters for trading hours, news events, and market volatility ensure optimal entry timing and reduced execution during unfavorable market conditions.</p>
+                        
+                        <h4>Special Mechanisms</h4>
+                        <p>RSI level-based exits, session-based trading windows, emergency close functionality, and comprehensive logging system for performance tracking and analysis.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mermaid Diagrams Section -->
+    <section id="logic-flow" class="section-diagrams">
+        <div class="container">
+            <h2 class="section-title">Logic Flow Diagrams</h2>
+            <p class="section-subtitle">Visual representation of the trading system's decision-making process</p>
+            
+            <!-- DIAGRAM 1: Overall Trading Logic -->
+            <div class="diagram-container">
+                <h3 class="diagram-title">Complete Trading Logic Flow</h3>
+                <p class="diagram-description">This flowchart shows the entire decision-making process from EA initialization to trade execution and management.</p>
+                <div class="mermaid">
+flowchart TD
+    Start([EA Initialization]) --> Init{Initialize<br/>Successfully?}
+    Init -->|No| Error[Display Error<br/>& Exit]
+    Init -->|Yes| CheckMarket{Market<br/>Open?}
+    
+    CheckMarket -->|No| Wait1[Wait for<br/>Market Open]
+    Wait1 --> CheckMarket
+    CheckMarket -->|Yes| CheckSession{Within Trading<br/>Hours?}
+    
+    CheckSession -->|No| Wait2[Wait Outside<br/>Session]
+    Wait2 --> CheckSession
+    CheckSession -->|Yes| CheckNews{News Event<br/>Nearby?}
+    
+    CheckNews -->|Yes| Wait3[Wait for News<br/>to Pass]
+    Wait3 --> CheckNews
+    CheckNews -->|No| CheckExisting{Existing<br/>Positions?}
+    
+    CheckExisting -->|Yes| ManagePos[Manage Existing<br/>Positions]
+    ManagePos --> CheckExit{Exit Signal<br/>or Target?}
+    
+    CheckExit -->|SL Hit| CloseLoss[Close Position<br/>with Loss]
+    CheckExit -->|TP Hit| CloseProfit[Close Position<br/>with Profit]
+    CheckExit -->|Trailing| AdjustSL[Adjust Trailing<br/>Stop Loss]
+    CheckExit -->|Continue| CheckExisting
+    
+    CheckExisting -->|No| MaxPos{Max Positions<br/>Reached?}
+    MaxPos -->|Yes| CheckExisting
+    MaxPos -->|No| ScanSignal[Scan for<br/>Entry Signals]
+    
+    ScanSignal --> CheckRSILevel{RSI in<br/>Valid Range?}
+    CheckRSILevel -->|No| CheckExisting
+    CheckRSILevel -->|Yes| CheckDivergence{Divergence<br/>Detected?}
+    
+    CheckDivergence -->|Bullish| CheckPriceLow{Price Makes<br/>Lower Low?}
+    CheckDivergence -->|Bearish| CheckPriceHigh{Price Makes<br/>Higher High?}
+    CheckDivergence -->|No| CheckReversal{Reversal<br/>Signal?}
+    
+    CheckPriceLow -->|Yes| CheckRSIBull{RSI Makes<br/>Higher Low?}
+    CheckPriceHigh -->|Yes| CheckRSIBear{RSI Makes<br/>Lower High?}
+    CheckReversal -->|No| CheckExisting
+    
+    CheckRSIBull -->|Yes| CheckConfirm{Centerline<br/>Confirmation?}
+    CheckRSIBear -->|Yes| CheckConfirm
+    
+    CheckReversal -->|Yes| CheckRSIChange{RSI Crosses<br/>50 Level?}
+    CheckRSIChange -->|Yes| CheckConfirm
+    CheckRSIChange -->|No| CheckExisting
+    
+    CheckConfirm -->|No| CheckExisting
+    CheckConfirm -->|Yes| CheckRisk{Risk<br/>Acceptable?}
+    
+    CheckRisk -->|No| CheckExisting
+    CheckRisk -->|Yes| CheckMargin{Sufficient<br/>Margin?}
+    
+    CheckMargin -->|No| CheckExisting
+    CheckMargin -->|Yes| CalcSize[Calculate<br/>Position Size]
+    
+    CalcSize --> SendOrder[Send Market<br/>Order]
+    SendOrder --> OrderSuccess{Order<br/>Successful?}
+    OrderSuccess -->|No| LogError[Log Error]
+    OrderSuccess -->|Yes| SetSLTP[Set Stop Loss<br/>& Take Profit]
+    
+    SetSLTP --> SendAlert[Send Alert/<br/>Notification]
+    LogError --> CheckExisting
+    SendAlert --> CheckExisting
+    
+    CloseLoss --> UpdateStats[Update<br/>Statistics]
+    CloseProfit --> UpdateStats
+    AdjustSL --> CheckExisting
+    UpdateStats --> CheckExisting
+    
+    Error --> End([EA Stopped])
+    
+    style Start fill:#00d4ff,stroke:#00d4ff,stroke-width:3px,color:#000
+    style SendOrder fill:#00ff88,stroke:#00ff88,stroke-width:3px,color:#000
+    style CloseLoss fill:#ff0055,stroke:#ff0055,stroke-width:2px,color:#fff
+    style CloseProfit fill:#00ff88,stroke:#00ff88,stroke-width:2px,color:#000
+    style Error fill:#ff0055,stroke:#ff0055,stroke-width:2px,color:#fff
+    style End fill:#7b2cbf,stroke:#7b2cbf,stroke-width:3px,color:#fff
+    
+    style CheckRSILevel fill:#151932,stroke:#00d4ff,stroke-width:2px
+    style CheckDivergence fill:#151932,stroke:#00d4ff,stroke-width:2px
+    style CheckReversal fill:#151932,stroke:#00d4ff,stroke-width:2px
+    style CheckRisk fill:#151932,stroke:#ffaa00,stroke-width:2px
+    style CheckMargin fill:#151932,stroke:#ffaa00,stroke-width:2px
+                </div>
+            </div>
+            
+            <!-- DIAGRAM 2: Entry Signal Detection -->
+            <div class="diagram-container">
+                <h3 class="diagram-title">RSI Signal Detection Process</h3>
+                <p class="diagram-description">Detailed breakdown of how RSI-based entry signals are identified and validated.</p>
+                <div class="mermaid">
+flowchart LR
+    Start([New Candle]) --> GetData[Fetch RSI<br/>Indicator Data]
+    GetData --> CheckOscillation{RSI in<br/>Oscillation Range?}
+    
+    CheckOscillation -->|No| NoSignal[No Signal<br/>Detected]
+    CheckOscillation -->|Yes| CheckDiv{Divergence<br/>Enabled?}
+    
+    CheckDiv -->|Yes| AnalyzeDiv[Analyze Price vs<br/>RSI Divergence]
+    CheckDiv -->|No| CheckRev{Reversal<br/>Enabled?}
+    
+    AnalyzeDiv --> DivType{Divergence<br/>Type?}
+    DivType -->|Bullish| CheckBull[Bullish Divergence<br/>Check]
+    DivType -->|Bearish| CheckBear[Bearish Divergence<br/>Check]
+    
+    CheckBull --> PriceLower{Price Makes<br/>Lower Lows?}
+    CheckBear --> PriceHigher{Price Makes<br/>Higher Highs?}
+    
+    PriceLower -->|Yes| RSIHigher{RSI Makes<br/>Higher Lows?}
+    PriceHigher -->|Yes| RSILower{RSI Makes<br/>Lower Highs?}
+    
+    PriceLower -->|No| CheckRev
+    PriceHigher -->|No| CheckRev
+    RSIHigher -->|Yes| DivSignal([Divergence<br/>Signal Found])
+    RSILower -->|Yes| DivSignal
+    
+    CheckRev -->|Yes| ReversalCheck[Check Overbought/<br/>Oversold Conditions]
+    CheckRev -->|No| NoSignal
+    
+    ReversalCheck --> OBOSCheck{OB/OS<br/>Reversal?}
+    OBOSCheck -->|Bullish| RSIExitOS{RSI Exits<br/>Oversold?}
+    OBOSCheck -->|Bearish| RSIExitOB{RSI Exits<br/>Overbought?}
+    
+    RSIExitOS -->|Yes| CenterlineCheck{Crosses<br/>Centerline?}
+    RSIExitOB -->|Yes| CenterlineCheck
+    
+    CenterlineCheck -->|Yes| RevSignal([Reversal<br/>Signal Found])
+    CenterlineCheck -->|No| NoSignal
+    
+    DivSignal --> Confirmation{Additional<br/>Confirmation?}
+    RevSignal --> Confirmation
+    NoSignal --> End([End])
+    
+    Confirmation -->|Yes| ConfirmChecks[Validate Signals]
+    Confirmation -->|No| ValidSignal([Valid Signal<br/>Confirmed])
+    
+    ConfirmChecks --> Filter1{Trend<br/>Alignment?}
+    ConfirmChecks --> Filter2{Volume<br/>Confirmation?}
+    ConfirmChecks --> Filter3{Timeframe<br/>Agreement?}
+    
+    Filter1 -->|Yes| ValidSignal
+    Filter2 -->|Yes| ValidSignal
+    Filter3 -->|Yes| ValidSignal
+    
+    Filter1 -->|No| Reject[Reject Signal]
+    Filter2 -->|No| Reject
+    Filter3 -->|No| Reject
+    
+    ValidSignal --> DetermineSide{Long or<br/>Short?}
+    DetermineSide -->|Long| BuySignal([Buy Signal])
+    DetermineSide -->|Short| SellSignal([Sell Signal])
+    
+    Reject --> End
+    
+    style Start fill:#00d4ff,stroke:#00d4ff,stroke-width:2px,color:#000
+    style DivSignal fill:#00ff88,stroke:#00ff88,stroke-width:3px,color:#000
+    style RevSignal fill:#00ff88,stroke:#00ff88,stroke-width:3px,color:#000
+    style BuySignal fill:#00ff88,stroke:#00ff88,stroke-width:3px,color:#000
+    style SellSignal fill:#ff0055,stroke:#ff0055,stroke-width:3px,color:#fff
+    style NoSignal fill:#7b2cbf,stroke:#7b2cbf,stroke-width:2px,color:#fff
+    style End fill:#7b2cbf,stroke:#7b2cbf,stroke-width:2px,color:#fff
+                </div>
+            </div>
+            
+            <!-- DIAGRAM 3: Exit Strategy -->
+            <div class="diagram-container">
+                <h3 class="diagram-title">Exit Strategy & Position Management</h3>
+                <p class="diagram-description">How open positions are monitored and closed using RSI levels and trailing stops.</p>
+                <div class="mermaid">
+flowchart TD
+    Start([Position Open]) --> Monitor[Monitor Position<br/>Status]
+    
+    Monitor --> CheckSL{Stop Loss<br/>Hit?}
+    CheckSL -->|Yes| CloseSL[Close at<br/>Stop Loss]
+    CheckSL -->|No| CheckTP{Take Profit<br/>Hit?}
+    
+    CheckTP -->|Yes| CloseTP[Close at<br/>Take Profit]
+    CheckTP -->|No| CheckRSIExit{RSI Exit<br/>Enabled?}
+    
+    CheckRSIExit -->|No| CheckTrail{Trailing Stop<br/>Enabled?}
+    CheckRSIExit -->|Yes| CheckCurrentRSI[Get Current<br/>RSI Value]
+    
+    CheckCurrentRSI --> PosType{Position<br/>Type?}
+    PosType -->|Long| CheckRSIOB{RSI >=<br/>Overbought?}
+    PosType -->|Short| CheckRSIOS{RSI <=<br/>Oversold?}
+    
+    CheckRSIOB -->|Yes| CloseRSI[Close by RSI<br/>Overbought]
+    CheckRSIOS -->|Yes| CloseRSI[Close by RSI<br/>Oversold]
+    
+    CheckRSIOB -->|No| CheckTrail
+    CheckRSIOS -->|No| CheckTrail
+    CheckRSIExit -->|No| CheckTrail
+    
+    CheckTrail -->|No| CheckTime{Max Time<br/>in Trade?}
+    CheckTrail -->|Yes| CheckTrigger{Profit ><br/>Trigger?}
+    
+    CheckTrigger -->|No| CheckTime
+    CheckTrigger -->|Yes| CalculateTrail[Calculate New<br/>Trailing Stop]
+    
+    CalculateTrail --> UpdateSL[Update Stop Loss<br/>to Trailing Level]
+    UpdateSL --> CheckTime
+    
+    CheckTime -->|Yes| CloseTime[Close by<br/>Time Exit]
+    CheckTime -->|No| CheckSession{Session<br/>Ending?}
+    
+    CheckSession -->|Yes| CloseSession[Close All<br/>Positions]
+    CheckSession -->|No| Monitor
+    
+    CloseSL --> LogLoss[Log Loss<br/>Statistics]
+    CloseTP --> LogWin[Log Win<br/>Statistics]
+    CloseRSI --> LogRSI[Log RSI Exit<br/>Statistics]
+    CloseTime --> LogTime[Log Time Exit<br/>Statistics]
+    CloseSession --> LogSession[Log Session Close<br/>Statistics]
+    
+    LogLoss --> End([Position Closed])
+    LogWin --> End
+    LogRSI --> End
+    LogTime --> End
+    LogSession --> End
+    
+    style Start fill:#00d4ff,stroke:#00d4ff,stroke-width:2px,color:#000
+    style CloseSL fill:#ff0055,stroke:#ff0055,stroke-width:3px,color:#fff
+    style CloseTP fill:#00ff88,stroke:#00ff88,stroke-width:3px,color:#000
+    style CloseRSI fill:#ffaa00,stroke:#ffaa00,stroke-width:3px,color:#000
+    style CloseTime fill:#7b2cbf,stroke:#7b2cbf,stroke-width:2px,color:#fff
+    style CloseSession fill:#ffaa00,stroke:#ffaa00,stroke-width:2px,color:#000
+    style End fill:#00d4ff,stroke:#00d4ff,stroke-width:2px,color:#000
+                </div>
+            </div>
+            
+            <!-- DIAGRAM 4: Risk Management -->
+            <div class="diagram-container">
+                <h3 class="diagram-title">Risk Management System</h3>
+                <p class="diagram-description">Position sizing and risk calculation workflow with daily limits.</p>
+                <div class="mermaid">
+flowchart TD
+    Start([Entry Signal<br/>Validated]) --> CheckDaily{Daily Limits<br/>Enabled?}
+    
+    CheckDaily -->|Yes| CheckReset{New Day<br/>Reset?}
+    CheckDaily -->|No| GetEquity[Get Account<br/>Equity]
+    
+    CheckReset -->|Yes| ResetLimits[Reset Daily<br/>Limit Flags]
+    CheckReset -->|No| CheckHit{Limits Already<br/>Hit Today?}
+    
+    ResetLimits --> GetEquity
+    CheckHit -->|Yes| DenyTrade([Trade Denied:<br/>Daily Limit])
+    CheckHit -->|No| GetEquity
+    
+    GetEquity --> CheckDrawdown{Current<br/>Drawdown OK?}
+    CheckDrawdown -->|No| DenyDD[Denial: Max<br/>Drawdown]
+    CheckDrawdown -->|Yes| CheckProfit{Check Today's<br/>Profit/Loss}
+    
+    CheckProfit --> ProfitTarget{Profit >=<br/>Target?}
+    CheckProfit --> LossLimit{Loss <=<br/>Limit?}
+    
+    ProfitTarget -->|Yes| DenyProfit([Trade Denied:<br/>Profit Target])
+    LossLimit -->|Yes| DenyLoss([Trade Denied:<br/>Loss Limit])
+    ProfitTarget -->|No| GetRisk[Get Risk<br/>Percentage]
+    LossLimit -->|No| GetRisk
+    
+    GetRisk --> CalcRisk[Calculate Risk<br/>Amount in $]
+    CalcRisk --> GetSL[Get Planned<br/>Stop Loss Pips]
+    GetSL --> CalcPipValue[Calculate<br/>Pip Value]
+    
+    CalcPipValue --> CalcLot[Calculate<br/>Lot Size]
+    CalcLot --> RiskMgmt{Risk Management<br/>Enabled?}
+    
+    RiskMgmt -->|Yes| UseCalc[Use Calculated<br/>Lot Size]
+    RiskMgmt -->|No| UseFixed[Use Fixed<br/>Lot Size]
+    
+    UseCalc --> CheckMin{Size ><br/>Min Lot?}
+    UseFixed --> CheckMin
+    
+    CheckMin -->|No| DenySmall[Denial: Position<br/>Too Small]
+    CheckMin -->|Yes| CheckMax{Size <<br/>Max Lot?}
+    
+    CheckMax -->|No| CapSize[Use Maximum<br/>Lot Size]
+    CheckMax -->|Yes| CheckMargin{Sufficient<br/>Margin?}
+    
+    CapSize --> CheckMargin
+    CheckMargin -->|No| DenyMargin[Denial: Insufficient<br/>Margin]
+    CheckMargin -->|Yes| CheckSpread{Spread<br/>Acceptable?}
+    
+    CheckSpread -->|No| DenySpread[Denial: Spread<br/>Too Wide]
+    CheckSpread -->|Yes| FinalSize[Final Position<br/>Size Approved]
+    
+    FinalSize --> Approved([Size Approved<br/>for Trading])
+    
+    DenyDD --> Denied([Trade Denied])
+    DenyProfit --> Denied
+    DenyLoss --> Denied
+    DenySmall --> Denied
+    DenyMargin --> Denied
+    DenySpread --> Denied
+    
+    style Start fill:#00d4ff,stroke:#00d4ff,stroke-width:2px,color:#000
+    style Approved fill:#00ff88,stroke:#00ff88,stroke-width:3px,color:#000
+    style Denied fill:#ff0055,stroke:#ff0055,stroke-width:3px,color:#fff
+    style DenyDD fill:#ff0055,stroke:#ff0055,stroke-width:2px,color:#fff
+    style DenyProfit fill:#ff0055,stroke:#ff0055,stroke-width:2px,color:#fff
+    style DenyLoss fill:#ff0055,stroke:#ff0055,stroke-width:2px,color:#fff
+    style DenySmall fill:#ff0055,stroke:#ff0055,stroke-width:2px,color:#fff
+    style DenyMargin fill:#ff0055,stroke:#ff0055,stroke-width:2px,color:#fff
+    style DenySpread fill:#ff0055,stroke:#ff0055,stroke-width:2px,color:#fff
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mermaid.js Initialization Script -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                darkMode: true,
+                background: '#0a0e27',
+                primaryColor: '#00d4ff',
+                primaryTextColor: '#ffffff',
+                primaryBorderColor: '#00d4ff',
+                lineColor: '#00d4ff',
+                secondaryColor: '#7b2cbf',
+                tertiaryColor: '#151932',
+                noteBkgColor: '#151932',
+                noteTextColor: '#ffffff',
+                noteBorderColor: '#00d4ff'
+            },
+            flowchart: {
+                curve: 'basis',
+                padding: 15,
+                nodeSpacing: 50,
+                rankSpacing: 50
+            }
+        });
+    </script>
+
+    <!-- Key Features Section -->
+    <section id="features" class="section section-features">
+        <div class="container">
+            <h2 class="section-title">Key Features & Capabilities</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <span class="icon-emoji">🎯</span>
+                    </div>
+                    <h3 class="feature-title">Advanced RSI Divergence Detection</h3>
+                    <p class="feature-description">
+                        Sophisticated algorithm that identifies both bullish and bearish divergences by comparing price action with RSI movements, providing early signals of potential trend reversals.
+                    </p>
+                    <ul class="feature-specs">
+                        <li>Customizable lookback period for divergence analysis</li>
+                        <li>Automatic detection of hidden divergences</li>
+                        <li>Overbought/oversold level validation</li>
+                        <li>Multi-timeframe confirmation capability</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <span class="icon-emoji">⚙️</span>
+                    </div>
+                    <h3 class="feature-title">Multi-Signal Confirmation System</h3>
+                    <p class="feature-description">
+                        Combines multiple RSI signals including divergence, overbought/oversold reversals, and centerline crossovers to validate entry conditions and reduce false signals.
+                    </p>
+                    <ul class="feature-specs">
+                        <li>RSI overbought/oversold reversal detection</li>
+                        <li>Centerline (50 level) confirmation mechanism</li>
+                        <li>Configurable signal combination rules</li>
+                        <li>Noise reduction through multiple filters</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <span class="icon-emoji">🛡️</span>
+                    </div>
+                    <h3 class="feature-title">Dynamic Position Sizing</h3>
+                    <p class="feature-description">
+                        Intelligent position sizing based on account equity and specified risk percentage, automatically adjusting lot sizes to maintain consistent risk exposure across different market conditions.
+                    </p>
+                    <ul class="feature-specs">
+                        <li>Percentage-based risk management</li>
+                        <li>Automatic lot size calculation</li>
+                        <li>Broker volume normalization</li>
+                        <li>Margin requirement validation</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <span class="icon-emoji">📈</span>
+                    </div>
+                    <h3 class="feature-title">Intelligent Trailing Stops</h3>
+                    <p class="feature-description">
+                        Adaptive trailing stop system that activates only after positions reach specified profit thresholds, protecting gains while allowing for optimal profit potential.
+                    </p>
+                    <ul class="feature-specs">
+                        <li>Profit trigger-based activation</li>
+                        <li>Dynamic trailing distance adjustment</li>
+                        <li>One-way trail direction enforcement</li>
+                        <li>Break-even protection mechanism</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <span class="icon-emoji">⏰</span>
+                    </div>
+                    <h3 class="feature-title">Daily Limits & Risk Controls</h3>
+                    <p class="feature-description">
+                        Comprehensive daily profit and loss limits prevent excessive risk-taking and protect accumulated gains, ensuring disciplined trading behavior.
+                    </p>
+                    <ul class="feature-specs">
+                        <li>Configurable daily profit targets</li>
+                        <li>Daily loss limit protection</li>
+                        <li>Automatic trading halt when limits reached</li>
+                        <li>Daily reset mechanism</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <span class="icon-emoji">📊</span>
+                    </div>
+                    <h3 class="feature-title">Advanced Filtering System</h3>
+                    <p class="feature-description">
+                        Multiple filters including trading hours, news events, and market session management ensure optimal entry timing and reduced execution during unfavorable conditions.
+                    </p>
+                    <ul class="feature-specs">
+                        <li>Session-based trading hours</li>
+                        <li>News event time restrictions</li>
+                        <li>Market condition filters</li>
+                        <li>Spread and slippage controls</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Parameters Section -->
+    <section id="parameters" class="section section-parameters">
+        <div class="container">
+            <h2 class="section-title">Input Parameters & Configuration</h2>
+            <p class="section-subtitle">Complete list of all configurable settings with descriptions and recommended ranges</p>
+            
+            <!-- Search/Filter for parameters -->
+            <div class="parameter-controls">
+                <input type="text" id="param-search" class="param-search" placeholder="🔍 Search parameters...">
+                <div class="param-filter-buttons">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="trading">Trading</button>
+                    <button class="filter-btn" data-filter="risk">Risk</button>
+                    <button class="filter-btn" data-filter="indicator">Indicators</button>
+                    <button class="filter-btn" data-filter="advanced">Advanced</button>
+                </div>
+            </div>
+            
+            <!-- Parameters Table -->
+            <div class="parameters-table-container">
+                <table class="parameters-table" id="parameters-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter Name</th>
+                            <th>Type</th>
+                            <th>Default</th>
+                            <th>Range</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-category="trading">
+                            <td class="param-name"><code>InpUseRiskManagement</code></td>
+                            <td class="param-type">bool</td>
+                            <td class="param-default">
+                                false
+                                <button class="copy-btn" onclick="copyToClipboard('false')">📋</button>
+                            </td>
+                            <td class="param-range">true/false</td>
+                            <td class="param-desc">Enable dynamic lot sizing based on account equity and risk percentage.</td>
+                            <td class="param-category"><span class="badge badge-trading">Trading</span></td>
+                        </tr>
+                        <tr data-category="risk">
+                            <td class="param-name"><code>InpRiskPercent</code></td>
+                            <td class="param-type">double</td>
+                            <td class="param-default">
+                                1.0
+                                <button class="copy-btn" onclick="copyToClipboard('1.0')">📋</button>
+                            </td>
+                            <td class="param-range">0.1 - 10.0</td>
+                            <td class="param-desc">Risk percentage of equity per trade when risk management is enabled.</td>
+                            <td class="param-category"><span class="badge badge-risk">Risk</span></td>
+                        </tr>
+                        <tr data-category="trading">
+                            <td class="param-name"><code>InpLots</code></td>
+                            <td class="param-type">double</td>
+                            <td class="param-default">
+                                0.1
+                                <button class="copy-btn" onclick="copyToClipboard('0.1')">📋</button>
+                            </td>
+                            <td class="param-range">0.01 - 100.0</td>
+                            <td class="param-desc">Fixed lot size per trade when risk management is disabled.</td>
+                            <td class="param-category"><span class="badge badge-trading">Trading</span></td>
+                        </tr>
+                        <tr data-category="risk">
+                            <td class="param-name"><code>InpStopLossPoints</code></td>
+                            <td class="param-type">int</td>
+                            <td class="param-default">
+                                300
+                                <button class="copy-btn" onclick="copyToClipboard('300')">📋</button>
+                            </td>
+                            <td class="param-range">10 - 2000</td>
+                            <td class="param-desc">Stop loss distance in points from entry price (required for risk management).</td>
+                            <td class="param-category"><span class="badge badge-risk">Risk</span></td>
+                        </tr>
+                        <tr data-category="risk">
+                            <td class="param-name"><code>InpTakeProfitPoints</code></td>
+                            <td class="param-type">int</td>
+                            <td class="param-default">
+                                300
+                                <button class="copy-btn" onclick="copyToClipboard('300')">📋</button>
+                            </td>
+                            <td class="param-range">10 - 2000</td>
+                            <td class="param-desc">Take profit distance in points from entry price.</td>
+                            <td class="param-category"><span class="badge badge-risk">Risk</span></td>
+                        </tr>
+                        <tr data-category="trading">
+                            <td class="param-name"><code>InpMagicNumber</code></td>
+                            <td class="param-type">ulong</td>
+                            <td class="param-default">
+                                1901
+                                <button class="copy-btn" onclick="copyToClipboard('1901')">📋</button>
+                            </td>
+                            <td class="param-range">1 - 999999</td>
+                            <td class="param-desc">Unique identifier for EA's trades to distinguish from other EAs.</td>
+                            <td class="param-category"><span class="badge badge-trading">Trading</span></td>
+                        </tr>
+                        <tr data-category="advanced">
+                            <td class="param-name"><code>InpUseTrailingStop</code></td>
+                            <td class="param-type">bool</td>
+                            <td class="param-default">
+                                true
+                                <button class="copy-btn" onclick="copyToClipboard('true')">📋</button>
+                            </td>
+                            <td class="param-range">true/false</td>
+                            <td class="param-desc">Enable intelligent trailing stop loss functionality.</td>
+                            <td class="param-category"><span class="badge badge-advanced">Advanced</span></td>
+                        </tr>
+                        <tr data-category="advanced">
+                            <td class="param-name"><code>InpTrailingStopTrigger</code></td>
+                            <td class="param-type">int</td>
+                            <td class="param-default">
+                                3000
+                                <button class="copy-btn" onclick="copyToClipboard('3000')">📋</button>
+                            </td>
+                            <td class="param-range">100 - 10000</td>
+                            <td class="param-desc">Profit in points required to activate trailing stop.</td>
+                            <td class="param-category"><span class="badge badge-advanced">Advanced</span></td>
+                        </tr>
+                        <tr data-category="advanced">
+                            <td class="param-name"><code>InpTrailingStopStep</code></td>
+                            <td class="param-type">int</td>
+                            <td class="param-default">
+                                50
+                                <button class="copy-btn" onclick="copyToClipboard('50')">📋</button>
+                            </td>
+                            <td class="param-range">10 - 500</td>
+                            <td class="param-desc">Trailing distance from current price in points.</td>
+                            <td class="param-category"><span class="badge badge-advanced">Advanced</span></td>
+                        </tr>
+                        <tr data-category="indicator">
+                            <td class="param-name"><code>InpRSI_Period</code></td>
+                            <td class="param-type">int</td>
+                            <td class="param-default">
+                                14
+                                <button class="copy-btn" onclick="copyToClipboard('14')">📋</button>
+                            </td>
+                            <td class="param-range">2 - 50</td>
+                            <td class="param-desc">Period for RSI indicator calculation.</td>
+                            <td class="param-category"><span class="badge badge-indicator">Indicators</span></td>
+                        </tr>
+                        <tr data-category="indicator">
+                            <td class="param-name"><code>InpRSI_Overbought</code></td>
+                            <td class="param-type">int</td>
+                            <td class="param-default">
+                                70
+                                <button class="copy-btn" onclick="copyToClipboard('70')">📋</button>
+                            </td>
+                            <td class="param-range">50 - 90</td>
+                            <td class="param-desc">RSI overbought level threshold.</td>
+                            <td class="param-category"><span class="badge badge-indicator">Indicators</span></td>
+                        </tr>
+                        <tr data-category="indicator">
+                            <td class="param-name"><code>InpRSI_Oversold</code></td>
+                            <td class="param-type">int</td>
+                            <td class="param-default">
+                                30
+                                <button class="copy-btn" onclick="copyToClipboard('30')">📋</button>
+                            </td>
+                            <td class="param-range">10 - 50</td>
+                            <td class="param-desc">RSI oversold level threshold.</td>
+                            <td class="param-category"><span class="badge badge-indicator">Indicators</span></td>
+                        </tr>
+                        <tr data-category="indicator">
+                            <td class="param-name"><code>InpRSI_Centerline</code></td>
+                            <td class="param-type">int</td>
+                            <td class="param-default">
+                                50
+                                <button class="copy-btn" onclick="copyToClipboard('50')">📋</button>
+                            </td>
+                            <td class="param-range">40 - 60</td>
+                            <td class="param-desc">RSI centerline level for confirmation signals.</td>
+                            <td class="param-category"><span class="badge badge-indicator">Indicators</span></td>
+                        </tr>
+                        <tr data-category="advanced">
+                            <td class="param-name"><code>InpUse_Divergence_Signal</code></td>
+                            <td class="param-type">bool</td>
+                            <td class="param-default">
+                                true
+                                <button class="copy-btn" onclick="copyToClipboard('true')">📋</button>
+                            </td>
+                            <td class="param-range">true/false</td>
+                            <td class="param-desc">Use RSI divergence as a primary trading signal.</td>
+                            <td class="param-category"><span class="badge badge-advanced">Advanced</span></td>
+                        </tr>
+                        <tr data-category="advanced">
+                            <td class="param-name"><code>InpUse_OverboughtOversold_Reversal</code></td>
+                            <td class="param-type">bool</td>
+                            <td class="param-default">
+                                true
+                                <button class="copy-btn" onclick="copyToClipboard('true')">📋</button>
+                            </td>
+                            <td class="param-range">true/false</td>
+                            <td class="param-desc">Use overbought/oversold reversal signals as entry triggers.</td>
+                            <td class="param-category"><span class="badge badge-advanced">Advanced</span></td>
+                        </tr>
+                        <tr data-category="advanced">
+                            <td class="param-name"><code>InpUse_Centerline_Confirmation</code></td>
+                            <td class="param-type">bool</td>
+                            <td class="param-default">
+                                true
+                                <button class="copy-btn" onclick="copyToClipboard('true')">📋</button>
+                            </td>
+                            <td class="param-range">true/false</td>
+                            <td class="param-desc">Wait for RSI to cross centerline (50) for entry confirmation.</td>
+                            <td class="param-category"><span class="badge badge-advanced">Advanced</span></td>
+                        </tr>
+                        <tr data-category="advanced">
+                            <td class="param-name"><code>InpUse_RSI_Level_Exit</code></td>
+                            <td class="param-type">bool</td>
+                            <td class="param-default">
+                                false
+                                <button class="copy-btn" onclick="copyToClipboard('false')">📋</button>
+                            </td>
+                            <td class="param-range">true/false</td>
+                            <td class="param-desc">Exit trades when RSI reaches opposite extreme levels.</td>
+                            <td class="param-category"><span class="badge badge-advanced">Advanced</span></td>
+                        </tr>
+                        <tr data-category="advanced">
+                            <td class="param-name"><code>InpDivergence_Lookback_Bars</code></td>
+                            <td class="param-type">int</td>
+                            <td class="param-default">
+                                60
+                                <button class="copy-btn" onclick="copyToClipboard('60')">📋</button>
+                            </td>
+                            <td class="param-range">20 - 200</td>
+                            <td class="param-desc">Number of bars to look back for divergence detection.</td>
+                            <td class="param-category"><span class="badge badge-advanced">Advanced</span></td>
+                        </tr>
+                        <tr data-category="risk">
+                            <td class="param-name"><code>EnableDailyLimits</code></td>
+                            <td class="param-type">bool</td>
+                            <td class="param-default">
+                                true
+                                <button class="copy-btn" onclick="copyToClipboard('true')">📋</button>
+                            </td>
+                            <td class="param-range">true/false</td>
+                            <td class="param-desc">Enable daily profit and loss limit controls.</td>
+                            <td class="param-category"><span class="badge badge-risk">Risk</span></td>
+                        </tr>
+                        <tr data-category="risk">
+                            <td class="param-name"><code>DailyProfitTarget</code></td>
+                            <td class="param-type">double</td>
+                            <td class="param-default">
+                                10000.0
+                                <button class="copy-btn" onclick="copyToClipboard('10000.0')">📋</button>
+                            </td>
+                            <td class="param-range">100 - 100000</td>
+                            <td class="param-desc">Stop trading if daily profit reaches this amount (in account currency).</td>
+                            <td class="param-category"><span class="badge badge-risk">Risk</span></td>
+                        </tr>
+                        <tr data-category="risk">
+                            <td class="param-name"><code>DailyLossLimit</code></td>
+                            <td class="param-type">double</td>
+                            <td class="param-default">
+                                5000.0
+                                <button class="copy-btn" onclick="copyToClipboard('5000.0')">📋</button>
+                            </td>
+                            <td class="param-range">100 - 50000</td>
+                            <td class="param-desc">Stop trading if daily loss reaches this amount (in account currency).</td>
+                            <td class="param-category"><span class="badge badge-risk">Risk</span></td>
+                        </tr>
+                        <tr data-category="advanced">
+                            <td class="param-name"><code>InpUseNewsFilter</code></td>
+                            <td class="param-type">bool</td>
+                            <td class="param-default">
+                                false
+                                <button class="copy-btn" onclick="copyToClipboard('false')">📋</button>
+                            </td>
+                            <td class="param-range">true/false</td>
+                            <td class="param-desc">Enable news event time restrictions.</td>
+                            <td class="param-category"><span class="badge badge-advanced">Advanced</span></td>
+                        </tr>
+                        <tr data-category="advanced">
+                            <td class="param-name"><code>InpNewsTimeHour</code></td>
+                            <td class="param-type">int</td>
+                            <td class="param-default">
+                                15
+                                <button class="copy-btn" onclick="copyToClipboard('15')">📋</button>
+                            </td>
+                            <td class="param-range">0 - 23</td>
+                            <td class="param-desc">News event hour (server time) for filter activation.</td>
+                            <td class="param-category"><span class="badge badge-advanced">Advanced</span></td>
+                        </tr>
+                        <tr data-category="advanced">
+                            <td class="param-name"><code>InpMinutesBeforeNews</code></td>
+                            <td class="param-type">int</td>
+                            <td class="param-default">
+                                10
+                                <button class="copy-btn" onclick="copyToClipboard('10')">📋</button>
+                            </td>
+                            <td class="param-range">0 - 60</td>
+                            <td class="param-desc">Stop trading X minutes BEFORE scheduled news event.</td>
+                            <td class="param-category"><span class="badge badge-advanced">Advanced</span></td>
+                        </tr>
+                        <tr data-category="advanced">
+                            <td class="param-name"><code>InpMinutesAfterNews</code></td>
+                            <td class="param-type">int</td>
+                            <td class="param-default">
+                                10
+                                <button class="copy-btn" onclick="copyToClipboard('10')">📋</button>
+                            </td>
+                            <td class="param-range">0 - 60</td>
+                            <td class="param-desc">Resume trading X minutes AFTER scheduled news event.</td>
+                            <td class="param-category"><span class="badge badge-advanced">Advanced</span></td>
+                        </tr>
+                        <tr data-category="advanced">
+                            <td class="param-name"><code>EnableTimeFilter</code></td>
+                            <td class="param-type">bool</td>
+                            <td class="param-default">
+                                false
+                                <button class="copy-btn" onclick="copyToClipboard('false')">📋</button>
+                            </td>
+                            <td class="param-range">true/false</td>
+                            <td class="param-desc">Enable session-based trading hours control.</td>
+                            <td class="param-category"><span class="badge badge-advanced">Advanced</span></td>
+                        </tr>
+                        <tr data-category="advanced">
+                            <td class="param-name"><code>CloseAtEndTime</code></td>
+                            <td class="param-type">bool</td>
+                            <td class="param-default">
+                                false
+                                <button class="copy-btn" onclick="copyToClipboard('false')">📋</button>
+                            </td>
+                            <td class="param-range">true/false</td>
+                            <td class="param-desc">Close all positions when trading session ends.</td>
+                            <td class="param-category"><span class="badge badge-advanced">Advanced</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Parameter Categories Explanation -->
+            <div class="param-categories-info">
+                <h3>Parameter Categories</h3>
+                <div class="categories-grid">
+                    <div class="category-card">
+                        <span class="badge badge-trading">Trading</span>
+                        <p>Core trading parameters including lot size, order types, and execution settings.</p>
+                    </div>
+                    <div class="category-card">
+                        <span class="badge badge-risk">Risk</span>
+                        <p>Risk management parameters including stop loss, take profit, and position sizing.</p>
+                    </div>
+                    <div class="category-card">
+                        <span class="badge badge-indicator">Indicators</span>
+                        <p>Technical indicator settings such as periods, methods, and applied prices.</p>
+                    </div>
+                    <div class="category-card">
+                        <span class="badge badge-advanced">Advanced</span>
+                        <p>Advanced features including filters, timeframe settings, and optimization options.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Performance Section -->
+    <section id="performance" class="performance-section">
+        <div class="container">
+            <h2 class="section-title">Performance Analytics</h2>
+            <p class="section-subtitle">Comprehensive backtesting and live trading results</p>
+            
+            <!-- PLACEHOLDER FOR PERFORMANCE TABLE -->
+            <div class="performance-placeholder">
+                <div class="placeholder-content">
+                    <div class="placeholder-icon">📊</div>
+                    <h3>Performance Data Placeholder</h3>
+                    <p>Strategy performance metrics will be added here in tabulated form</p>
+                    
+                    <!-- ========================================== -->
+                    <!-- INSERT YOUR PERFORMANCE TABLE BELOW        -->
+                    <!-- ========================================== -->
+                    
+                    <!-- SUGGESTED TABLE STRUCTURE: -->
+                    <!--
+                    <table class="performance-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Total Trades</td>
+                                <td class="value-neutral">247</td>
+                            </tr>
+                            <tr>
+                                <td>Win Rate</td>
+                                <td class="value-positive">68.4%</td>
+                            </tr>
+                            <tr>
+                                <td>Profit Factor</td>
+                                <td class="value-positive">1.87</td>
+                            </tr>
+                            <tr>
+                                <td>Max Drawdown</td>
+                                <td class="value-negative">-12.3%</td>
+                            </tr>
+                            <tr>
+                                <td>Sharpe Ratio</td>
+                                <td class="value-positive">2.14</td>
+                            </tr>
+                            <tr>
+                                <td>Average Win</td>
+                                <td class="value-positive">$450</td>
+                            </tr>
+                            <tr>
+                                <td>Average Loss</td>
+                                <td class="value-negative">-$280</td>
+                            </tr>
+                            <tr>
+                                <td>Largest Win</td>
+                                <td class="value-positive">$1,850</td>
+                            </tr>
+                            <tr>
+                                <td>Largest Loss</td>
+                                <td class="value-negative">-$920</td>
+                            </tr>
+                            <tr>
+                                <td>Average Trade Duration</td>
+                                <td class="value-neutral">4.2 hours</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    -->
+                    
+                    <!-- ========================================== -->
+                    <!-- END OF PERFORMANCE TABLE INSERTION POINT   -->
+                    <!-- ========================================== -->
+                    
+                    <div class="suggested-metrics">
+                        <h4>Suggested Metrics to Include:</h4>
+                        <ul>
+                            <li><strong>Overall Performance:</strong> Total Trades, Winning Trades, Losing Trades, Win Rate</li>
+                            <li><strong>Profitability:</strong> Net Profit, Gross Profit, Gross Loss, Profit Factor</li>
+                            <li><strong>Risk Metrics:</strong> Max Drawdown, Max Drawdown %, Recovery Factor, Sharpe Ratio</li>
+                            <li><strong>Trade Analysis:</strong> Average Win, Average Loss, Largest Win, Largest Loss, Risk/Reward Ratio</li>
+                            <li><strong>Consistency:</strong> Consecutive Wins, Consecutive Losses, Average Trade Duration</li>
+                            <li><strong>Timeframe Data:</strong> Results by month, quarter, or year</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Usage Section -->
+    <section id="usage" class="section section-usage">
+        <div class="container">
+            <h2 class="section-title">Usage & Implementation Guide</h2>
+            
+            <!-- Step-by-step guide with visual timeline -->
+            <div class="usage-timeline">
+                <!-- Step 1: Installation -->
+                <div class="timeline-item">
+                    <div class="timeline-marker">1</div>
+                    <div class="timeline-content">
+                        <h3>Installation</h3>
+                        <div class="step-details">
+                            <h4>File Placement</h4>
+                            <p>Copy the EA file to your MetaTrader 5 installation directory:</p>
+                            <code class="code-block">
+                                C:\Users\[YourUsername]\AppData\Roaming\MetaQuotes\Terminal\[BrokerID]\MQL5\Experts\
+                            </code>
+                            
+                            <h4>Compilation</h4>
+                            <ol>
+                                <li>Open MetaEditor (F4 in MT5)</li>
+                                <li>Locate the EA file in the Navigator</li>
+                                <li>Double-click to open</li>
+                                <li>Click "Compile" button or press F7</li>
+                                <li>Check for any errors in the "Errors" tab</li>
+                            </ol>
+                            
+                            <h4>Refresh Navigator</h4>
+                            <p>Right-click in the Navigator window and select "Refresh" or restart MT5 to see the EA appear in the Expert Advisors list.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 2: Chart Setup -->
+                <div class="timeline-item">
+                    <div class="timeline-marker">2</div>
+                    <div class="timeline-content">
+                        <h3>Chart Setup</h3>
+                        <div class="step-details">
+                            <h4>Attach to Chart</h4>
+                            <ol>
+                                <li>Open a chart for your desired symbol</li>
+                                <li>Set the appropriate timeframe (recommended: M15 or H1)</li>
+                                <li>Drag the EA from Navigator onto the chart</li>
+                                <li>Alternatively: Right-click chart → Expert Advisors → The RSI Engine</li>
+                            </ol>
+                            
+                            <h4>Enable Algo Trading</h4>
+                            <p>Click the "Algo Trading" button in the toolbar (or press Ctrl+E) to enable automated trading. The button should turn green.</p>
+                            
+                            <h4>Verify Attachment</h4>
+                            <p>A smiley face 😊 in the top-right corner indicates the EA is running. If you see a sad face ☹️, check the Expert logs for errors.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Configuration -->
+                <div class="timeline-item">
+                    <div class="timeline-marker">3</div>
+                    <div class="timeline-content">
+                        <h3>Parameter Configuration</h3>
+                        <div class="step-details">
+                            <h4>Access Settings</h4>
+                            <p>Double-click the EA name in the top-left corner of the chart to open the properties dialog.</p>
+                            
+                            <h4>Recommended Settings for Beginners</h4>
+                            <div class="settings-recommendation">
+                                <table class="settings-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Parameter</th>
+                                            <th>Conservative</th>
+                                            <th>Moderate</th>
+                                            <th>Aggressive</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>InpRiskPercent</code></td>
+                                            <td>1.0%</td>
+                                            <td>2.0%</td>
+                                            <td>5.0%</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>InpStopLossPoints</code></td>
+                                            <td>400 pips</td>
+                                            <td>300 pips</td>
+                                            <td>200 pips</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>InpTakeProfitPoints</code></td>
+                                            <td>400 pips</td>
+                                            <td>300 pips</td>
+                                            <td>200 pips</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>InpTrailingStopTrigger</code></td>
+                                            <td>4000 points</td>
+                                            <td>3000 points</td>
+                                            <td>2000 points</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <h4>Symbol-Specific Adjustments</h4>
+                            <ul>
+                                <li><strong>Forex Majors (EUR/USD, GBP/USD):</strong> Use standard pip values (Stop Loss: 300, Take Profit: 300)</li>
+                                <li><strong>Forex Minors & Crosses:</strong> Increase pip values by 20-30% due to higher volatility</li>
+                                <li><strong>Indices (US30, SPX500):</strong> Use point values appropriate for index trading</li>
+                                <li><strong>Commodities (Gold, Oil):</strong> Adjust for commodity-specific volatility patterns</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 4: Optimization -->
+                <div class="timeline-item">
+                    <div class="timeline-marker">4</div>
+                    <div class="timeline-content">
+                        <h3>Optimization & Backtesting</h3>
+                        <div class="step-details">
+                            <h4>Strategy Tester</h4>
+                            <ol>
+                                <li>Open Strategy Tester (View → Strategy Tester or Ctrl+R)</li>
+                                <li>Select "The RSI Engine v2.1" from the dropdown</li>
+                                <li>Choose symbol and timeframe</li>
+                                <li>Set date range (at least 1 year recommended)</li>
+                                <li>Select "Every tick" or "1 minute OHLC" mode</li>
+                                <li>Click "Start" to run backtest</li>
+                            </ol>
+                            
+                            <h4>Optimization Process</h4>
+                            <ol>
+                                <li>Click "Optimization" checkbox in Strategy Tester</li>
+                                <li>Select parameters to optimize (RSI Period, Overbought/Oversold levels)</li>
+                                <li>Set min, max, and step values</li>
+                                <li>Choose optimization criterion (Balance, Profit Factor, Sharpe Ratio)</li>
+                                <li>Run optimization</li>
+                                <li>Analyze results in the "Optimization Results" tab</li>
+                            </ol>
+                            
+                            <h4>Forward Testing</h4>
+                            <p>After backtesting, enable "Forward" checkbox and set a forward testing period (e.g., last 3 months) to validate robustness.</p>
+                            
+                            <div class="warning-box">
+                                <h4>⚠️ Optimization Best Practices</h4>
+                                <ul>
+                                    <li>Don't over-optimize (curve fitting)</li>
+                                    <li>Use walk-forward optimization</li>
+                                    <li>Test on out-of-sample data</li>
+                                    <li>Validate on different symbols/timeframes</li>
+                                    <li>Consider slippage and spread</li>
+                                    <li>Check maximum drawdown carefully</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 5: Live Trading -->
+                <div class="timeline-item">
+                    <div class="timeline-marker">5</div>
+                    <div class="timeline-content">
+                        <h3>Live Trading Deployment</h3>
+                        <div class="step-details">
+                            <h4>Pre-Launch Checklist</h4>
+                            <div class="checklist">
+                                <label><input type="checkbox"> EA tested and optimized on demo account</label>
+                                <label><input type="checkbox"> Parameters validated with conservative settings</label>
+                                <label><input type="checkbox"> Risk settings appropriate for account size</label>
+                                <label><input type="checkbox"> Stable internet connection or VPS setup</label>
+                                <label><input type="checkbox"> Broker allows algo trading</label>
+                                <label><input type="checkbox"> Sufficient account balance for position sizing</label>
+                                <label><input type="checkbox"> Monitoring system in place</label>
+                                <label><input type="checkbox"> Daily limits set appropriately</label>
+                            </div>
+                            
+                            <h4>Monitoring & Maintenance</h4>
+                            <ul>
+                                <li><strong>Daily:</strong> Check for errors in Expert logs and verify EA status</li>
+                                <li><strong>Daily:</strong> Review open positions and recent trade outcomes</li>
+                                <li><strong>Weekly:</strong> Analyze performance metrics and adjust if needed</li>
+                                <li><strong>Weekly:</strong> Review market conditions and parameter relevance</li>
+                                <li><strong>Monthly:</strong> Full performance review and optimization assessment</li>
+                            </ul>
+                            
+                            <h4>Warning Signs to Watch For</h4>
+                            <div class="warning-box">
+                                <ul>
+                                    <li>⚠️ Consecutive losses exceeding normal expectation</li>
+                                    <li>⚠️ Drawdown approaching maximum acceptable level</li>
+                                    <li>⚠️ EA not opening trades when signals should occur</li>
+                                    <li>⚠️ Orders rejected by broker frequently</li>
+                                    <li>⚠️ Significant change in market volatility/conditions</li>
+                                    <li>⚠️ Daily limits being triggered consistently</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Specifications -->
+    <section id="technical" class="section section-technical">
+        <div class="container">
+            <h2 class="section-title">Technical Specifications</h2>
+            
+            <div class="specs-grid">
+                <!-- Platform Info -->
+                <div class="spec-card">
+                    <h3>Platform Requirements</h3>
+                    <table class="spec-table">
+                        <tr>
+                            <td class="spec-label">Platform</td>
+                            <td class="spec-value">MetaTrader 5</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">MQL Version</td>
+                            <td class="spec-value">2.1</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Build</td>
+                            <td class="spec-value">Build 2600+ recommended</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Type</td>
+                            <td class="spec-value">Expert Advisor</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <!-- Trading Specs -->
+                <div class="spec-card">
+                    <h3>Trading Specifications</h3>
+                    <table class="spec-table">
+                        <tr>
+                            <td class="spec-label">Timeframes</td>
+                            <td class="spec-value">M1, M5, M15, M30, H1</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Best Timeframe</td>
+                            <td class="spec-value">M15, H1</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Symbols</td>
+                            <td class="spec-value">All major pairs, indices, commodities</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Execution Mode</td>
+                            <td class="spec-value">OnTick</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <!-- Account Requirements -->
+                <div class="spec-card">
+                    <h3>Account Requirements</h3>
+                    <table class="spec-table">
+                        <tr>
+                            <td class="spec-label">Min Balance</td>
+                            <td class="spec-value">$1,000</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Account Type</td>
+                            <td class="spec-value">Standard, ECN compatible</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Hedging</td>
+                            <td class="spec-value">Not required</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Leverage</td>
+                            <td class="spec-value">1:100 or higher</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <!-- Technical Details -->
+                <div class="spec-card">
+                    <h3>Code Specifications</h3>
+                    <table class="spec-table">
+                        <tr>
+                            <td class="spec-label">Lines of Code</td>
+                            <td class="spec-value">~675</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Custom Functions</td>
+                            <td class="spec-value">15</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Indicator Handles</td>
+                            <td class="spec-value">1 (RSI)</td>
+                        </tr>
+                        <tr>
+                            <td class="spec-label">Complexity</td>
+                            <td class="spec-value">Intermediate</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <!-- Features Checklist -->
+                <div class="spec-card spec-card-wide">
+                    <h3>Features Checklist</h3>
+                    <div class="features-checklist">
+                        <div class="checklist-column">
+                            <label><input type="checkbox" checked disabled> Money Management</label>
+                            <label><input type="checkbox" checked disabled> Stop Loss Management</label>
+                            <label><input type="checkbox" checked disabled> Take Profit Management</label>
+                            <label><input type="checkbox" checked disabled> Trailing Stop</label>
+                            <label><input type="checkbox" checked disabled> Break-Even</label>
+                        </div>
+                        <div class="checklist-column">
+                            <label><input type="checkbox" checked disabled> Divergence Detection</label>
+                            <label><input type="checkbox" checked disabled> Alert Notifications</label>
+                            <label><input type="checkbox" checked disabled> Email Notifications</label>
+                            <label><input type="checkbox" checked disabled> Trading Hours Filter</label>
+                            <label><input type="checkbox" checked disabled> News Filter</label>
+                        </div>
+                        <div class="checklist-column">
+                            <label><input type="checkbox" checked disabled> Max Spread Control</label>
+                            <label><input type="checkbox" checked disabled> Slippage Control</label>
+                            <label><input type="checkbox" checked disabled> Position Limits</label>
+                            <label><input type="checkbox" checked disabled> Daily Limits</label>
+                            <label><input type="checkbox" checked disabled> Customizable Parameters</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Compatibility -->
+                <div class="spec-card spec-card-wide">
+                    <h3>Broker & Server Compatibility</h3>
+                    <div class="compatibility-info">
+                        <div class="compat-item">
+                            <span class="compat-icon">✅</span>
+                            <div>
+                                <h4>Market Execution</h4>
+                                <p>Compatible with brokers using market execution models</p>
+                            </div>
+                        </div>
+                        <div class="compat-item">
+                            <span class="compat-icon">✅</span>
+                            <div>
+                                <h4>ECN/STP Accounts</h4>
+                                <p>Works with ECN and STP account types for optimal execution</p>
+                            </div>
+                        </div>
+                        <div class="compat-item">
+                            <span class="compat-icon">✅</span>
+                            <div>
+                                <h4>4/5 Digit Brokers</h4>
+                                <p>Auto-adapts to 4 or 5 digit broker quote formats</p>
+                            </div>
+                        </div>
+                        <div class="compat-item">
+                            <span class="compat-icon">⚠️</span>
+                            <div>
+                                <h4>VPS Recommended</h4>
+                                <p>For 24/7 operation, VPS hosting is recommended</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Risk Disclaimer -->
+    <section class="section-disclaimer">
+        <div class="container">
+            <div class="disclaimer-card">
+                <div class="disclaimer-header">
+                    <span class="disclaimer-icon">⚠️</span>
+                    <h2>IMPORTANT RISK DISCLOSURE</h2>
+                </div>
+                <div class="disclaimer-content">
+                    <p class="disclaimer-lead">
+                        <strong>Trading involves substantial risk of loss and may not be suitable for all investors.</strong>
+                    </p>
+                    
+                    <div class="disclaimer-text">
+                        <p>
+                            Trading foreign exchange, stocks, futures, options, and cryptocurrencies on margin carries a high level of risk and may not be suitable for all investors. The high degree of leverage can work against you as well as for you. Before deciding to trade, you should carefully consider your investment objectives, level of experience, and risk appetite. <strong>There is a possibility that you could sustain a loss of some or all of your initial investment.</strong> Therefore, you should not invest money that you cannot afford to lose.
+                        </p>
+                        
+                        <h4>About This Expert Advisor</h4>
+                        <p>
+                            This Expert Advisor is a software tool designed to assist in analyzing market conditions and executing trades based on predefined algorithms. <strong>It does not guarantee profits or success.</strong> Past performance results, whether from backtesting, demo trading, or live trading, do not guarantee future results. Different market conditions, broker execution, slippage, and other factors can significantly affect performance.
+                        </p>
+                        
+                        <h4>User Responsibility</h4>
+                        <p>
+                            You are fully responsible for all trading decisions made using this EA, including:
+                        </p>
+                        <ul>
+                            <li>Parameter configuration and optimization</li>
+                            <li>Risk management and position sizing</li>
+                            <li>Monitoring and maintaining the EA</li>
+                            <li>Understanding the trading logic and risks involved</li>
+                            <li>Ensuring compatibility with your broker and account type</li>
+                        </ul>
+                        
+                        <h4>No Warranties</h4>
+                        <p>
+                            Quantech Innovation provides this Expert Advisor "as is" without any warranties, express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, or non-infringement. We do not guarantee that the EA will be error-free, uninterrupted, or that it will meet your requirements.
+                        </p>
+                        
+                        <h4>Recommendations</h4>
+                        <ul>
+                            <li>Always test the EA thoroughly on a demo account before live trading</li>
+                            <li>Start with conservative risk settings and gradually increase if comfortable</li>
+                            <li>Never risk more than you can afford to lose on a single trade</li>
+                            <li>Regularly monitor the EA's performance and market conditions</li>
+                            <li>Be prepared to intervene manually if unusual market conditions occur</li>
+                            <li>Keep your MetaTrader platform and the EA updated</li>
+                            <li>Ensure stable internet connection or use VPS for 24/7 operation</li>
+                        </ul>
+                        
+                        <p class="disclaimer-footer">
+                            By using this Expert Advisor, you acknowledge that you have read, understood, and accepted all risks associated with algorithmic trading. You agree that Quantech Innovation shall not be liable for any losses, damages, or claims arising from the use of this EA.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <!-- Company Info -->
+                <div class="footer-section">
+                    <h3 class="footer-logo">Quantech Innovation</h3>
+                    <p class="footer-tagline">Algorithmic Trading Excellence</p>
+                    <p class="footer-description">
+                        Professional MetaTrader Expert Advisors and indicators designed for modern algorithmic traders.
+                    </p>
+                </div>
+                
+                <!-- Quick Links -->
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">All Strategies</a></li>
+                        <li><a href="#overview">Overview</a></li>
+                        <li><a href="#parameters">Parameters</a></li>
+                        <li><a href="#performance">Performance</a></li>
+                        <li><a href="#usage">Usage Guide</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact -->
+                <div class="footer-section">
+                    <h4>Get in Touch</h4>
+                    <p class="footer-contact-text">
+                        Have questions or need custom development? We're here to help.
+                    </p>
+                    <div class="footer-buttons">
+                        <a href="/cdn-cgi/l/email-protection#97f4f8f9e3f6f4e3d7e6e2f6f9e3f2f4fffef9f9f8e1f6e3fef8f9b9f4f8fa" class="footer-btn footer-btn-email">
+                            <span class="btn-icon">✉</span>
+                            <span>Send Email</span>
+                        </a>
+                        <a href="https://portfolio.quantechinnovation.com/" class="footer-btn footer-btn-portfolio" target="_blank" rel="noopener">
+                            <span class="btn-icon">🌐</span>
+                            <span>Full Portfolio</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Copyright -->
+            <div class="footer-bottom">
+                <div class="footer-divider"></div>
+                <p class="footer-copyright">
+                    &copy; 2024 Quantech Innovation. All rights reserved.
+                </p>
+                <p class="footer-disclaimer-link">
+                    Trading involves risk. See <a href="#disclaimer">risk disclosure</a> for details.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        // Parameter search functionality
+        document.getElementById('param-search').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#parameters-table tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Parameter filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filter = this.getAttribute('data-filter');
+                const rows = document.querySelectorAll('#parameters-table tbody tr');
+                
+                rows.forEach(row => {
+                    if (filter === 'all' || row.getAttribute('data-category') === filter) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Copy to clipboard functionality
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied: ' + text);
+            });
+        }
+
+        // Navbar hide/show on scroll
+        let lastScrollTop = 0;
+        const navbar = document.getElementById('navbar');
+        
+        window.addEventListener('scroll', function() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > lastScrollTop && scrollTop > 100) {
+                // Scrolling down
+                navbar.classList.add('hidden');
+            } else {
+                // Scrolling up
+                navbar.classList.remove('hidden');
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const offsetTop = target.offsetTop - 80; // Account for fixed navbar
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Active navigation highlighting
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-menu a[href^="#"]');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop && window.pageYOffset < sectionTop + sectionHeight) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
